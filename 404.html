@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Sayfa bulunamadı - Furkan Güven" />
+  <title>404 — Sayfa Bulunamadı | Furkan Güven</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>F</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .error-page {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 60vh; text-align: center;
+    }
+    .error-code {
+      font-family: 'JetBrains Mono', monospace; font-size: 6rem; font-weight: 700;
+      color: var(--border); line-height: 1; margin-bottom: 1rem;
+    }
+    .error-page h1 {
+      font-size: 1.4rem; color: var(--accent); margin-bottom: 1rem;
+    }
+    .error-page p {
+      color: var(--text-muted); margin-bottom: 2rem; max-width: 480px;
+    }
+    .error-link {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;
+      color: var(--highlight); border: 1px solid var(--highlight);
+      padding: 0.6rem 1.4rem; border-radius: 4px;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+    .error-link:hover {
+      background: var(--highlight); color: var(--bg); text-decoration: none; opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="nav-wrapper">
+        <a href="index.html" class="logo">F. Güven</a>
+        <nav aria-label="Ana navigasyon">
+          <ul>
+            <li><a href="makaleler.html">/makaleler</a></li>
+            <li><a href="laboratuvar.html">/laboratuvar</a></li>
+            <li><a href="hadis-arama.html">/hadis</a></li>
+            <li><a href="kuran-analiz-v2/">/kök-analiz</a></li>
+            <li><a href="kitap-kulubu/">/kitap-kulübü</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <div class="error-page">
+      <div class="error-code">404</div>
+      <h1>Sayfa Bulunamadı</h1>
+      <p>Aradığınız sayfa mevcut değil veya taşınmış olabilir. Adres çubuğunu kontrol edin ya da ana sayfaya dönün.</p>
+      <a href="index.html" class="error-link">← ana sayfaya dön</a>
+    </div>
+
+    <footer>
+      <div>© 2026 Furkan Güven</div>
+      <div><a href="https://github.com/drFurkanGuven" target="_blank" rel="noopener noreferrer">github</a></div>
+    </footer>
+  </div>
+
+</body>
+</html>

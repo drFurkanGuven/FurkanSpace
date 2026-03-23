@@ -1,0 +1,2122 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nöro Komitesi — Klinik Nöroloji Rehberi</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #21262d;
+  --border: #30363d;
+  --border2: #444c56;
+  --text: #e6edf3;
+  --text2: #8b949e;
+  --text3: #6e7681;
+  --accent: #58a6ff;
+  --accent2: #1f6feb;
+  --green: #3fb950;
+  --green2: #238636;
+  --red: #f85149;
+  --red2: #da3633;
+  --yellow: #d29922;
+  --yellow2: #e3b341;
+  --purple: #bc8cff;
+  --orange: #ffa657;
+  --teal: #39d353;
+  --r: 8px;
+  --sidebar-w: 280px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 1.5rem;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  z-index: 100;
+}
+.topbar-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.topbar-logo span {
+  color: var(--accent);
+}
+.topbar-logo .dot {
+  width: 8px; height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  display: inline-block;
+  animation: blink 2s ease infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.topbar-tabs {
+  display: flex;
+  gap: 0.25rem;
+}
+.tab-btn {
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.tab-btn:hover { background: var(--bg3); color: var(--text); }
+.tab-btn.active {
+  background: var(--bg3);
+  border-color: var(--border2);
+  color: var(--text);
+}
+.tab-btn i { font-size: 0.8rem; }
+
+/* ── MAIN LAYOUT ── */
+.app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+.sidebar-section { padding: 1rem 0.75rem 0.5rem; }
+.sidebar-section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  padding: 0 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 0.875rem;
+  font-weight: 400;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+  position: relative;
+}
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active {
+  background: rgba(88, 166, 255, 0.1);
+  border-color: rgba(88, 166, 255, 0.2);
+  color: var(--accent);
+}
+.nav-item .nav-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.nav-item .nav-count {
+  margin-left: auto;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text3);
+  background: var(--bg3);
+  padding: 0.1rem 0.4rem;
+  border-radius: 10px;
+}
+.nav-item.active .nav-count { color: var(--accent); }
+
+.sidebar-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0.5rem 1rem;
+}
+
+/* ── CONTENT AREA ── */
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem 2.5rem;
+}
+.content-area::-webkit-scrollbar { width: 6px; }
+.content-area::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+/* ── PAGE HEADER ── */
+.page-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.page-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+.page-desc {
+  color: var(--text2);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  max-width: 600px;
+}
+.page-badges {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+.badge {
+  padding: 0.2rem 0.65rem;
+  border-radius: 20px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+.badge-blue { background: rgba(88,166,255,0.15); color: var(--accent); border: 1px solid rgba(88,166,255,0.3); }
+.badge-green { background: rgba(63,185,80,0.15); color: var(--green); border: 1px solid rgba(63,185,80,0.3); }
+.badge-red { background: rgba(248,81,73,0.15); color: var(--red); border: 1px solid rgba(248,81,73,0.3); }
+.badge-purple { background: rgba(188,140,255,0.15); color: var(--purple); border: 1px solid rgba(188,140,255,0.3); }
+.badge-orange { background: rgba(255,166,87,0.15); color: var(--orange); border: 1px solid rgba(255,166,87,0.3); }
+.badge-yellow { background: rgba(210,153,34,0.15); color: var(--yellow2); border: 1px solid rgba(210,153,34,0.3); }
+
+/* ── NERVE DETAIL CARD ── */
+.nerve-detail {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.detail-block {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.detail-block-header {
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: rgba(255,255,255,0.02);
+}
+.detail-block-header i { color: var(--accent); font-size: 0.85rem; }
+.detail-block-body { padding: 1.25rem; }
+
+/* Row grid */
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.info-item {}
+.info-label {
+  font-size: 0.75rem;
+  font-family: 'DM Mono', monospace;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.3rem;
+}
+.info-value { font-size: 0.9rem; color: var(--text); line-height: 1.5; }
+
+/* Tags row */
+.tag-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.tag {
+  padding: 0.25rem 0.6rem;
+  border-radius: 5px;
+  font-size: 0.78rem;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text2);
+}
+
+/* Symptom table */
+.symptom-table { width: 100%; border-collapse: collapse; }
+.symptom-table th {
+  text-align: left;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text3);
+  padding: 0 1rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.symptom-table th:first-child { padding-left: 0; }
+.symptom-table td {
+  padding: 0.7rem 1rem;
+  font-size: 0.875rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  color: var(--text2);
+}
+.symptom-table td:first-child { padding-left: 0; color: var(--text); }
+.symptom-table tr:last-child td { border-bottom: none; }
+.sev { 
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+}
+.sev-high { background: rgba(248,81,73,0.15); color: var(--red); }
+.sev-mid { background: rgba(210,153,34,0.15); color: var(--yellow2); }
+.sev-low { background: rgba(63,185,80,0.15); color: var(--green); }
+
+/* Callout / Alert */
+.callout {
+  border-radius: 6px;
+  padding: 0.9rem 1rem;
+  border-left: 3px solid;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.callout:last-child { margin-bottom: 0; }
+.callout-red { border-color: var(--red); background: rgba(248,81,73,0.08); }
+.callout-yellow { border-color: var(--yellow2); background: rgba(210,153,34,0.08); }
+.callout-blue { border-color: var(--accent); background: rgba(88,166,255,0.08); }
+.callout-green { border-color: var(--green); background: rgba(63,185,80,0.08); }
+.callout-purple { border-color: var(--purple); background: rgba(188,140,255,0.08); }
+.callout-title {
+  font-weight: 600;
+  font-size: 0.78rem;
+  font-family: 'DM Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Two-column layout for some sections */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+
+/* ── NERVE LIST (ana sayfa) ── */
+.nerve-list { display: grid; gap: 0.6rem; }
+.nerve-list-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.nerve-list-item:hover {
+  background: var(--bg3);
+  border-color: var(--border2);
+  transform: translateX(3px);
+}
+.nerve-list-item.has-sub { cursor: default; }
+.nerve-list-item.has-sub:hover { transform: none; }
+.nli-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.nli-name {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.nli-sub {
+  font-size: 0.78rem;
+  color: var(--text3);
+  margin-top: 0.15rem;
+}
+.nli-badge { margin-left: auto; flex-shrink: 0; }
+.nli-arrow {
+  margin-left: 0.5rem;
+  color: var(--text3);
+  font-size: 0.8rem;
+  transition: transform 0.15s;
+}
+.nerve-list-item:hover .nli-arrow { transform: translateX(3px); color: var(--accent); }
+
+/* section divider header */
+.section-divider {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  margin: 1.5rem 0 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── QUIZ ── */
+#quiz-view { display: none; }
+.quiz-container { max-width: 720px; margin: 0 auto; }
+
+.quiz-progress-bar {
+  height: 4px;
+  background: var(--bg3);
+  border-radius: 4px;
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+.quiz-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent2), var(--accent));
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.quiz-question-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 2rem;
+  margin-bottom: 1.25rem;
+}
+.quiz-q-number {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.75rem;
+}
+.quiz-q-text {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+.quiz-q-context {
+  font-size: 0.875rem;
+  color: var(--text2);
+  background: var(--bg3);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--accent);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.quiz-options { display: grid; gap: 0.6rem; }
+.quiz-option {
+  padding: 0.9rem 1.25rem;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.15s;
+}
+.quiz-option:hover:not(.disabled) {
+  background: rgba(88,166,255,0.08);
+  border-color: var(--accent);
+  color: var(--text);
+}
+.quiz-option.correct {
+  background: rgba(63,185,80,0.12);
+  border-color: var(--green);
+  color: var(--green);
+}
+.quiz-option.wrong {
+  background: rgba(248,81,73,0.12);
+  border-color: var(--red);
+  color: var(--red);
+}
+.quiz-option.disabled { cursor: default; }
+.quiz-option-letter {
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  flex-shrink: 0;
+  color: var(--text3);
+}
+.quiz-option.correct .quiz-option-letter { background: rgba(63,185,80,0.2); border-color: var(--green); color: var(--green); }
+.quiz-option.wrong .quiz-option-letter { background: rgba(248,81,73,0.2); border-color: var(--red); color: var(--red); }
+
+.quiz-explanation {
+  display: none;
+  margin-top: 1rem;
+  padding: 1rem 1.25rem;
+  background: rgba(88,166,255,0.07);
+  border: 1px solid rgba(88,166,255,0.2);
+  border-radius: 7px;
+  font-size: 0.875rem;
+  color: var(--text2);
+  line-height: 1.65;
+}
+.quiz-explanation.show { display: block; }
+.quiz-explanation strong { color: var(--accent); }
+
+.quiz-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+.btn {
+  padding: 0.6rem 1.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: var(--bg3);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.btn:hover { background: var(--bg2); border-color: var(--accent); color: var(--accent); }
+.btn-primary {
+  background: var(--accent2);
+  border-color: var(--accent);
+  color: white;
+}
+.btn-primary:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+.quiz-score-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 3rem 2rem;
+  text-align: center;
+}
+.quiz-score-number {
+  font-family: 'Syne', sans-serif;
+  font-size: 4rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+.quiz-score-label {
+  color: var(--text2);
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+.score-breakdown {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+.score-item { text-align: center; }
+.score-item-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+/* ── VIEWS ── */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  :root { --sidebar-w: 220px; }
+  .content-area { padding: 1.5rem; }
+  .two-col { grid-template-columns: 1fr; }
+  .info-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .sidebar { display: none; }
+  .topbar-tabs .tab-btn span { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-logo">
+    <span class="dot"></span>
+    Nöro<span>Komitesi</span>
+  </div>
+  <div class="topbar-tabs">
+    <button class="tab-btn active" onclick="switchTab('learn')" id="tab-learn">
+      <i class="fas fa-book-open"></i><span>Çalış</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('quiz')" id="tab-quiz">
+      <i class="fas fa-brain"></i><span>Quiz</span>
+    </button>
+  </div>
+</header>
+
+<div class="app-body">
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Genel Bakış</div>
+      <div class="nav-item active" onclick="showHome()" id="nav-home">
+        <span class="nav-dot" style="background:var(--accent)"></span>
+        Ana Sayfa
+      </div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Periferik Sinirler</div>
+      <!-- Üst Ekstremite -->
+      <div class="nav-item" onclick="showNerve('n_radialis')" id="nav-n_radialis">
+        <span class="nav-dot" style="background:var(--purple)"></span>
+        N. Radialis
+        <span class="nav-count">4</span>
+      </div>
+      <div class="nav-item" onclick="showNerve('n_medianus')" id="nav-n_medianus">
+        <span class="nav-dot" style="background:var(--purple)"></span>
+        N. Medianus
+        <span class="nav-count">5</span>
+      </div>
+      <div class="nav-item" onclick="showNerve('n_ulnaris')" id="nav-n_ulnaris">
+        <span class="nav-dot" style="background:var(--purple)"></span>
+        N. Ulnaris
+        <span class="nav-count">5</span>
+      </div>
+      <div class="nav-item" onclick="showNerve('n_axillaris')" id="nav-n_axillaris">
+        <span class="nav-dot" style="background:var(--purple)"></span>
+        N. Axillaris
+        <span class="nav-count">3</span>
+      </div>
+      <div class="nav-item" onclick="showNerve('n_musculocutaneus')" id="nav-n_musculocutaneus">
+        <span class="nav-dot" style="background:var(--purple)"></span>
+        N. Musculocutaneus
+        <span class="nav-count">3</span>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label" style="padding-top:0">Alt Ekstremite</div>
+      <div class="nav-item" onclick="showNerve('n_femoralis')" id="nav-n_femoralis">
+        <span class="nav-dot" style="background:var(--orange)"></span>
+        N. Femoralis
+        <span class="nav-count">4</span>
+      </div>
+      <div class="nav-item" onclick="showNerve('n_ischiadicus')" id="nav-n_ischiadicus">
+        <span class="nav-dot" style="background:var(--orange)"></span>
+        N. Ischiadicus
+        <span class="nav-count">4</span>
+      </div>
+      <div class="nav-item" onclick="showNerve('n_peroneus')" id="nav-n_peroneus">
+        <span class="nav-dot" style="background:var(--orange)"></span>
+        N. Peroneus Communis
+        <span class="nav-count">3</span>
+      </div>
+      <div class="nav-item" onclick="showNerve('n_tibialis')" id="nav-n_tibialis">
+        <span class="nav-dot" style="background:var(--orange)"></span>
+        N. Tibialis
+        <span class="nav-count">3</span>
+      </div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Kraniyal Sinirler</div>
+      <div class="nav-item" onclick="showNerve('cn5')" id="nav-cn5">
+        <span class="nav-dot" style="background:var(--teal)"></span>
+        CN V — Trigeminal
+        <span class="nav-count">4</span>
+      </div>
+      <div class="nav-item" onclick="showNerve('cn7')" id="nav-cn7">
+        <span class="nav-dot" style="background:var(--teal)"></span>
+        CN VII — Fasiyal
+        <span class="nav-count">5</span>
+      </div>
+      <div class="nav-item" onclick="showNerve('cn8')" id="nav-cn8">
+        <span class="nav-dot" style="background:var(--teal)"></span>
+        CN VIII — Vestibulokoklear
+        <span class="nav-count">4</span>
+      </div>
+      <div class="nav-item" onclick="showNerve('cn3')" id="nav-cn3">
+        <span class="nav-dot" style="background:var(--teal)"></span>
+        CN III — Okulomotor
+        <span class="nav-count">3</span>
+      </div>
+      <div class="nav-item" onclick="showNerve('cn9_10')" id="nav-cn9_10">
+        <span class="nav-dot" style="background:var(--teal)"></span>
+        CN IX/X — Glossofarengeal/Vagus
+        <span class="nav-count">4</span>
+      </div>
+      <div class="nav-item" onclick="showNerve('cn11')" id="nav-cn11">
+        <span class="nav-dot" style="background:var(--teal)"></span>
+        CN XI — Aksesuvar
+        <span class="nav-count">3</span>
+      </div>
+      <div class="nav-item" onclick="showNerve('cn12')" id="nav-cn12">
+        <span class="nav-dot" style="background:var(--teal)"></span>
+        CN XII — Hipoglossal
+        <span class="nav-count">2</span>
+      </div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Omurilik Lezyonları</div>
+      <div class="nav-item" onclick="showNerve('sc_complete')" id="nav-sc_complete">
+        <span class="nav-dot" style="background:var(--red)"></span>
+        Tam Transeksiyon
+        <span class="nav-count">5</span>
+      </div>
+      <div class="nav-item" onclick="showNerve('sc_brown')" id="nav-sc_brown">
+        <span class="nav-dot" style="background:var(--red)"></span>
+        Brown-Séquard Sendromu
+        <span class="nav-count">5</span>
+      </div>
+      <div class="nav-item" onclick="showNerve('sc_central')" id="nav-sc_central">
+        <span class="nav-dot" style="background:var(--red)"></span>
+        Santral Kord Sendromu
+        <span class="nav-count">4</span>
+      </div>
+      <div class="nav-item" onclick="showNerve('sc_anterior')" id="nav-sc_anterior">
+        <span class="nav-dot" style="background:var(--red)"></span>
+        Anterior Kord Sendromu
+        <span class="nav-count">4</span>
+      </div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Beyin Lezyonları</div>
+      <div class="nav-item" onclick="showNerve('br_internalcapsule')" id="nav-br_internalcapsule">
+        <span class="nav-dot" style="background:var(--yellow2)"></span>
+        İnternal Kapsül
+        <span class="nav-count">4</span>
+      </div>
+      <div class="nav-item" onclick="showNerve('br_brainstem')" id="nav-br_brainstem">
+        <span class="nav-dot" style="background:var(--yellow2)"></span>
+        Beyin Sapı Lezyonları
+        <span class="nav-count">5</span>
+      </div>
+      <div class="nav-item" onclick="showNerve('br_cerebellum')" id="nav-br_cerebellum">
+        <span class="nav-dot" style="background:var(--yellow2)"></span>
+        Serebellar Lezyon
+        <span class="nav-count">5</span>
+      </div>
+      <div class="nav-item" onclick="showNerve('br_parietal')" id="nav-br_parietal">
+        <span class="nav-dot" style="background:var(--yellow2)"></span>
+        Parietal Lob Lezyonu
+        <span class="nav-count">4</span>
+      </div>
+    </div>
+    <div style="height:1.5rem"></div>
+  </nav>
+
+  <!-- CONTENT -->
+  <main class="content-area" id="contentArea">
+
+    <!-- HOME VIEW -->
+    <div class="view active" id="view-home">
+      <div class="page-header">
+        <div class="page-title">Klinik Nöroloji Rehberi</div>
+        <div class="page-desc">Periferik sinir, kraniyal sinir, omurilik ve beyin lezyonlarını sistematik olarak öğren. Her konu için lezyon anatomisi, klinik bulgular ve ayırıcı tanı bilgilerini içerir.</div>
+        <div class="page-badges">
+          <span class="badge badge-purple">9 Periferik Sinir</span>
+          <span class="badge badge-green">7 Kraniyal Sinir</span>
+          <span class="badge badge-red">4 Omurilik Sendromu</span>
+          <span class="badge badge-yellow">4 Beyin Lezyonu</span>
+        </div>
+      </div>
+
+      <div class="section-divider">Üst Ekstremite Sinirleri</div>
+      <div class="nerve-list">
+        <div class="nerve-list-item" onclick="showNerve('n_radialis')">
+          <div class="nli-icon" style="background:rgba(188,140,255,0.12);color:var(--purple)"><i class="fas fa-hand-paper"></i></div>
+          <div>
+            <div class="nli-name">N. Radialis</div>
+            <div class="nli-sub">Wrist drop · Posterior ön kol · C5–C8</div>
+          </div>
+          <span class="badge badge-red nli-badge">Sık sınav sorusu</span>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+        <div class="nerve-list-item" onclick="showNerve('n_medianus')">
+          <div class="nli-icon" style="background:rgba(188,140,255,0.12);color:var(--purple)"><i class="fas fa-hand-rock"></i></div>
+          <div>
+            <div class="nli-name">N. Medianus</div>
+            <div class="nli-sub">Maymun el · Karpal tünel · C6–T1</div>
+          </div>
+          <span class="badge badge-red nli-badge">Sık sınav sorusu</span>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+        <div class="nerve-list-item" onclick="showNerve('n_ulnaris')">
+          <div class="nli-icon" style="background:rgba(188,140,255,0.12);color:var(--purple)"><i class="fas fa-hand-spock"></i></div>
+          <div>
+            <div class="nli-name">N. Ulnaris</div>
+            <div class="nli-sub">Pençe el · İnterossei · C8–T1</div>
+          </div>
+          <span class="badge badge-red nli-badge">Sık sınav sorusu</span>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+        <div class="nerve-list-item" onclick="showNerve('n_axillaris')">
+          <div class="nli-icon" style="background:rgba(188,140,255,0.12);color:var(--purple)"><i class="fas fa-circle"></i></div>
+          <div>
+            <div class="nli-name">N. Axillaris</div>
+            <div class="nli-sub">Deltoid atrofisi · Omuz abduksiyonu · C5–C6</div>
+          </div>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+        <div class="nerve-list-item" onclick="showNerve('n_musculocutaneus')">
+          <div class="nli-icon" style="background:rgba(188,140,255,0.12);color:var(--purple)"><i class="fas fa-circle"></i></div>
+          <div>
+            <div class="nli-name">N. Musculocutaneus</div>
+            <div class="nli-sub">Biseps zayıflığı · Ön kol lateral duyusu · C5–C6</div>
+          </div>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+      </div>
+
+      <div class="section-divider">Alt Ekstremite Sinirleri</div>
+      <div class="nerve-list">
+        <div class="nerve-list-item" onclick="showNerve('n_femoralis')">
+          <div class="nli-icon" style="background:rgba(255,166,87,0.12);color:var(--orange)"><i class="fas fa-walking"></i></div>
+          <div>
+            <div class="nli-name">N. Femoralis</div>
+            <div class="nli-sub">Diz ekstansiyonu · Kuadriseps · L2–L4</div>
+          </div>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+        <div class="nerve-list-item" onclick="showNerve('n_ischiadicus')">
+          <div class="nli-icon" style="background:rgba(255,166,87,0.12);color:var(--orange)"><i class="fas fa-bone"></i></div>
+          <div>
+            <div class="nli-name">N. Ischiadicus</div>
+            <div class="nli-sub">İsiyalji · Hamstring · L4–S3</div>
+          </div>
+          <span class="badge badge-red nli-badge">Sık sınav sorusu</span>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+        <div class="nerve-list-item" onclick="showNerve('n_peroneus')">
+          <div class="nli-icon" style="background:rgba(255,166,87,0.12);color:var(--orange)"><i class="fas fa-circle"></i></div>
+          <div>
+            <div class="nli-name">N. Peroneus Communis</div>
+            <div class="nli-sub">Foot drop · Eversiyon kaybı · L4–S1</div>
+          </div>
+          <span class="badge badge-red nli-badge">Sık sınav sorusu</span>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+        <div class="nerve-list-item" onclick="showNerve('n_tibialis')">
+          <div class="nli-icon" style="background:rgba(255,166,87,0.12);color:var(--orange)"><i class="fas fa-circle"></i></div>
+          <div>
+            <div class="nli-name">N. Tibialis</div>
+            <div class="nli-sub">Plantar fleksiyon kaybı · Tarsal tünel · L4–S3</div>
+          </div>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+      </div>
+
+      <div class="section-divider">Kraniyal Sinirler</div>
+      <div class="nerve-list">
+        <div class="nerve-list-item" onclick="showNerve('cn5')">
+          <div class="nli-icon" style="background:rgba(57,211,83,0.12);color:var(--teal)"><i class="fas fa-theater-masks"></i></div>
+          <div><div class="nli-name">CN V — Trigeminal</div><div class="nli-sub">Yüz duyusu · Çiğneme kasları · Trigeminal nevralji</div></div>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+        <div class="nerve-list-item" onclick="showNerve('cn7')">
+          <div class="nli-icon" style="background:rgba(57,211,83,0.12);color:var(--teal)"><i class="fas fa-smile"></i></div>
+          <div><div class="nli-name">CN VII — Fasiyal</div><div class="nli-sub">Santral vs periferik felç · Bell palsi</div></div>
+          <span class="badge badge-red nli-badge">Sık sınav sorusu</span>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+        <div class="nerve-list-item" onclick="showNerve('cn8')">
+          <div class="nli-icon" style="background:rgba(57,211,83,0.12);color:var(--teal)"><i class="fas fa-headphones"></i></div>
+          <div><div class="nli-name">CN VIII — Vestibulokoklear</div><div class="nli-sub">İşitme kaybı · Vertigo · Nistagmus</div></div>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+        <div class="nerve-list-item" onclick="showNerve('cn3')">
+          <div class="nli-icon" style="background:rgba(57,211,83,0.12);color:var(--teal)"><i class="fas fa-eye"></i></div>
+          <div><div class="nli-name">CN III — Okulomotor</div><div class="nli-sub">Ptoz · Midriyazis · "Down and out" gözü</div></div>
+          <span class="badge badge-red nli-badge">Sık sınav sorusu</span>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+        <div class="nerve-list-item" onclick="showNerve('cn9_10')">
+          <div class="nli-icon" style="background:rgba(57,211,83,0.12);color:var(--teal)"><i class="fas fa-lungs"></i></div>
+          <div><div class="nli-name">CN IX / X — Glossofarengeal / Vagus</div><div class="nli-sub">Yutma güçlüğü · Ses kısıklığı · Damak felci</div></div>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+        <div class="nerve-list-item" onclick="showNerve('cn11')">
+          <div class="nli-icon" style="background:rgba(57,211,83,0.12);color:var(--teal)"><i class="fas fa-dumbbell"></i></div>
+          <div><div class="nli-name">CN XI — Aksesuvar</div><div class="nli-sub">SCM & trapezius zayıflığı · Omuz düşüklüğü</div></div>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+        <div class="nerve-list-item" onclick="showNerve('cn12')">
+          <div class="nli-icon" style="background:rgba(57,211,83,0.12);color:var(--teal)"><i class="fas fa-comment-dots"></i></div>
+          <div><div class="nli-name">CN XII — Hipoglossal</div><div class="nli-sub">Dil felci · İpsilateral deviasyon</div></div>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+      </div>
+
+      <div class="section-divider">Omurilik Lezyonları</div>
+      <div class="nerve-list">
+        <div class="nerve-list-item" onclick="showNerve('sc_complete')">
+          <div class="nli-icon" style="background:rgba(248,81,73,0.12);color:var(--red)"><i class="fas fa-times-circle"></i></div>
+          <div><div class="nli-name">Tam Omurilik Transeksiyonu</div><div class="nli-sub">Lezyon altında tam motor/duyu kaybı · Arefleksi → spastisite</div></div>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+        <div class="nerve-list-item" onclick="showNerve('sc_brown')">
+          <div class="nli-icon" style="background:rgba(248,81,73,0.12);color:var(--red)"><i class="fas fa-cut"></i></div>
+          <div><div class="nli-name">Brown-Séquard Sendromu</div><div class="nli-sub">Yarı lezyon · İpsilateral motor & propriosepsiyon kaybı</div></div>
+          <span class="badge badge-red nli-badge">Sık sınav sorusu</span>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+        <div class="nerve-list-item" onclick="showNerve('sc_central')">
+          <div class="nli-icon" style="background:rgba(248,81,73,0.12);color:var(--red)"><i class="fas fa-dot-circle"></i></div>
+          <div><div class="nli-name">Santral Kord Sendromu</div><div class="nli-sub">Üst > alt ekstremite güçsüzlüğü · Hiperekstensiyon travması</div></div>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+        <div class="nerve-list-item" onclick="showNerve('sc_anterior')">
+          <div class="nli-icon" style="background:rgba(248,81,73,0.12);color:var(--red)"><i class="fas fa-arrow-down"></i></div>
+          <div><div class="nli-name">Anterior Kord Sendromu</div><div class="nli-sub">Motor & ağrı/ısı kaybı · Propriosepsiyon korunur</div></div>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+      </div>
+
+      <div class="section-divider">Beyin Lezyonları</div>
+      <div class="nerve-list">
+        <div class="nerve-list-item" onclick="showNerve('br_internalcapsule')">
+          <div class="nli-icon" style="background:rgba(210,153,34,0.12);color:var(--yellow2)"><i class="fas fa-project-diagram"></i></div>
+          <div><div class="nli-name">İnternal Kapsül Lezyonu</div><div class="nli-sub">Saf motor inme · Kontralateral hemipleji</div></div>
+          <span class="badge badge-red nli-badge">Sık sınav sorusu</span>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+        <div class="nerve-list-item" onclick="showNerve('br_brainstem')">
+          <div class="nli-icon" style="background:rgba(210,153,34,0.12);color:var(--yellow2)"><i class="fas fa-wave-square"></i></div>
+          <div><div class="nli-name">Beyin Sapı Lezyonları</div><div class="nli-sub">Crossed sendromlar · Weber · Wallenberg</div></div>
+          <span class="badge badge-red nli-badge">Sık sınav sorusu</span>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+        <div class="nerve-list-item" onclick="showNerve('br_cerebellum')">
+          <div class="nli-icon" style="background:rgba(210,153,34,0.12);color:var(--yellow2)"><i class="fas fa-network-wired"></i></div>
+          <div><div class="nli-name">Serebellar Lezyon</div><div class="nli-sub">İpsilateral ataksi · DANISH mnemoniği</div></div>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+        <div class="nerve-list-item" onclick="showNerve('br_parietal')">
+          <div class="nli-icon" style="background:rgba(210,153,34,0.12);color:var(--yellow2)"><i class="fas fa-map-marked"></i></div>
+          <div><div class="nli-name">Parietal Lob Lezyonu</div><div class="nli-sub">Kortikal duyu kaybı · Hemineglect · Gerstmann sendromu</div></div>
+          <i class="fas fa-chevron-right nli-arrow"></i>
+        </div>
+      </div>
+      <div style="height:2rem"></div>
+    </div>
+
+    <!-- NERVE DETAIL VIEW -->
+    <div class="view" id="view-nerve">
+      <div id="nerve-content"></div>
+    </div>
+
+    <!-- QUIZ VIEW -->
+    <div class="view" id="view-quiz">
+      <div class="page-header">
+        <div class="page-title">Klinik Quiz</div>
+        <div class="page-desc">Klinik senaryo bazlı sorularla bilgini test et. Her sorudan sonra açıklama gösterilir.</div>
+      </div>
+      <div class="quiz-container">
+        <div id="quiz-progress-bar" class="quiz-progress-bar">
+          <div class="quiz-progress-fill" id="quiz-fill" style="width:0%"></div>
+        </div>
+        <div id="quiz-body"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  VERİ TABANI
+// ══════════════════════════════════════════════
+const NERVES = {
+
+  n_radialis: {
+    name: 'N. Radialis',
+    category: 'Periferik — Üst Ekstremite',
+    color: 'purple',
+    roots: 'C5, C6, C7, C8 (T1)',
+    origin: 'Brakiyal pleksus — posterior kord',
+    course: 'Aksilla → humerus arka yüzü (spiral groove) → lateral epikondil önü → yüzeyel ve derin dallara ayrılır',
+    motor: [
+      'Triceps brachii (dirsek ekstansiyonu)',
+      'Brachioradialis',
+      'Extensor carpi radialis longus/brevis (bilek ekstansiyonu)',
+      'Supinator (ön kol supinasyonu)',
+      'Extensor digitorum (parmak ekstansiyonu)',
+      'Abductor pollicis longus / Extensor pollicis brevis/longus',
+    ],
+    sensory: 'Ön kolun dorsal lateral yüzü, el sırtı, başparmak ve 1.–2. web space dorsal yüzü',
+    reflexes: 'Brachioradialis refleksi (C5–C6), triceps refleksi (C7)',
+    lesion_sites: [
+      { site: 'Aksilla', cause: 'Koltuk değneği basısı, tümör', note: 'Triceps etkilenir' },
+      { site: 'Spiral groove (humerus ortası)', cause: 'Humerus kırığı, "Saturday night palsy"', note: 'Wrist drop + parmak drop; triceps korunabilir' },
+      { site: 'Lateral epikondil önü', cause: 'Dirsek kırığı', note: 'Yüzeyel duyu kaybı + ekstansör zayıflık; brachioradialis korunur' },
+    ],
+    symptoms: [
+      { s: 'Wrist drop (düşük el bilek ekstansiyonu yok)', sev: 'high' },
+      { s: 'Parmak MCP ekstansiyon kaybı', sev: 'high' },
+      { s: 'Ön kol supinasyon zayıflığı', sev: 'mid' },
+      { s: 'Brachioradialis refleksi kaybı', sev: 'mid' },
+      { s: 'El sırtı / başparmak birinci web space duyu azalması', sev: 'low' },
+      { s: 'Spiral groove lezyonunda triceps etkilenir (aksilla lezyonunda da)', sev: 'mid' },
+    ],
+    differentials: [
+      'C7 radikülopatisi: Boyun ağrısı, Spurling testi +, triceps refleksi kaybı',
+      'Posterior interosseöz sinir lezyonu: Wrist drop yok (ekstansör carpi radialis korunur), sadece parmak drop',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Kritik Nokta', text: 'Spiral groove lezyonunda triceps genellikle etkilenmez veya hafif etkilenir, çünkü triceps dalı daha proksimalde çıkar. Aksilla lezyonunda ise tümü etkilenir.' },
+      { type: 'blue', icon: 'fa-lightbulb', title: 'Klinik İpucu', text: '"Saturday night palsy" veya "honeymoon palsy": Kol uzun süre baskı altında kalıp uyumak (sarhoş, koltukta uyuma) → spiral groove basısı.' },
+      { type: 'yellow', icon: 'fa-star', title: 'Sınav Sorusu', text: 'Wrist drop varsa → N. Radialis. Ancak bilek ekstansiyonu mevcut, sadece parmak drop varsa → Posterior İnterosseöz Sinir (PIN) lezyonu düşün.' },
+    ],
+  },
+
+  n_medianus: {
+    name: 'N. Medianus',
+    category: 'Periferik — Üst Ekstremite',
+    color: 'purple',
+    roots: 'C6, C7, C8, T1',
+    origin: 'Brakiyal pleksus — lateral + medial kordun birleşimi',
+    course: 'Aksilla → kolun medialinden iner → dirsek önü → pronator teres arasında → karpal tünelden geçer → elde terminal dallara ayrılır',
+    motor: [
+      'Pronator teres & pronator quadratus (ön kol pronasyonu)',
+      'Flexor carpi radialis (bilek fleksiyonu)',
+      'Palmaris longus',
+      'Flexor digitorum superficialis (tüm parmaklar)',
+      'Flexor digitorum profundus 1.–2. parmak (FDP)',
+      'Thenar kaslar: Abductor pollicis brevis, Opponens pollicis, Flexor pollicis brevis (yüzeyel başı)',
+      'Lumbrical 1. ve 2.',
+    ],
+    sensory: 'Palmar yüzde başparmak, işaret, orta parmak ve yüzük parmağın radial yarısı; ayrıca bu parmakların dorsal distal falanksleri',
+    reflexes: 'Direkt refleks yok; median sinir radyopati değerlendirmesi EMG ile yapılır',
+    lesion_sites: [
+      { site: 'Yüksek (dirsek üstü) lezyon', cause: 'Suprakondiler humerus kırığı (çocuk)', note: 'Tüm median sinir fonksiyonları etkilenir, "benediction hand" işareti var' },
+      { site: 'Karpal tünel (bilek)', cause: 'Karpal tünel sendromu (en sık)', note: 'Sadece thenar etkilenir; FDS/FDP korunur; Tinel & Phalen testi +' },
+      { site: 'Anterior İnterosseöz Sinir (AIS)', cause: 'Travma, fibröz bant', note: 'Saf motor: FDP (1.–2.), FPL, pronator quadratus. Duyu kaybı yok.' },
+    ],
+    symptoms: [
+      { s: 'Maymun eli (ape hand): Başparmak thenar atrofisi + yassılaşma', sev: 'high' },
+      { s: 'Başparmak opozisyonu kaybı (yazı yazma güçlüğü)', sev: 'high' },
+      { s: 'İşaret/orta parmak fleksiyonu güçlüğü (DIP)', sev: 'high' },
+      { s: '"OK işareti yapamama" (AIS lezyonu)', sev: 'mid' },
+      { s: 'Gece uyarısı ile parmaklarda uyuşma/yanma (KTS)', sev: 'mid' },
+      { s: 'Palmar 3.5 parmakta duyu azalması', sev: 'low' },
+    ],
+    differentials: [
+      'C8–T1 radikülopatisi: Boyun ağrısı, tüm intrinsikler etkilenir, EMG/sinir iletisi farkı',
+      'Anterior İnterosseöz Sinir: Saf motor, duyu kaybı yok, "OK işareti" bozuk',
+      'N. Ulnaris: Yüzük + serçe parmak, hipotenar atrofi, pençe el',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Kritik Nokta', text: 'Karpal tünel sendromu (KTS) = median sinirin bilek seviyesi lezyonu. Thenar atrofi görülür ancak FDS/FDP korunduğu için maymun eli olmaz. Maymun eli için yüksek lezyon gerekir.' },
+      { type: 'blue', icon: 'fa-lightbulb', title: 'Klinik İpucu', text: 'Tinel testi: Bileğe perküsyon → parmakta karıncalanma. Phalen testi: Bileği 60 sn fleksiyonda tutmak → semptom. İkisi birlikte %80+ duyarlılık.' },
+      { type: 'yellow', icon: 'fa-star', title: 'Sınav Sorusu', text: 'OK işareti yapamıyorsa (işaret ve başparmak tam halka oluşturamıyor) → Anterior İnterosseöz Sinir Lezyonu. Duyu kaybı yoktur.' },
+    ],
+  },
+
+  n_ulnaris: {
+    name: 'N. Ulnaris',
+    category: 'Periferik — Üst Ekstremite',
+    color: 'purple',
+    roots: 'C8, T1',
+    origin: 'Brakiyal pleksus — medial kord',
+    course: 'Aksilla → kolun medialinden iner → dirsek arkasından (kubital tünel) → ön kol ulnar yüzü → Guyon kanalından (bileğe) → elde terminal dallara ayrılır',
+    motor: [
+      'Flexor carpi ulnaris (bilek ulnar fleksiyon)',
+      'Flexor digitorum profundus 4.–5. parmak',
+      'Hipotenar kaslar (Abductor, Flexor, Opponens digiti minimi)',
+      'Interosseoz kaslar (parmak abduksiyonu/adduksiyonu)',
+      'Lumbrikal 3. ve 4.',
+      'Adductor pollicis + Flexor pollicis brevis (derin başı)',
+    ],
+    sensory: 'Palmar ve dorsal yüzde 5. parmak ve 4. parmağın ulnar yarısı; hipotenar bölge',
+    reflexes: 'Direkt klinik refleks yok',
+    lesion_sites: [
+      { site: 'Kubital tünel (dirsek)', cause: 'Dirsek kırığı, uzun süre dirsek bükük tutma', note: 'En sık lezyon yeri; FCU ve FDP4-5 etkilenir' },
+      { site: 'Guyon kanalı (bilek)', cause: 'Bisiklet gidonuna bası, ganglion kisti', note: 'FCU ve FDP4-5 korunur; sadece el içi kaslar ve duyu' },
+    ],
+    symptoms: [
+      { s: 'Pençe eli (claw hand): 4.–5. parmakta MCP hiperekstensiyon + IP fleksiyon', sev: 'high' },
+      { s: 'İnterosseouz atrofi (el sırtında çukurlaşma)', sev: 'high' },
+      { s: 'Parmak abduksiyonu kaybı (kağıt tutma testi +)', sev: 'high' },
+      { s: 'Froment işareti: Başparmak adduksiyonu zayıf → okuma pozisyonunda IP fleksiyon', sev: 'mid' },
+      { s: '4.–5. parmak ve hipotenar bölgede duyu azalması', sev: 'mid' },
+      { s: '5. parmak DIP fleksiyon kaybı (FDP4-5)', sev: 'low' },
+    ],
+    differentials: [
+      'C8–T1 radikülopatisi: Boyun ağrısı, median ve ulnar birlikte etkilenebilir',
+      'N. Medianus yüksek lezyon: Maymun eli (başparmak), daha farklı dağılım',
+      'TOS (Torasik çıkış sendromu): Alt trunkus baskısı → C8–T1 her iki sinir',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Kritik Nokta', text: 'Ulnar sinir lezyonunda pençe eli paradoksal olarak proksimal lezyonda daha azdır. Çünkü dirsek üstü lezyonda FDP4-5 de etkilenir → 4.–5. parmak IP fleksiyonu azalır → pençe daha az belirgin görünür. Buna "ulnar paradoks" denir.' },
+      { type: 'blue', icon: 'fa-lightbulb', title: 'Klinik İpucu', text: 'Froment işareti: Hastadan iki eliyle kağıt tutmasını iste. Etkilenen elde başparmak IP eklemi fleksiyona giderse (Adductor pollicis zayıflığını Flexor pollicis longus kompanse eder) → Froment +.' },
+      { type: 'yellow', icon: 'fa-star', title: 'Sınav Sorusu', text: 'Pençe el → Ulnar. Maymun el → Median. Wrist drop → Radial. Bu üçlüyü ezberle.' },
+    ],
+  },
+
+  n_axillaris: {
+    name: 'N. Axillaris',
+    category: 'Periferik — Üst Ekstremite',
+    color: 'purple',
+    roots: 'C5, C6',
+    origin: 'Brakiyal pleksus — posterior kord',
+    course: 'Aksilladan quadrilateral space üzerinden → humeral boyun etrafından döner → deltoid ve teres minor\'u innerve eder',
+    motor: ['Deltoid (omuz abduksiyonu 15°–90°)', 'Teres minor (dış rotasyon)'],
+    sensory: 'Omuz laterali (regimental patch = apolet bölgesi)',
+    reflexes: 'Yok',
+    lesion_sites: [
+      { site: 'Humerus cerrahi boynu', cause: 'Humerus boynu kırığı, omuz çıkığı', note: 'En sık neden' },
+      { site: 'Quadrilateral space', cause: 'Quadrilateral space sendromu', note: 'Nadir; teres minör de etkilenir' },
+    ],
+    symptoms: [
+      { s: 'Omuz abduksiyonu 15°–90° arası zayıflık (ilk 15° süpraspinatusla mümkün)', sev: 'high' },
+      { s: 'Deltoid atrofisi', sev: 'high' },
+      { s: 'Omuz dış rotasyonu hafif zayıflığı', sev: 'mid' },
+      { s: 'Omuz lateral duyusu azalması (apolet bölgesi)', sev: 'low' },
+    ],
+    differentials: [
+      'Rotator kaf yırtığı: Görüntüleme ile ayrılır, duyu kaybı yok',
+      'C5 radikülopatisi: Biseps refleksi de etkilenir, boyun ağrısı eşlik eder',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Kritik Nokta', text: 'Omuz abduksiyonunun ilk 15°\'si skapular kaslarla (supraspinatus + skapula rotasyonu) yapılır. N. Axillaris lezyonunda deltoid yoktur ama hasta hiç kaldıramaz demez; tricky bir muayene noktasıdır.' },
+      { type: 'yellow', icon: 'fa-star', title: 'Sınav Sorusu', text: 'Humerus boynu kırığı + omuz abduksiyonu kaybı + apolet bölgesi duyu kaybı = N. Axillaris lezyonu.' },
+    ],
+  },
+
+  n_musculocutaneus: {
+    name: 'N. Musculocutaneus',
+    category: 'Periferik — Üst Ekstremite',
+    color: 'purple',
+    roots: 'C5, C6',
+    origin: 'Brakiyal pleksus — lateral kord',
+    course: 'Lateral korddan çıkar → coracobrachialis içinden geçer → biceps ve brachialis\'i innerve eder → lateral antebrakiyal kutanöz sinir olarak devam eder',
+    motor: ['Biceps brachii (dirsek fleksiyonu + supinasyon)', 'Brachialis (dirsek fleksiyonu)', 'Coracobrachialis'],
+    sensory: 'Ön kolun lateral (radial) yüzü — N. Cutaneus Antebrachii Lateralis',
+    reflexes: 'Biseps refleksi (C5–C6)',
+    lesion_sites: [
+      { site: 'İzole lezyon', cause: 'Nadir; yoğun spor/ağırlık çalışması, aksiller kanama', note: '' },
+    ],
+    symptoms: [
+      { s: 'Dirsek fleksiyonu zayıflığı (özellikle supinasyonda)', sev: 'high' },
+      { s: 'Biseps refleksi kaybı', sev: 'high' },
+      { s: 'Ön kol lateral yüz duyu azalması', sev: 'mid' },
+    ],
+    differentials: ['C5–C6 radikülopatisi: Boyun ağrısı, aksiller de etkilenebilir'],
+    pearls: [
+      { type: 'blue', icon: 'fa-lightbulb', title: 'Klinik İpucu', text: 'İzole N. Musculocutaneus lezyonu oldukça nadirdir. Biseps refleksi kaybı + dirsek fleksiyon zayıflığı + ön kol lateral duyu kaybı üçlüsü birlikte varsa düşün.' },
+    ],
+  },
+
+  n_femoralis: {
+    name: 'N. Femoralis',
+    category: 'Periferik — Alt Ekstremite',
+    color: 'orange',
+    roots: 'L2, L3, L4',
+    origin: 'Lomber pleksus',
+    course: 'Psoas majör içinde oluşur → inguinal ligamanın altından geçer → uyluk ön yüzüne ulaşır → terminal dalları: safen sinir (diz + bacak mediali duyusu)',
+    motor: ['Quadriceps femoris (diz ekstansiyonu)', 'Iliopsoas (kalça fleksiyonu — femoral dalı)', 'Sartorius, Pectineus'],
+    sensory: 'Ön ve iç uyluk (nervus cutaneus femoris medialis), diz iç yüzü ve bacak mediali (n. saphenus)',
+    reflexes: 'Patellar refleks (L3–L4)',
+    lesion_sites: [
+      { site: 'İnguinal ligaman', cause: 'Retroperitoneal hematom (antikoagülan), pelvik tümör, histerektomi', note: 'En sık neden retroperitoneal hematom' },
+      { site: 'İntraabdominal', cause: 'Psoas apsesi, hematom', note: 'Kalça fleksiyonu da etkilenir' },
+    ],
+    symptoms: [
+      { s: 'Diz ekstansiyonu zayıflığı (merdiven çıkamama, çömelme güçlüğü)', sev: 'high' },
+      { s: 'Patellar refleks kaybı', sev: 'high' },
+      { s: 'Ön uyluk ve diz iç yüzü duyu azalması', sev: 'mid' },
+      { s: 'Kalça fleksiyonu zayıflığı (proksimal lezyon)', sev: 'mid' },
+    ],
+    differentials: [
+      'L3–L4 radikülopatisi: Bel ağrısı, posterior uyluk yayılımı',
+      'N. Obturatorius lezyonu: İç uyluk adduksiyonu kaybı, obturator kanal',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Kritik Nokta', text: 'Retroperitoneal hematom (antikoagülan tedavide) en sık nedenidir. Ani başlayan kasık ağrısı + quadriceps zayıflığı olan antikoagülan hastada N. Femoralis lezyonu mutlaka düşünülmeli.' },
+      { type: 'yellow', icon: 'fa-star', title: 'Sınav Sorusu', text: 'Patellar refleks kaybı = L3–L4 veya N. Femoralis. Bel ağrısı varsa radikülopati; yoksa periferik nöropati düşün.' },
+    ],
+  },
+
+  n_ischiadicus: {
+    name: 'N. Ischiadicus (Siyatik Sinir)',
+    category: 'Periferik — Alt Ekstremite',
+    color: 'orange',
+    roots: 'L4, L5, S1, S2, S3',
+    origin: 'Sakral pleksus',
+    course: 'Büyük siyatik foramen → gluteus maximus altı → uyluk posterior → popliteal fossa üzerinde N. Peroneus Communis + N. Tibialis\'e bölünür (genellikle diz üstü ama varyasyon var)',
+    motor: ['Hamstring grubu: Biceps femoris, Semitendinosus, Semimembranosus (diz fleksiyonu)', 'N. Peroneus aracılığıyla ayak dorsifleksiyonu/eversiyon', 'N. Tibialis aracılığıyla ayak plantar fleksiyonu/inversiyon'],
+    sensory: 'Diz altı tüm bacak ve ayak (peroneal + tibial dağılım)',
+    reflexes: 'Aşil refleksi (S1–S2)',
+    lesion_sites: [
+      { site: 'Büyük siyatik foramen çıkışı', cause: 'Piriformis sendromu, kalça protezi, enjeksiyon hasarı', note: '' },
+      { site: 'Uyluk posterior', cause: 'Künt travma, hematom', note: '' },
+    ],
+    symptoms: [
+      { s: 'Diz fleksiyonu zayıflığı (hamstringler)', sev: 'high' },
+      { s: 'Tüm ayak kas güçsüzlüğü (dorsifleksiyon + plantar fleksiyon)', sev: 'high' },
+      { s: 'Siyatik ağrı: Gluteal bölge → uyluk posterior → diz altı', sev: 'high' },
+      { s: 'Aşil refleksi kaybı', sev: 'mid' },
+      { s: 'Diz altı duyu kaybı (peroneal + tibial dağılım)', sev: 'mid' },
+    ],
+    differentials: [
+      'L4–S1 radikülopatisi (disk hernisi): Çok sık, düz bacak kaldırma testi + (Lasègue)',
+      'N. Peroneus izole lezyonu: Sadece dorsifleksiyon/eversiyon kaybı, plantar fleksiyon korunur',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Kritik Nokta', text: 'Kalça enjeksiyonlarında siyatik sinir hasarı üst-dış kadran kullanımıyla önlenir. Yanlış bölgeye enjeksiyon → kalıcı siyatik hasar.' },
+      { type: 'blue', icon: 'fa-lightbulb', title: 'Klinik İpucu', text: 'Piriformis sendromu: Oturmakla ağrı (daha çok), Lasègue - veya hafif +, FAIR testi (fleksiyon + iç rotasyon + adduksiyon) +. Disk hernisinden ayırımı MRI ile.' },
+    ],
+  },
+
+  n_peroneus: {
+    name: 'N. Peroneus Communis',
+    category: 'Periferik — Alt Ekstremite',
+    color: 'orange',
+    roots: 'L4, L5, S1',
+    origin: 'N. Ischiadicus\'un peroneal bölümü → fibula başı çevresinden döner → yüzeyel + derin dallara ayrılır',
+    course: 'Popliteal fossa → fibula başı lateral/posterior → fibula boynu etrafından döner (bası noktası!) → derin ve yüzeyel dal',
+    motor: [
+      'Derin peroneal: Tibialis anterior (dorsifleksiyon), ekstansörler',
+      'Yüzeyel peroneal: Peroneus longus/brevis (eversiyon)',
+    ],
+    sensory: 'Bacağın anterolateral yüzü (yüzeyel dal), ayak dorsal yüzü ve 1.–2. web space (derin dal)',
+    reflexes: 'Tibialis anterior testi',
+    lesion_sites: [
+      { site: 'Fibula boynu', cause: 'Alçı, bacak bacak üstüne atma, uzun yatış, kilo kaybı', note: 'En sık lezyon yeri — basıya çok açık' },
+    ],
+    symptoms: [
+      { s: 'Foot drop (ayak dorsifleksiyonu yok, stepaj yürüyüşü)', sev: 'high' },
+      { s: 'Ayak eversiyonu kaybı', sev: 'high' },
+      { s: 'Bacak anterolateral + ayak dorsal duyu kaybı', sev: 'mid' },
+      { s: 'Plantar fleksiyon ve inversiyon korunur (Tibialis)', sev: 'low' },
+    ],
+    differentials: [
+      'L4–L5 radikülopatisi: Bel ağrısı, tibialis posterior da etkilenebilir (inversiyon zayıf)',
+      'N. Ischiadicus lezyonu: Hamstring + plantar fleksiyon da etkilenir',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Kritik Nokta', text: 'Foot drop\'ta ayak eversiyonu kaybolmuşsa → N. Peroneus. Eversiyon korunmuşsa → L4–L5 radikülopatisi (Tibialis posterior = L5, inversiyon kaybı olur). Bu ayrım sınav sorusudur.' },
+      { type: 'yellow', icon: 'fa-star', title: 'Sınav Sorusu', text: 'Alçı sonrası foot drop → Fibula boynu basısı → N. Peroneus Communis.' },
+    ],
+  },
+
+  n_tibialis: {
+    name: 'N. Tibialis',
+    category: 'Periferik — Alt Ekstremite',
+    color: 'orange',
+    roots: 'L4, L5, S1, S2, S3',
+    origin: 'N. Ischiadicus\'un tibial bölümü',
+    course: 'Popliteal fossa → bacak posterior → medial malleol arkasından (tarsal tünel) → ayak tabanına girer',
+    motor: ['Gastrocnemius + Soleus (plantar fleksiyon)', 'Tibialis posterior (inversiyon)', 'Ayak içi kaslar (lumbrikaller, interosseozlar)'],
+    sensory: 'Ayak tabanı (medial ve lateral plantar sinirler)',
+    reflexes: 'Aşil refleksi (S1–S2)',
+    lesion_sites: [
+      { site: 'Tarsal tünel (medial malleol)', cause: 'Tarsal tünel sendromu, ayak bileği kırığı/fraktür', note: '' },
+    ],
+    symptoms: [
+      { s: 'Plantar fleksiyon zayıflığı', sev: 'high' },
+      { s: 'Aşil refleksi kaybı', sev: 'high' },
+      { s: 'Ayak tabanı uyuşukluğu, yanma (tarsal tünel)', sev: 'mid' },
+      { s: 'Yürüyüşte itme fazı güçlüğü', sev: 'mid' },
+    ],
+    differentials: [
+      'S1 radikülopatisi: Bel ağrısı, aşil refleksi kaybı, büyük ayak parmağı lateral duyu',
+      'N. Peroneus lezyonu: Dorsifleksiyon/eversiyon kaybı, plantar fleksiyon korunur',
+    ],
+    pearls: [
+      { type: 'blue', icon: 'fa-lightbulb', title: 'Klinik İpucu', text: 'Tarsal tünel sendromu: Ayak tabanında yanma/uyuşma + medial malleol arkasına perküsyon ile Tinel +. Gece ağrısı olabilir. Karpal tünel sendromuyla analoji kur.' },
+    ],
+  },
+
+  cn5: {
+    name: 'CN V — N. Trigeminus',
+    category: 'Kraniyal Sinir',
+    color: 'green',
+    roots: 'Pons düzeyinde nükleus',
+    origin: 'Pons lateral yüzünden çıkar → Meckel\'s cave → Gasser gangliyonu → 3 dala ayrılır',
+    motor: ['V3 (mandibüler): Masseter, temporalis, pterygoidler (çiğneme kasları)', 'Tensor tympani, tensor veli palatini, mylohyoid, anterior digastrik'],
+    sensory: 'V1 (oftalmik): Alın, burun, kornea, üst göz kapağı\nV2 (maksillar): Yanak, alt göz kapağı, üst dudak, üst diş\nV3 (mandibüler): Alt yanak, alt dudak, alt diş, ön 2/3 dil duyusu (tat değil), kulak önü',
+    reflexes: 'Kornea refleksi (afferent: V1, efferent: VII)\nÇene jerk refleksi (masseterin uzama refleksi — pons)',
+    lesion_sites: [
+      { site: 'Gasser gangliyonu / köken', cause: 'Herpes zoster (ramsay hunt değil, v1 genellikle), tümör, MVD', note: 'Tüm V dalları' },
+      { site: 'Kavernöz sinüs', cause: 'Tromboz, tümör', note: 'CN III, IV, V1–V2, VI birlikte' },
+      { site: 'Foramen ovale', cause: 'Tümör, fraktür', note: 'V3 izole' },
+    ],
+    symptoms: [
+      { s: 'Trigeminal nevralji: Elektrik çarpar gibi kısa (saniyeler) ataklar, trigger nokta', sev: 'high' },
+      { s: 'Yüz duyusu kaybı: Etkilenen dal dağılımına göre', sev: 'mid' },
+      { s: 'Kornea refleksi kaybı (V1 lezyonu)', sev: 'mid' },
+      { s: 'Çiğneme güçlüğü + masseter atrofisi (V3 lezyonu)', sev: 'mid' },
+      { s: 'Çene deviasyonu: Motor V3 lezyonunda etkilenen tarafa (pterygoidler zayıf)', sev: 'mid' },
+    ],
+    differentials: [
+      'Atipik yüz ağrısı: Trigeminal nevralji yoktur trigger nokta, sürekli ağrı',
+      'Dental ağrı: Ayırım klinik muayene ile',
+      'MS plakı: Genç hasta, ek bulgular',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Kritik Nokta', text: 'Trigeminal nevralji: 50 yaş üstü, sağ taraf daha sık, V2–V3 en sık. Genç + bilateral → MS düşün. Tedavi: Karbamazepin ilk tercih.' },
+      { type: 'blue', icon: 'fa-lightbulb', title: 'Klinik İpucu', text: 'Kornea refleksi: V1 afferent yol, CN VII efferent. CN VII lezyonunda göz kapanmaz ama his (V1) var. V1 lezyonunda his yok ama kas çalışır. Hangi sinirin etkilendiğini bu şekilde ayırt edebilirsin.' },
+      { type: 'yellow', icon: 'fa-star', title: 'Sınav Sorusu', text: 'Çiğneme güçlüğü + çene etkilenen tarafa kayıyor → V3 motor lifleri etkilenmiş. Masseterlerin unilateral güçsüzlüğü ile karşı pterygoidler çeneyi etkilenen tarafa iter.' },
+    ],
+  },
+
+  cn7: {
+    name: 'CN VII — N. Facialis',
+    category: 'Kraniyal Sinir',
+    color: 'green',
+    roots: 'Pons alt kısmı, fasiyal nükleus',
+    origin: 'Pons-medulla bileşkesinden çıkar → internal akustik kanal → fasyal kanal (temporal kemik) → stilomastoid foramen → parotis bezinden geçer → 5 terminal dal',
+    motor: ['Tüm yüz ifadesi kasları (frontal, orbicularis oculi, orbicularis oris, platysma vb.)', 'Stapedius (hiperakkuzi)', 'Stylohyoid, posterior digastrik'],
+    sensory: 'Anterior 2/3 dil tat duyusu (chorda tympani aracılığıyla)\nKulak yolu posterior küçük deri alanı',
+    reflexes: 'Kornea refleksi efferent kolu (VII)\nBlinks refleksi (stapedial, akustik)',
+    lesion_sites: [
+      { site: 'Supranükleer (UMN — korteks)', cause: 'İnme, tümör', note: 'Alın kurtulur (santral felç), kontralatera alt yüz felci' },
+      { site: 'Nükleer veya infranükleer (LMN — Bell palsi)', cause: 'Bell palsi, Ramsay Hunt, tümör, parotis', note: 'Alın dahil tüm yüz etkilenir (periferik)' },
+    ],
+    symptoms: [
+      { s: 'Santral (UMN): Kontralateral alt yüz felci, alın hareketleri korunur', sev: 'high' },
+      { s: 'Periferik (LMN): Aynı taraf tüm yüz felci (alın dahil)', sev: 'high' },
+      { s: 'Lagoftalmi (göz kapanmaması) → kornea kuruması', sev: 'high' },
+      { s: 'Ağız deviyasyonu karşı tarafa', sev: 'mid' },
+      { s: 'Tat kaybı (chorda tympani lezyonu, temporal kemik içi)', sev: 'mid' },
+      { s: 'Hiperakkuzi (stapedius etkilenirse)', sev: 'low' },
+    ],
+    differentials: [
+      'Bell palsi (idiyopatik periferik): Genellikle viral (HSV), %80 tam iyileşme',
+      'Ramsay Hunt sendromu: Kulakta veziküler döküntü + işitme kaybı + vertigo + fasiyal felç (Herpes Zoster Oticus)',
+      'Parotis tümörü: Yavaş başlangıç, kitlesi var',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Kritik Nokta — Santral vs Periferik', text: 'Alın etkilenmiş mi? Evet → Periferik (Bell palsi). Alın korunmuş → Santral (inme). Çünkü frontal korteks iki taraflı temsil edilir; karşı taraf kortekste lezyon olsa bile iki taraflı kortikal innervasyonu olan alın kasları korunur.' },
+      { type: 'blue', icon: 'fa-lightbulb', title: 'Ramsay Hunt Sendromu', text: 'Herpes zoster geniculate ganglion\'ı tutarsa: Kulak kepçesi/yolu veziküler döküntü + fasiyal felç + işitme kaybı + vertigo. Bell palsi\'ye göre daha kötü prognoz.' },
+      { type: 'yellow', icon: 'fa-star', title: 'Sınav Sorusu', text: 'Bell palsi tedavisi: Prednizon (oral kortikosteroid) + göz koruma (göz kapanmıyorsa yapay gözyaşı, gece gözü kapatmak). Antiviral eklenmesi tartışmalı ama Ramsay Hunt\'ta eklenir.' },
+    ],
+  },
+
+  cn8: {
+    name: 'CN VIII — N. Vestibulocochlearis',
+    category: 'Kraniyal Sinir',
+    color: 'green',
+    roots: 'Pontomedüller bileşke',
+    origin: 'İç kulak → internal akustik kanal → beyin sapı',
+    motor: ['Motor innervasyonu yok'],
+    sensory: 'Koklear dal: İşitme (spiral ganglion → korteks işitme alanı)\nVestibüler dal: Denge/baş pozisyonu (semisirkular kanallar + utrikulus/sakkulus)',
+    reflexes: 'Vestibulo-oküler refleks (VOR)\nAkustik blefarospazm refleksi',
+    lesion_sites: [
+      { site: 'Periferik vestibüler', cause: 'Benign paroksismal pozisyonel vertigo (BPPV), labirentit, Meniere', note: 'En sık vertigo nedenleri' },
+      { site: 'CN VIII siniri', cause: 'Vestibüler schwannoma (akustik nöroma)', note: 'Tek taraflı işitme kaybı + tinnitus' },
+      { site: 'Santral vestibüler', cause: 'Beyin sapı/serebellar inme', note: 'Daha tehlikeli, fokal bulgular eşlik eder' },
+    ],
+    symptoms: [
+      { s: 'Vertigo: Periferik — başlangıç ani, pozisyonel, bulantı şiddetli, nistatgmus yatay-torsiyonel', sev: 'high' },
+      { s: 'İşitme kaybı (sensorinöral, tek taraflı → schwannoma)', sev: 'high' },
+      { s: 'Tinnitus', sev: 'mid' },
+      { s: 'Nistagmus: Periferik → tek yönlü, fiksasyonla baskılanır; santral → değişken yön, baskılanmaz', sev: 'mid' },
+      { s: 'Düşme eğilimi etkilenen tarafa (vestibüler ataksi)', sev: 'mid' },
+    ],
+    differentials: [
+      'BPPV: Pozisyonel, Dix-Hallpike testi +, latans ve yorulma var, işitme kaybı yok',
+      'Meniere hastalığı: Epizodik vertigo + düşük frekanslı işitme kaybı + tinnitus + kulak dolgunluğu',
+      'Vestibüler nörit: Ani başlayan, sürekli vertigo, viral geçmiş, işitme kaybı yok',
+      'Santral: HINTS muayenesi (Head impulse - Nystagmus - Test of Skew) — negatif head impulse testi santral lezyonu düşündürür',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Kritik Nokta — HINTS Muayenesi', text: 'Akut vertigo + yürüme güçlüğünde HINTS muayenesi: (1) Head Impulse Testi negatif, (2) Direction-changing nistagmus, (3) Skew deviasyon → SANTRAL (inme). Bunlardan biri bile varsa görüntüleme!' },
+      { type: 'yellow', icon: 'fa-star', title: 'Sınav Sorusu', text: 'Tek taraflı sensorinöral işitme kaybı + tinnitus + denge bozukluğu → Akustik Nöroma (Vestibüler Schwannoma). MRI kontrastlı gereklidir.' },
+    ],
+  },
+
+  cn3: {
+    name: 'CN III — N. Oculomotorius',
+    category: 'Kraniyal Sinir',
+    color: 'green',
+    roots: 'Mezensefalon (III. sinir nükleusu)',
+    origin: 'Mezensefalon → kavernöz sinüsten geçer → superior orbital fissürden orbita içine girer',
+    motor: ['Superior, inferior, medial rektus kasları (göz hareketleri)', 'İnferior oblik kas', 'Levator palpebrae superioris (üst kapak)', 'Sfinkter pupillae (parasempatik — miyozis)', 'Silier kas (akomodasyon)'],
+    sensory: 'Yok',
+    reflexes: 'Işık refleksi (parasempatik = Edinger-Westphal nükleusu)',
+    lesion_sites: [
+      { site: 'İntrinsik (parasempatik korunmuş — diyabetik)', cause: 'Diyabetik okulomotor palsi', note: 'Pupil korunur → diyabetik/vasküler neden' },
+      { site: 'Ekstrinsik (parasempatik etkilenmiş)', cause: 'Posterior kommunikan arter anevrizması, herniasyon', note: 'Pupil dilate (midriyazis) → CEP (kompresif): ACİL!' },
+    ],
+    symptoms: [
+      { s: 'Pitoz (üst kapak düşüklüğü)', sev: 'high' },
+      { s: '"Down and out" göz pozisyonu (IV + VI korunmuş)', sev: 'high' },
+      { s: 'Diplopi', sev: 'high' },
+      { s: 'Midriyazis (pupil dilatasyonu — kompresif lezyonda)', sev: 'high' },
+      { s: 'Işık refleksi kaybı (kompresif lezyonda)', sev: 'high' },
+    ],
+    differentials: [
+      'Diyabetik CN III: Pupil korunur, ağrı olabilir, 3 ayda iyileşir',
+      'Posterior kommunikan anevrizma: Pupil dilate + ağrılı → ACİL anjiografi',
+      'Horner sendromu: Pitoz + miyozis (ptoz hafif, pupil küçük — tam tersi!)',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'ACİL — Pitoz + Midriyazis', text: 'Ağrılı pitoz + midriyazis + "down-out" göz → Posterior kommunikan arter anevrizması açılıyor olabilir. Bu ACİL nöroşirürjik durumudur. Diyabetik CN III lezyonunda pupil korunur.' },
+      { type: 'yellow', icon: 'fa-star', title: 'Sınav Sorusu', text: 'Pupil tutulmuş mu? Evet → Kompresif (anevrizma). Hayır → Diyabetik/vasküler. Parasempatik lifler CN III\'ün dış yüzeyinde seyreder, basıya erken tepki verir.' },
+    ],
+  },
+
+  cn9_10: {
+    name: 'CN IX / X — Glossofarengeal & Vagus',
+    category: 'Kraniyal Sinir',
+    color: 'green',
+    roots: 'Medulla oblongata — nükleus ambiguus (motor), nükleus traktus solitarius (duyusal)',
+    origin: 'Jugüler foramen üzerinden kafatasını terk eder',
+    motor: ['CN IX: Stilofarengeus (farenks)', 'CN X: Yumuşak damak, farenks, larenks kasları (konuşma, yutma)', 'CN X: Özefagus + mide motilitesi (parasempatik)'],
+    sensory: 'CN IX: Arka 1/3 dil tat ve genel duyusu, orofarenks, kulak yolu\nCN X: Larenks, trakea, özefagus, karın organları (viseral afferent)',
+    reflexes: 'Gag refleksi: Afferent CN IX, efferent CN X',
+    lesion_sites: [
+      { site: 'Jugüler foramen', cause: 'Jugüler foramen sendromu (CN IX, X, XI birlikte)', note: 'Tümör, travma' },
+      { site: 'Bulber / nükleer', cause: 'Bulber palsi (ALS, inme, tümör)', note: 'Flasid; Psödobulber = spastik' },
+    ],
+    symptoms: [
+      { s: 'Yutma güçlüğü (disfaji) — sıvılar daha zor', sev: 'high' },
+      { s: 'Yumuşak damak sarkması + uvula karşı tarafa deviasyonu', sev: 'high' },
+      { s: 'Ses kısıklığı, nazal konuşma (vokal kord paralizisi)', sev: 'high' },
+      { s: 'Gag refleksi kaybı', sev: 'mid' },
+      { s: 'Aspirasyon pnömonisi riski', sev: 'high' },
+    ],
+    differentials: [
+      'Bulber palsi (flasid): ALS alt motor nöron, atrofi, fasikülasyon',
+      'Psödobulber palsi (spastik): UMN, duygusal labilite, spastik konuşma',
+      'Miyastenia gravis: Yorulmayla artan, tensilon testi +',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Kritik Nokta', text: 'Uvula deviasyonu: Hangi tarafa gider? Sağlam tarafa. Yani sol CN X lezyonunda yumuşak damak solda sarkar, uvula sağa kayar. "Uvula lezyondan kaçar."' },
+      { type: 'blue', icon: 'fa-lightbulb', title: 'Klinik İpucu', text: 'Vokal kord felci: Sağ n. laryngeus recurrens daha uzun gider (arkus aortadan döner) → daha sık etkilenir. Sol larengeal nöropati → akciğer tümörü, aort anevrizması düşün.' },
+    ],
+  },
+
+  cn11: {
+    name: 'CN XI — N. Accessorius',
+    category: 'Kraniyal Sinir',
+    color: 'green',
+    roots: 'C1–C5 anterior horn (spinal köken) + nükleus ambiguus (küçük kranyal köken)',
+    origin: 'Spinal kök → foramen magnumdan girer → jugüler foramenden çıkar → SCM ve trapezius',
+    motor: ['Sternocleidomastoideus (SCM): Boyun rotasyonu karşı tarafa, fleksiyon', 'Trapezius üst lifler: Omuz elevasyonu, skapula retraksiyonu'],
+    sensory: 'Yok',
+    reflexes: 'Yok',
+    lesion_sites: [
+      { site: 'Jugüler foramen', cause: 'Jugüler foramen sendromu (IX, X, XI)', note: '' },
+      { site: 'Posterior trigonum colli', cause: 'Lenf nodu disseksiyonu, cerrahi', note: 'İyatrojenik en sık neden' },
+    ],
+    symptoms: [
+      { s: 'Omuz düşüklüğü ve elevasyonda güçsüzlük (trapezius)', sev: 'high' },
+      { s: 'Skapula alata (kanat skapula — CN XI değil, uzun torasik sinir de yapabilir)', sev: 'mid' },
+      { s: 'Boyunun etkilenen tarafa rotasyonu güçlüğü (SCM)', sev: 'mid' },
+    ],
+    differentials: [
+      'N. Thoracicus longus lezyonu: Serratus anterior → kanat skapula, trapezius normal',
+      'Torasik çıkış sendromu: Ek nörovasküler bulgular',
+    ],
+    pearls: [
+      { type: 'yellow', icon: 'fa-star', title: 'Sınav Sorusu', text: 'SCM muayenesi: "Başınızı sağa döndürün" → Sol SCM kasılır. Yani sol CN XI lezyonunda sağa rotasyon zayıflar. Test: Hasta çeneyi karşı tarafa döndürürken direnç uygula.' },
+    ],
+  },
+
+  cn12: {
+    name: 'CN XII — N. Hypoglossus',
+    category: 'Kraniyal Sinir',
+    color: 'green',
+    roots: 'Medulla oblongata — hipoglossal nükleus',
+    origin: 'Medulladan çıkar → hipoglossal kanal → dil kaslarını innerve eder',
+    motor: ['Tüm intrinsik ve ekstrinsik dil kasları (genioglossus, hyoglossus, styloglossus) → sadece palatoglossus hariç (CN X)'],
+    sensory: 'Yok',
+    reflexes: 'Yok',
+    lesion_sites: [
+      { site: 'Periferik (LMN)', cause: 'Hipoglossal kanal tümörü, atlanto-aksiyal sublüksasyon', note: 'Atrofi + fasikülasyon' },
+      { site: 'Nükleer', cause: 'ALS, Wallenberg sendromu', note: '' },
+    ],
+    symptoms: [
+      { s: 'Dil çıkartınca etkilenen tarafa deviasyon (LMN: ipsilateral; genioglossus karşı tarafa iter, zayıf taraf kalmaz geriye)', sev: 'high' },
+      { s: 'Dil atrofisi ve fasikülasyon (LMN lezyonu)', sev: 'high' },
+      { s: 'Dizartri (dil hareketleri kısıtlı — özellikle "l", "t", "d" sesleri)', sev: 'mid' },
+    ],
+    differentials: [
+      'UMN CN XII lezyonu: Karşı tarafa deviasyon, atrofi yok (örn. inme)',
+      'Dil tümörü: Görünür kitle',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Kritik Nokta — Deviasyon Yönü', text: 'LMN lezyonu: Dil etkilenen tarafa (ipsilateral) kayar. UMN (inme): Dil kontralateral tarafa kayar. Kural: LMN → aynı taraf, UMN → karşı taraf (diğer motor bulgularla uyumlu).' },
+    ],
+  },
+
+  sc_complete: {
+    name: 'Tam Omurilik Transeksiyonu',
+    category: 'Omurilik Lezyonu',
+    color: 'red',
+    roots: 'Herhangi bir seviye',
+    origin: 'Travma, tümör, enfarkt — tüm iniş/çıkış yollarının kesilmesi',
+    motor: ['Lezyon altında tüm istemli hareket kaybı', 'Akut dönem: Arefleksi, flasidite (spinal şok)', 'Kronik dönem: Spastisite, hiperrefleksi, klonus, Babinski +'],
+    sensory: 'Lezyon seviyesinin altında tüm duyuların kaybı (ağrı, ısı, dokunma, vibrasyon, propriosepsiyon)',
+    reflexes: 'Akut: Tüm refleksler kaybı (spinal şok). Kronik: Hiperrefleksi',
+    lesion_sites: [
+      { site: 'C3–C5 üzeri', cause: 'Travma', note: 'Diyafragma felci → ventilatör bağımlılığı' },
+      { site: 'T1–L1', cause: 'Travma, tümör', note: 'Parapleji' },
+      { site: 'C4–T1', cause: 'Travma', note: 'Tetrapleji (kuadripleji)' },
+    ],
+    symptoms: [
+      { s: 'Lezyon altında motor paralizi (flasid akut → spastik kronik)', sev: 'high' },
+      { s: 'Lezyon altında tüm duyu kaybı', sev: 'high' },
+      { s: 'Sfinkter disfonksiyonu (mesane, bağırsak)', sev: 'high' },
+      { s: 'Spinal şok: Arefleksi + hipotansiyon + bradikardi (akut faz)', sev: 'high' },
+      { s: 'Otonom disrefleksi (T6 üzeri lezyonlarda): Hipertansif kriz + bradikardi + terleme', sev: 'high' },
+    ],
+    differentials: [
+      'Brown-Séquard: Yarı transeksiyon, asimetrik bulgular',
+      'Conus medullaris sendromu: L1–L2 seviyesi, karışık UMN/LMN',
+      'Kauda equina: L2 altı, saf LMN',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Spinal Şok', text: 'Akut tam omurilik yaralanmasında saatler-haftalar süren arefleksi + hipotansiyon dönemine "spinal şok" denir. Bulbokavernöz refleksin geri dönmesi spinal şokun bittiğini gösterir.' },
+      { type: 'yellow', icon: 'fa-star', title: 'Sınav Sorusu', text: 'Otonom disrefleksi: T6 üstü lezyon + dolmuş mesane/bağırsak → şiddetli hipertansiyon + bradikardi + terleme/kızarma. Acil tetikleyiciyi kaldır (mesane sondası tıkalıysa aç).' },
+    ],
+  },
+
+  sc_brown: {
+    name: 'Brown-Séquard Sendromu',
+    category: 'Omurilik Lezyonu',
+    color: 'red',
+    roots: 'Herhangi bir servikal veya torakal seviye',
+    origin: 'Omuriliğin yarım transeksiyonu (sol veya sağ yarım)',
+    motor: ['İPSİLATERAL: Motor paralizi (kortikospinal traktus çaprazlamaz → aynı tarafta iner)', 'İPSİLATERAL: Propriosepsiyon + vibrasyon kaybı (dorsal kolon)', 'KONTRALATERAl: Ağrı + ısı kaybı (spinotalamik traktus = lezyon seviyesi 1–2 segment üstünde çapraz yapar)'],
+    sensory: 'Lezyon seviyesinde ipsilateral bant şeklinde duyu kaybı\nLezyon altında: İpsilateral propriosepsiyon/vibrasyon kaybı + kontralateral ağrı/ısı kaybı',
+    reflexes: 'İpsilateral hiperrefleksi (kronik) + Babinski +',
+    lesion_sites: [
+      { site: 'Servikal', cause: 'Penetran travma (bıçak), MS plakı, tümör', note: '' },
+    ],
+    symptoms: [
+      { s: 'İpsilateral güçsüzlük/paralizi lezyon altında', sev: 'high' },
+      { s: 'İpsilateral propriosepsiyon + vibrasyon kaybı (dorsal kolon)', sev: 'high' },
+      { s: 'Kontralateral ağrı + ısı duyusu kaybı (1–2 seviye aşağıdan)', sev: 'high' },
+      { s: 'İpsilateral lezyon seviyesinde LMN bulguları (o segment)', sev: 'mid' },
+      { s: 'Kontralateral dokunma görece korunur (ince dokunma bilateral yol alır)', sev: 'low' },
+    ],
+    differentials: [
+      'Tam transeksiyon: Her iki taraf etkilenir',
+      'Santral kord: Üst > alt ekstremite, simetrik',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Kritik Nokta — Çapraz Tablo', text: 'Brown-Séquard özeti: Motor kaybı + propriosepsiyon kaybı = lezyon ile AYNI TARAF. Ağrı + ısı kaybı = KARŞI TARAF. "Motor ve his ayrı tarafta" sorusu gördüğünde Brown-Séquard düşün.' },
+      { type: 'yellow', icon: 'fa-star', title: 'Sınav Sorusu', text: 'Penetran boyun travması (bıçak): Sağ taraf motor paralizi + sağ propriosepsiyon kaybı + sol ağrı/ısı kaybı → Sağ hemiseksiyel omurilik lezyonu = Brown-Séquard.' },
+    ],
+  },
+
+  sc_central: {
+    name: 'Santral Kord Sendromu',
+    category: 'Omurilik Lezyonu',
+    color: 'red',
+    roots: 'Servikal bölge en sık',
+    origin: 'Omuriliğin merkezindeki hasar — kortikospinal traktusun merkezi lifleri (üst ekstremite temsili) daha çok etkilenir',
+    motor: ['Üst ekstremite > alt ekstremite motor kayıp (ters piramidal dağılım)', 'El ve parmaklar en çok etkilenir (en santral lifler)', 'Mesane disfonksiyonu sık'],
+    sensory: 'Değişken; cape dağılımında (omuzlar arası) duyu kaybı olabilir',
+    reflexes: 'Hiperrefleksi alt ekstremitenin daha erken döner',
+    lesion_sites: [
+      { site: 'Servikal santral kanal', cause: 'Hiperekstensiyon travması (yaşlı + spondilozu olan kişi)', note: 'En sık klinik omurilik sendromu' },
+    ],
+    symptoms: [
+      { s: 'Üst > alt ekstremite zayıflığı (el parmakları en çok)', sev: 'high' },
+      { s: 'Üriner retansiyon / inkontinans', sev: 'high' },
+      { s: 'Değişken duyu kaybı (genellikle dizestezi)', sev: 'mid' },
+      { s: 'Alt ekstremiteler görece korunur (yürüme mümkün)', sev: 'low' },
+    ],
+    differentials: [
+      'Siringomiyeli: Yavaş başlangıç, cape dağılımı, MRI tanısal',
+      'Anterior kord: Motor + ağrı/ısı kaybı, propriosepsiyon korunur',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Kritik Nokta', text: 'Santral kord sendromu = En sık inkomplet omurilik sendromu. Servikal hiperekstansiyon + spondilozu olan yaşlı hasta (düşme, trafik) → üst ekstremite > alt ekstremite zayıflığı.' },
+    ],
+  },
+
+  sc_anterior: {
+    name: 'Anterior Kord Sendromu',
+    category: 'Omurilik Lezyonu',
+    color: 'red',
+    roots: 'Herhangi bir seviye',
+    origin: 'Anterior spinal arterin beslediği alanın iskemisi → kortikospinal traktus + spinotalamik traktus hasarı; dorsal kolonlar korunur',
+    motor: ['Lezyon altında bilateral motor paralizi (kortikospinal traktus)'],
+    sensory: 'Lezyon altında bilateral ağrı + ısı kaybı (spinotalamik traktus)\nPROPRİOSEPSİYON VE VİBRASYON KORUNUR (dorsal kolonlar)',
+    reflexes: 'Hiperrefleksi, Babinski +',
+    lesion_sites: [
+      { site: 'Anterior spinal arter', cause: 'Aort disseksiyonu / cerrahisi, ateroskleroz, travma', note: '' },
+    ],
+    symptoms: [
+      { s: 'Bilateral motor paralizi lezyon altında', sev: 'high' },
+      { s: 'Bilateral ağrı + ısı duyusu kaybı lezyon altında', sev: 'high' },
+      { s: 'Propriosepsiyon + vibrasyon KORUNMUŞ (tanı koydurucudur!)', sev: 'high' },
+      { s: 'En kötü prognozlu inkomplet sendrom', sev: 'mid' },
+    ],
+    differentials: [
+      'Brown-Séquard: Asimetrik, unilateral motor',
+      'Tam transeksiyon: Dorsal kolon da gider',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Kritik Nokta — Dorsal Kolon Korunur', text: 'Anterior kord: Motor paralizi + ağrı/ısı kaybı ama propriosepsiyon/vibrasyon korunur. Bu ayrım sınavlarda sık sorulur. Aort cerrahisi sonrası gelişirse anterior spinal arter düşün.' },
+      { type: 'yellow', icon: 'fa-star', title: 'Sınav Sorusu', text: 'Aort cerrahisi sonrası alt ekstremitede güçsüzlük + ağrı/ısı kaybı + propriosepsiyon normal → Anterior kord sendromu (anterior spinal arter lezyonu).' },
+    ],
+  },
+
+  br_internalcapsule: {
+    name: 'İnternal Kapsül Lezyonu',
+    category: 'Beyin Lezyonu',
+    color: 'yellow',
+    roots: 'Serebral hemisfer derinleri',
+    origin: 'Kortikospinal + kortikonükleer + talamokortkal liflerin sıkışık geçiş noktası — küçük lezyon büyük klinik tablo',
+    motor: ['Arka bacak: Kortikospinal traktus (kontralateral ekstremite motor)', 'Diz: Kortikonükleer traktus (karşı taraf yüz alt yarısı, XII, XI)'],
+    sensory: 'Arka bacak + posterior limb: Talamokortikal duyusal lifler',
+    reflexes: 'Hiperrefleksi + Babinski kontralateral',
+    lesion_sites: [
+      { site: 'Arka bacak (posterior limb)', cause: 'Laküner enfarkt (en sık — küçük penetran damarlar)', note: '"Saf motor inme" = arka bacak laküner infarkt' },
+      { site: 'Anterior limb + genu', cause: 'Laküner enfarkt', note: '"Saf duyusal inme" veya "dizartri-beceriksiz el"' },
+    ],
+    symptoms: [
+      { s: 'Kontralateral hemipleji / hemiparezi (yüz-kol-bacak eşit)', sev: 'high' },
+      { s: 'Kontralateral hemisensori kayıp (arka bacak)', sev: 'mid' },
+      { s: 'Saf motor inme: Güçsüzlük + duyu korunmuş (arka bacak)', sev: 'high' },
+      { s: 'Laküner sendromlar: Dizartri-beceriksiz el, ataksik hemiparezi', sev: 'mid' },
+    ],
+    differentials: [
+      'Kortikal inme: Afazi, hemineglect, görme alanı defekti eşlik eder',
+      'Beyin sapı crossed sendromu: Karşı vücut + aynı taraf kraniyal sinir',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Kritik Nokta', text: 'İnternal kapsül lezyonunda yüz-kol-bacak hepsi etkilenir ve eşit derecede güçsüzlük görülür. Kortikal lezyonda dağılım eşit olmayabilir (el + yüz > bacak gibi). Bu fark lokalizasyonu işaret eder.' },
+      { type: 'yellow', icon: 'fa-star', title: 'Sınav Sorusu', text: 'Saf motor inme (pure motor stroke) = İnternal kapsül arka bacağı laküner enfarktı. Hipertansiyon + küçük penetran damar hasarı etiyolojisi.' },
+    ],
+  },
+
+  br_brainstem: {
+    name: 'Beyin Sapı Lezyonları',
+    category: 'Beyin Lezyonu',
+    color: 'yellow',
+    roots: 'Pons, mezensefalon, medulla',
+    origin: '"Crossed sendromlar" özelliği: Aynı taraf kraniyal sinir + karşı taraf vücut (hemipleji/hemisensori)',
+    motor: ['Kortikospinal traktus geçer → kontralateral vücut motor', 'Kraniyal sinir nükleusları → ipsilateral yüz/göz/dil'],
+    sensory: 'Spinotalamik traktus → kontralateral ağrı/ısı\nMedial lemnisküs → kontralateral propriosepsiyon/vibrasyon',
+    reflexes: 'Kontralateral hiperrefleksi',
+    lesion_sites: [
+      { site: 'Weber sendromu (mezensefalon)', cause: 'PCA dalı → mezensefalon pedünkül', note: 'CN III palsi (ipsilateral) + kontralateral hemipleji' },
+      { site: 'Wallenberg sendromu (lateral medulla)', cause: 'PICA veya vertebral arter', note: 'Lateral medulla: Horner + vertigo + disfaji + kontralateral ağrı/ısı, ipsilateral yüz ağrı/ısı (V nükleusu)' },
+      { site: 'Millard-Gubler (pons)', cause: 'Baziler dal', note: 'CN VI + CN VII palsi (ipsilateral) + kontralateral hemipleji' },
+    ],
+    symptoms: [
+      { s: 'Crossed hemipleji: Aynı taraf CN bulgular + karşı taraf hemipleji', sev: 'high' },
+      { s: 'Vertigo, bulantı, kusma (vestibüler nukleus)', sev: 'high' },
+      { s: 'Hiccup, yutma güçlüğü (medulla)', sev: 'mid' },
+      { s: 'Horner sendromu: Sempatik lifler mezensefalon-medulladan iner', sev: 'mid' },
+      { s: 'Dört göz hareketi bozukluğu türü (INO, gaze palsi vb.)', sev: 'mid' },
+    ],
+    differentials: [
+      'Kortikal inme: Crossed sendrom olmaz, afazi/neglect eşlik edebilir',
+      'Serebellar inme: Ataksi ön planda, motor kayıp hafif',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Wallenberg Sendromu — Ezberlenmesi Gereken', text: 'PICA tıkanması: Vertigo + yutma güçlüğü + ses kısıklığı + ipsilateral yüz ağrı/ısı kaybı (V nükleus) + kontralateral vücut ağrı/ısı kaybı + Horner + ataksi. Propriosepsiyon + motor korunur (piramisler tutulmaz).' },
+      { type: 'yellow', icon: 'fa-star', title: 'Sınav Sorusu', text: 'Weber sendromu = CN III palsi + kontralateral hemipleji = Mezensefalon pedünkül lezyonu. Millard-Gubler = CN VI + CN VII + kontralateral hemipleji = Pons lezyonu.' },
+    ],
+  },
+
+  br_cerebellum: {
+    name: 'Serebellar Lezyon',
+    category: 'Beyin Lezyonu',
+    color: 'yellow',
+    roots: 'Serebellum',
+    origin: 'Koordinasyon, denge, öğrenilmiş motor hareketlerin hassasiyeti — lezyon bulguları İPSİLATERAL (serebellar çaprazlama iki kez olur)',
+    motor: ['İpsilateral ekstremite ataksisi (koordinasyon bozukluğu)', 'İpsilateral gövde ataksisi (vermis lezyonunda bilateral)'],
+    sensory: 'Duyusal kayıp yok (saf serebellar)',
+    reflexes: 'Pendüler refleksler (artmış değil, sönümlenme azalmış)',
+    lesion_sites: [
+      { site: 'Serebellar hemisfer', cause: 'İnme (PICA, SCA), tümör, MS', note: 'İpsilateral ekstremite ataksisi' },
+      { site: 'Vermis', cause: 'Alkolizm, medulloblastom', note: 'Gövde/yürüme ataksisi, ekstremiteler az etkilenir' },
+    ],
+    symptoms: [
+      { s: 'Ataksi: İpsilateral ekstremite, tandem yürüyüş bozukluğu', sev: 'high' },
+      { s: 'Dizmetri: Parmak-burun ve topuk-diz testinde geçme/azlık', sev: 'high' },
+      { s: 'İntensiyon tremoru (hareketle artar, istirahatte yok)', sev: 'high' },
+      { s: 'Disdiadokokinezi (hızlı ardışık hareket yapamama)', sev: 'mid' },
+      { s: 'Nistajmus (horizontal, ipsilateral)', sev: 'mid' },
+    ],
+    differentials: [
+      'Sensoriyal ataksi: Romberg + (gözler kapalı daha kötü), propriosepsiyon kaybı',
+      'Vestibüler ataksi: Vertigo eşlik eder',
+    ],
+    pearls: [
+      { type: 'blue', icon: 'fa-lightbulb', title: 'DANISH Mnemonık', text: 'Serebellar bulgular: D — Dizmetri, A — Ataksi, N — Nistagmus, I — İntensiyon tremoru, S — Skandik konuşma, H — Hipotoni. Tümünü DANISH ile hatırla.' },
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Kritik Nokta', text: 'Serebellar bulgular İPSİLATERAL. Kortikospinal veya duyusal bulgular yok (saf serebellar ise). Romberg testi negatif (gözler kapalıyken kötüleşmez — duyusal ataksinin aksine).' },
+    ],
+  },
+
+  br_parietal: {
+    name: 'Parietal Lob Lezyonu',
+    category: 'Beyin Lezyonu',
+    color: 'yellow',
+    roots: 'Serebral korteks — parietal lob',
+    origin: 'Somatosensoriyel korteks + yüksek düzey duyusal entegrasyon — kontralateral etki',
+    motor: ['Motor kortekse yakın lezyonda hafif kontralateral motor kayıp olabilir'],
+    sensory: 'Birincil somatosensori etkilenmez (talamik girdi); kortikal duyusal işleme bozulur',
+    reflexes: 'Hemineglect + piramidal işaretler kontralateral',
+    lesion_sites: [
+      { site: 'Dominant (sol) parietal lob', cause: 'İnme, tümör', note: 'Gerstmann sendromu: Akalküli + agrafi + sağ-sol ayrım bozukluğu + parmak agnosisi' },
+      { site: 'Non-dominant (sağ) parietal lob', cause: 'İnme, tümör', note: 'Hemineglect (sol tarafı ihmal), apraksi, giyinme apraksi' },
+    ],
+    symptoms: [
+      { s: 'Kortikal duyusal kayıp: 2 nokta ayrımı, grafestezi, stereognozi bozukluğu', sev: 'high' },
+      { s: 'Hemineglect (sağ lezyon): Soldan uyarıyı görmezden gelme', sev: 'high' },
+      { s: 'Gerstmann sendromu (sol lezyon): Akalküli + agrafi + parmak agnosisi + sağ-sol ayrımı kaybı', sev: 'high' },
+      { s: 'Apraksi: Amaçlı hareketi organize edememe', sev: 'mid' },
+      { s: 'Homonim alt kadran görme alan defekti (optik radyasyon)', sev: 'mid' },
+    ],
+    differentials: [
+      'Temporal lob: Wernicke afazisi (sol), homonim üst kadran',
+      'Frontal lob: Broca afazisi (sol), davranış değişikliği',
+    ],
+    pearls: [
+      { type: 'red', icon: 'fa-exclamation-circle', title: 'Gerstmann Sendromu', text: 'Sol açısal girusun 4 belirtisi: (1) Akalküli, (2) Agrafi, (3) Parmak agnosisi, (4) Sağ-sol ayrımı bozukluğu. Hepsi birlikte ise açısal girus lezyonu düşün.' },
+      { type: 'blue', icon: 'fa-lightbulb', title: 'Hemineglect Testi', text: 'Çizgi biseksiyon testi: Hasta bir çizginin ortasını işaretlemekte zorlanır (orta noktayı sağa kayar). Saat çizme testi: Saatin sol yarısına rakam koymaz veya hepsini sağa koyar.' },
+    ],
+  },
+
+};
+
+// ══════════════════════════════════════════════
+//  QUIZ VERİSİ
+// ══════════════════════════════════════════════
+const QUIZ = [
+  {
+    q: 'Bir hastada bilek ekstansiyonu kaybı ve el sırtında duyu azalması saptanıyor. Parmakların MCP ekleminde de ekstansiyon yok. Hangi sinir hasarlıdır?',
+    context: '35 yaşında erkek, gece koltukta uyuya kalmış. Sabah kolunu kaldıramıyor.',
+    opts: ['N. Medianus', 'N. Radialis', 'N. Ulnaris', 'N. Musculocutaneus'],
+    ans: 1,
+    exp: 'N. Radialis lezyonu — "Saturday night palsy." Spiral groove basısı sonucu wrist drop + parmak MCP ekstansiyon kaybı. Triceps korunabilir (dalı daha proksimalde çıkar). N. Ulnaris pençe el yapar; N. Medianus maymun el.'
+  },
+  {
+    q: '"OK işareti" yapamayan bir hastada başparmak ve işaret parmağı tam halka oluşturamıyor. Yüzeyel duyu kaybı yok. Hangi yapı hasarlıdır?',
+    context: 'Kadın sporcu, ön kol travması geçirmiş. EMG: Distal median motor aksonal hasar.',
+    opts: ['N. Medianus yüksek lezyon', 'Anterior İnterosseöz Sinir', 'N. Radialis', 'N. Ulnaris'],
+    ans: 1,
+    exp: 'Anterior İnterosseöz Sinir (AIS) — Saf motor daldır; FDP (1.–2. parmak), FPL ve pronator quadratus\'u innerve eder. Yüzeyel duyu dalı etkilenmez. "OK işareti yapamama" klasik bulgusudur.'
+  },
+  {
+    q: 'Fasiyal felçte alın kırışması sağlamsa (alın korunmuş), lezyon nerededir?',
+    context: 'Hasta sabah aynaya bakıyor, ağzı sola kaymış, sağ göz kapanıyor ancak alın kırışıyor.',
+    opts: ['Periferik — Bell palsi', 'Santral — sağ hemisferde UMN lezyonu', 'Santral — sol hemisferde UMN lezyonu', 'Periferik — Ramsay Hunt sendromu'],
+    ans: 2,
+    exp: 'Sol UMN lezyonu → sağ alt yüz felci + alın korunur. Frontal korteks bilateral temsil edildiğinden UMN lezyonunda alın kasları korunur. Ağız sağa kaydıysa sol taraf zayıf → lezyon sol hemisferde. Periferik lezyonda alın da etkilenir.'
+  },
+  {
+    q: 'Hastada aynı taraf (sağ) motor paralizi + sağ propriosepsiyon kaybı + sol ağrı/ısı duyusu kaybı saptanıyor. Tanı nedir?',
+    context: 'Servikal bölgeye bıçak yaralanması geçiren 22 yaşında erkek.',
+    opts: ['Tam omurilik transeksiyonu', 'Brown-Séquard sendromu sağ', 'Anterior kord sendromu', 'Santral kord sendromu'],
+    ans: 1,
+    exp: 'Brown-Séquard sendromu: Sağ yarı transeksiyon. Motor + propriosepsiyon = ipsilateral (sağ). Ağrı/ısı = kontralateral (sol). Klasik "crossed" duyusal tablo. Anterior kord: Propriosepsiyon korunur. Santral kord: Üst > alt ekstremite.'
+  },
+  {
+    q: 'Aort cerrahisi sonrası alt ekstremitelerde güçsüzlük gelişiyor. Muayenede bilateral motor paralizi ve bilateral ağrı/ısı kaybı mevcut, ancak vibrasyon ve propriosepsiyon normal. Tanı?',
+    context: 'Açık kalp cerrahisi + torakoabdominal aort replasmanı sonrası yoğun bakım.',
+    opts: ['Tam omurilik transeksiyonu', 'Brown-Séquard sendromu', 'Anterior kord sendromu', 'Santral kord sendromu'],
+    ans: 2,
+    exp: 'Anterior Kord Sendromu — Anterior spinal arter iskemisi. Dorsal kolonlar (propriosepsiyon, vibrasyon) korunur çünkü posterior spinal arterden beslenir. Motor + ağrı/ısı kayıp. Aort cerrahisi veya disseksiyonu klasik etyolojisidir.'
+  },
+  {
+    q: 'Fibula boynu çevresine alçı konulan hastada alçı çıkarıldığında ayak dorsifleksiyonu kaybolmuş, eversiyon yok. Plantar fleksiyon ve inversiyon normal. Hangi sinir hasarlıdır?',
+    context: 'Tibia kırığı nedeniyle uzun bacak alçısı.',
+    opts: ['N. Tibialis', 'N. Ischiadicus', 'N. Peroneus Communis', 'L4–L5 radikülopati'],
+    ans: 2,
+    exp: 'N. Peroneus Communis — Fibula boynu klasik bası noktası. Dorsifleksiyon (derin dal) + eversiyon (yüzeyel dal) kaybı = foot drop. Plantar fleksiyon N. Tibialis → korunur. L4–L5 radikülopatisinden farkı: inversiyon da etkilenseydi (tibialis posterior) radikülopati düşünürdük.'
+  },
+  {
+    q: 'Ağrılı pitoz, midriyazis ve "aşağı-dışa" bakan göz saptanan bir hastada öncelikle hangi tanı düşünülmelidir?',
+    context: 'Acil serviste 48 yaşında hipertansif kadın. Ani başlayan baş ağrısı + pitoz.',
+    opts: ['Diyabetik CN III nöropatisi', 'Horner sendromu', 'Posterior kommunikan arter anevrizması', 'Kavernöz sinüs trombozu'],
+    ans: 2,
+    exp: 'Posterior kommunikan arter anevrizması — ACİL. Midriyazis + ağrı → kompresif CN III lezyonu. Parasempatik lifler CN III\'ün dış yüzeyinde seyreder, basıya erken tepki verir. Diyabetik CN III\'te pupil korunur (iç lifler iskemiye daha dayanıklı). Acil anjiografi endikasyonu.'
+  },
+  {
+    q: 'Uvula solda göze çarparken sağa kayıyor, sol yumuşak damak sarkık. Aynı hastada sol ses kısıklığı var. Hangi sinir etkilenmiş?',
+    context: 'Solda juguler foramen bölgesinde kitle saptanan 55 yaşında erkek.',
+    opts: ['Sol CN XII', 'Sol CN IX', 'Sol CN X', 'Sol CN VII'],
+    ans: 2,
+    exp: 'Sol CN X (Vagus) lezyonu — Sol yumuşak damak sarkık → uvula sağa (sağlam tarafa) kayıyor. Sol vokal kord paralizisi → ses kısıklığı. Kural: "Uvula lezyondan kaçar." CN IX birlikte de etkilenmiş olabilir (juguler foramen sendromu) ama ana motor bulgular CN X\'e aittir.'
+  },
+  {
+    q: 'Weber sendromu olan bir hastada hangi bulgular beklenir?',
+    context: 'Hipertansif hasta. MRI: Mezensefalonda sağ serebral pedünkül lezyonu.',
+    opts: [
+      'Sağ CN III paralizisi + sol hemipleji',
+      'Sol CN III paralizisi + sağ hemipleji',
+      'Sağ CN VI paralizisi + sol hemipleji',
+      'Sağ CN VII paralizisi + sol hemipleji'
+    ],
+    ans: 0,
+    exp: 'Weber Sendromu = Mezensefalon pedünkül lezyonu. Sağ lezyon: İpsilateral (sağ) CN III paralizisi (pitoz, midriyazis, down-out göz) + kontralateral (sol) hemipleji. Crossed sendrom klasiği. CN VI + hemipleji = Pons (Millard-Gubler).'
+  },
+  {
+    q: 'Bir hastada hesap yapamama, yazamama, parmak tanıyamama ve sağ-sol karışıklığı mevcut. Lezyon nerededir?',
+    context: 'Sol MCA territorial enfarkt şüphesiyle getirilen 62 yaşında kadın.',
+    opts: ['Sol frontal lob', 'Sol açısal girus (parietal)', 'Sağ parietal lob', 'Sol temporal lob'],
+    ans: 1,
+    exp: 'Sol açısal girus lezyonu → Gerstmann Sendromu: (1) Akalküli, (2) Agrafi, (3) Parmak agnosisi, (4) Sağ-sol ayrımı bozukluğu. Dört belirti birlikte dominan parietal lob açısal girusunu gösterir. Wernicke (temporal) ise konuşma anlama bozukluğu yapar.'
+  },
+  {
+    q: 'DANISH mnemonığı serebellar hangi bulguların kısaltmasıdır?',
+    context: 'Serebellar lezyon semiyolojisini kavrama sorusu.',
+    opts: [
+      'Dizartri, Ataksi, Nistagmus, İntensiyon tremoru, Sfinkter, Hipotan',
+      'Dizmetri, Ataksi, Nistagmus, İntensiyon tremoru, Skandik konuşma, Hipotoni',
+      'Diplopi, Ataksi, Nöropati, İstemli tremor, Spastisite, Hemiplejia',
+      'Dizmetri, Arefleksi, Nükleer, İnmeli, Santral, Hipertoni'
+    ],
+    ans: 1,
+    exp: 'DANISH: Dizmetri (parmak-burun geçme/kısalma), Ataksi, Nistagmus (horizontal, ipsilateral), İntensiyon tremoru (hareketle artar), Skandik konuşma (patlayıcı, düzensiz), Hipotoni. Serebellar bulgular ipsilateraldir.'
+  },
+  {
+    q: 'Karpal tünel sendromunda hangi bulgu beklenmez?',
+    context: 'El bileğinde gece uyuşma ve yanma şikayetiyle gelen hasta.',
+    opts: [
+      'Thenar atrofi',
+      'Phalen testi pozitifliği',
+      'Tinel işareti bileğe perküsyonla',
+      'FDP 4.–5. parmak fleksiyon zayıflığı'
+    ],
+    ans: 3,
+    exp: 'FDP 4.–5. parmak = N. Ulnaris. Karpal tünelde yalnızca N. Medianus bileğin distalinde etkilenir. FDS ve FDP 1.–2. (proksimalde çıkan AIS) korunur. Sadece thenar kas zayıflığı/atrofisi olur. Phalen ve Tinel bileğe ait median sinir testleridir.'
+  },
+];
+
+// ══════════════════════════════════════════════
+//  NAVİGASYON
+// ══════════════════════════════════════════════
+let currentTab = 'learn';
+let currentQuizIndex = 0;
+let quizAnswered = false;
+let score = 0;
+let quizDone = false;
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+
+  if (tab === 'learn') {
+    showHome();
+  } else {
+    document.getElementById('view-quiz').classList.add('active');
+    startQuiz();
+  }
+}
+
+function setActiveNav(id) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (id) document.getElementById(id)?.classList.add('active');
+}
+
+function showHome() {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-home').classList.add('active');
+  setActiveNav('nav-home');
+}
+
+function showNerve(id) {
+  const data = NERVES[id];
+  if (!data) return;
+
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-nerve').classList.add('active');
+  setActiveNav('nav-' + id);
+
+  const colorMap = {
+    purple: 'badge-purple',
+    orange: 'badge-orange',
+    green: 'badge-green',
+    red: 'badge-red',
+    yellow: 'badge-yellow',
+  };
+
+  const sev = (s) => {
+    if (s === 'high') return '<span class="sev sev-high">Şiddetli</span>';
+    if (s === 'mid') return '<span class="sev sev-mid">Orta</span>';
+    return '<span class="sev sev-low">Hafif</span>';
+  };
+
+  const callout = (p) => `
+    <div class="callout callout-${p.type}">
+      <div class="callout-title"><i class="fas ${p.icon}"></i> ${p.title}</div>
+      ${p.text}
+    </div>`;
+
+  const motorHtml = Array.isArray(data.motor) ? `
+    <ul style="padding-left:1.25rem;display:grid;gap:0.35rem;">
+      ${data.motor.map(m => `<li style="color:var(--text2);font-size:0.875rem;line-height:1.5">${m}</li>`).join('')}
+    </ul>` : `<p style="color:var(--text2);font-size:0.875rem;line-height:1.6">${data.motor}</p>`;
+
+  const lesionSiteHtml = data.lesion_sites ? `
+    <div class="detail-block">
+      <div class="detail-block-header"><i class="fas fa-map-pin"></i> Lezyon Seviyeleri ve Nedenleri</div>
+      <div class="detail-block-body">
+        <table class="symptom-table">
+          <thead><tr><th>Bölge</th><th>Sık Neden</th><th>Not</th></tr></thead>
+          <tbody>
+            ${data.lesion_sites.map(l => `<tr><td><strong>${l.site}</strong></td><td>${l.cause}</td><td style="color:var(--text3);font-size:0.8rem">${l.note}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>` : '';
+
+  const diffHtml = data.differentials?.length ? `
+    <div class="detail-block">
+      <div class="detail-block-header"><i class="fas fa-not-equal"></i> Ayırıcı Tanı</div>
+      <div class="detail-block-body">
+        ${data.differentials.map(d => `<div class="callout callout-blue" style="margin-bottom:0.5rem"><strong style="color:var(--accent)">${d.split(':')[0]}</strong>${d.includes(':') ? ': ' + d.split(':').slice(1).join(':') : ''}</div>`).join('')}
+      </div>
+    </div>` : '';
+
+  document.getElementById('nerve-content').innerHTML = `
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem">
+        <button onclick="showHome()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:0.85rem;display:flex;align-items:center;gap:0.35rem;padding:0.3rem 0;transition:color 0.15s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'">
+          <i class="fas fa-arrow-left"></i> Geri
+        </button>
+        <span style="color:var(--border2)">/</span>
+        <span style="color:var(--text3);font-size:0.85rem">${data.category}</span>
+      </div>
+      <div class="page-title">${data.name}</div>
+      <div class="page-badges" style="margin-top:0.6rem">
+        <span class="badge ${colorMap[data.color] || 'badge-blue'}">${data.category}</span>
+        ${data.roots ? `<span class="badge badge-blue">${data.roots}</span>` : ''}
+      </div>
+    </div>
+
+    <div class="nerve-detail">
+      <!-- Köken + Seyir -->
+      <div class="two-col">
+        <div class="detail-block">
+          <div class="detail-block-header"><i class="fas fa-sitemap"></i> Köken & Seyir</div>
+          <div class="detail-block-body" style="display:grid;gap:0.75rem">
+            <div><div class="info-label">Kökler</div><div class="info-value">${data.roots || '—'}</div></div>
+            <div><div class="info-label">Köken</div><div class="info-value">${data.origin || '—'}</div></div>
+            ${data.course ? `<div><div class="info-label">Seyir</div><div class="info-value">${data.course}</div></div>` : ''}
+          </div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-block-header"><i class="fas fa-hand-pointer"></i> Refleksler & Özel Testler</div>
+          <div class="detail-block-body">
+            <div class="info-value" style="white-space:pre-line">${data.reflexes || 'Spesifik refleks yok'}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Motor + Duyusal -->
+      <div class="two-col">
+        <div class="detail-block">
+          <div class="detail-block-header"><i class="fas fa-dumbbell"></i> Motor İnnervasyonu</div>
+          <div class="detail-block-body">${motorHtml}</div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-block-header"><i class="fas fa-hand-point-up"></i> Duyusal İnnervasyonu</div>
+          <div class="detail-block-body"><p style="color:var(--text2);font-size:0.875rem;line-height:1.6;white-space:pre-line">${data.sensory || 'Duyusal komponent yok'}</p></div>
+        </div>
+      </div>
+
+      <!-- Semptomlar -->
+      <div class="detail-block">
+        <div class="detail-block-header"><i class="fas fa-stethoscope"></i> Lezyon Semptomları</div>
+        <div class="detail-block-body">
+          <table class="symptom-table">
+            <thead><tr><th>Semptom / Bulgu</th><th>Şiddet</th></tr></thead>
+            <tbody>
+              ${data.symptoms.map(s => `<tr><td>${s.s}</td><td>${sev(s.sev)}</td></tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      ${lesionSiteHtml}
+      ${diffHtml}
+
+      <!-- Klinik İpuçları -->
+      ${data.pearls?.length ? `
+      <div class="detail-block">
+        <div class="detail-block-header"><i class="fas fa-lightbulb"></i> Klinik İpuçları & Sınav Notları</div>
+        <div class="detail-block-body">
+          ${data.pearls.map(p => callout(p)).join('')}
+        </div>
+      </div>` : ''}
+    </div>
+    <div style="height:2rem"></div>
+  `;
+
+  document.getElementById('contentArea').scrollTop = 0;
+}
+
+// ══════════════════════════════════════════════
+//  QUIZ
+// ══════════════════════════════════════════════
+function startQuiz() {
+  currentQuizIndex = 0;
+  score = 0;
+  quizDone = false;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const total = QUIZ.length;
+  if (currentQuizIndex >= total) {
+    showScore();
+    return;
+  }
+  document.getElementById('quiz-fill').style.width = ((currentQuizIndex / total) * 100) + '%';
+
+  const q = QUIZ[currentQuizIndex];
+  const letters = ['A', 'B', 'C', 'D'];
+  quizAnswered = false;
+
+  document.getElementById('quiz-body').innerHTML = `
+    <div class="quiz-question-card">
+      <div class="quiz-q-number">Soru ${currentQuizIndex + 1} / ${total}</div>
+      <div class="quiz-q-text">${q.q}</div>
+      ${q.context ? `<div class="quiz-q-context"><i class="fas fa-user-md" style="color:var(--accent);margin-right:0.4rem"></i>${q.context}</div>` : ''}
+      <div class="quiz-options" id="qopts">
+        ${q.opts.map((o, i) => `
+          <div class="quiz-option" id="qopt-${i}" onclick="selectAnswer(${i})">
+            <span class="quiz-option-letter">${letters[i]}</span>
+            ${o}
+          </div>
+        `).join('')}
+      </div>
+      <div class="quiz-explanation" id="qexp">
+        <strong>Açıklama:</strong> ${q.exp}
+      </div>
+    </div>
+    <div class="quiz-nav">
+      <div style="color:var(--text3);font-family:'DM Mono',monospace;font-size:0.8rem">
+        Puan: <span style="color:var(--green)">${score}</span> / ${currentQuizIndex}
+      </div>
+      <button class="btn btn-primary" id="qnext" onclick="nextQuestion()" style="display:none">
+        ${currentQuizIndex + 1 < total ? 'Sonraki Soru <i class="fas fa-arrow-right"></i>' : 'Sonucu Gör <i class="fas fa-flag-checkered"></i>'}
+      </button>
+    </div>
+  `;
+}
+
+function selectAnswer(idx) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const q = QUIZ[currentQuizIndex];
+  const opts = document.querySelectorAll('.quiz-option');
+  opts.forEach(o => o.classList.add('disabled'));
+
+  opts[idx].classList.add(idx === q.ans ? 'correct' : 'wrong');
+  if (idx !== q.ans) opts[q.ans].classList.add('correct');
+
+  if (idx === q.ans) score++;
+
+  document.getElementById('qexp').classList.add('show');
+  document.getElementById('qnext').style.display = 'flex';
+}
+
+function nextQuestion() {
+  currentQuizIndex++;
+  renderQuestion();
+}
+
+function showScore() {
+  const total = QUIZ.length;
+  const pct = Math.round((score / total) * 100);
+  document.getElementById('quiz-fill').style.width = '100%';
+  let grade = pct >= 85 ? { label: 'Mükemmel!', color: 'var(--green)' }
+             : pct >= 65 ? { label: 'İyi', color: 'var(--accent)' }
+             : { label: 'Tekrar Et', color: 'var(--yellow2)' };
+
+  document.getElementById('quiz-body').innerHTML = `
+    <div class="quiz-score-card">
+      <div class="quiz-score-number" style="color:${grade.color}">${pct}%</div>
+      <div class="quiz-score-label">${grade.label} · ${score} / ${total} doğru</div>
+      <div class="score-breakdown">
+        <div class="score-item"><div class="score-item-val" style="color:var(--green)">${score}</div><div style="color:var(--text3);font-size:0.8rem">Doğru</div></div>
+        <div class="score-item"><div class="score-item-val" style="color:var(--red)">${total - score}</div><div style="color:var(--text3);font-size:0.8rem">Yanlış</div></div>
+      </div>
+      <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="startQuiz()"><i class="fas fa-redo"></i> Tekrar Başla</button>
+        <button class="btn" onclick="switchTab('learn')"><i class="fas fa-book-open"></i> Konulara Dön</button>
+      </div>
+    </div>
+  `;
+}
+
+// Init
+showHome();
+</script>
+</body>
+</html>

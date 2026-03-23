@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Hadis Arama — furkanguven.space</title>
+<meta name="description" content="Kütüb-i Sitte hadislerinde Türkçe tam metin arama. Buhari, Müslim, Ebu Davud, Tirmizi, İbn Mace, Nesai."/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #0D0D0B;
+  --surface:  #141412;
+  --panel:    #1A1A17;
+  --border:   #2A2A25;
+  --border-hi:#3D3D35;
+  --text:     #E8E4D9;
+  --muted:    #7A7568;
+  --dim:      #4A4840;
+
+  --gold:     #C9A84C;
+  --gold-dim: #6B5820;
+  --gold-bg:  #1E1A0E;
+  --green:    #5A9A6A;
+  --green-bg: #0E1A12;
+  --red:      #9A5A5A;
+
+  --arabic:   #F0EAD6;
+  --r:        6px;
+  --sh:       0 2px 12px rgba(0,0,0,0.4);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Crimson Pro', Georgia, serif;
+  min-height: 100vh;
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+
+/* Subtle geometric background */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(201,168,76,0.03) 39px, rgba(201,168,76,0.03) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(201,168,76,0.03) 39px, rgba(201,168,76,0.03) 40px);
+  pointer-events: none;
+}
+
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 1.5rem; position: relative; z-index: 1; }
+a { color: var(--gold); text-decoration: none; transition: color .2s; }
+a:hover { color: var(--text); }
+
+/* ── HEADER ── */
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 1.4rem 0;
+}
+.nav-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+.logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem; font-weight: 400;
+  color: var(--text); letter-spacing: 0.05em;
+}
+.logo em { font-style: normal; color: var(--gold); }
+nav a {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem; color: var(--muted);
+  margin-left: 1.5rem; transition: color .2s;
+}
+nav a:hover { color: var(--gold); }
+
+/* ── HERO ── */
+.hero {
+  padding: 3.5rem 0 3rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2.5rem;
+}
+
+.hero-bismillah {
+  font-family: 'Amiri', serif;
+  font-size: 2.2rem;
+  direction: rtl;
+  color: var(--gold);
+  opacity: .55;
+  margin-bottom: 1.4rem;
+  letter-spacing: .02em;
+}
+
+.hero h1 {
+  font-family: 'Crimson Pro', serif;
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: 300;
+  letter-spacing: -.01em;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.hero h1 strong { font-weight: 600; color: var(--gold); }
+
+.hero-sub {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1rem;
+  color: var(--muted);
+  font-style: italic;
+  margin-bottom: 2.4rem;
+}
+
+/* ── SEARCH ── */
+.search-wrap { max-width: 660px; margin: 0 auto; }
+
+.search-field {
+  display: flex;
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r);
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color .25s, box-shadow .25s;
+  box-shadow: var(--sh);
+}
+.search-field:focus-within {
+  border-color: var(--gold-dim);
+  box-shadow: 0 0 0 3px rgba(201,168,76,.07), var(--sh);
+}
+
+#q {
+  flex: 1; padding: .85rem 1.2rem;
+  font-family: 'Crimson Pro', serif; font-size: 1.05rem;
+  background: transparent; border: none; outline: none; color: var(--text);
+}
+#q::placeholder { color: var(--dim); }
+
+.btn-search {
+  padding: .85rem 1.4rem;
+  font-family: 'JetBrains Mono', monospace; font-size: .75rem;
+  background: var(--gold-dim); color: var(--gold); border: none; cursor: pointer;
+  border-left: 1px solid var(--border);
+  transition: background .2s, color .2s;
+  white-space: nowrap; letter-spacing: .04em;
+}
+.btn-search:hover { background: var(--gold); color: var(--bg); }
+
+.hint {
+  font-family: 'JetBrains Mono', monospace; font-size: .65rem;
+  color: var(--dim); text-align: center; margin-top: .5rem;
+}
+
+/* Book chips */
+.chips {
+  display: flex; gap: .45rem; flex-wrap: wrap;
+  justify-content: center; margin-top: 1.2rem;
+}
+.chip {
+  padding: .28rem .7rem;
+  font-family: 'JetBrains Mono', monospace; font-size: .65rem;
+  border: 1px solid var(--border); border-radius: 20px;
+  background: transparent; color: var(--muted); cursor: pointer;
+  transition: all .2s;
+}
+.chip:hover { border-color: var(--gold-dim); color: var(--gold); }
+.chip.on { background: var(--gold-bg); border-color: var(--gold-dim); color: var(--gold); }
+
+/* ── LAYOUT ── */
+.layout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 2.2rem;
+  margin-bottom: 4rem;
+}
+
+/* ── SIDEBAR ── */
+.sidebar { position: sticky; top: 1.5rem; height: fit-content; }
+.sb-section { margin-bottom: 1.8rem; }
+.sb-label {
+  font-family: 'JetBrains Mono', monospace; font-size: .6rem;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--dim);
+  margin-bottom: .6rem; padding-bottom: .4rem; border-bottom: 1px solid var(--border);
+}
+.sb-list { list-style: none; }
+.sb-list li { margin-bottom: .15rem; }
+.sb-btn {
+  width: 100%; text-align: left;
+  padding: .4rem .65rem;
+  font-family: 'Crimson Pro', serif; font-size: .95rem;
+  background: none; border: none; border-radius: 4px;
+  color: var(--muted); cursor: pointer; transition: all .18s;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.sb-btn:hover { background: var(--panel); color: var(--text); }
+.sb-btn.on { background: var(--gold-bg); color: var(--gold); }
+.sb-cnt {
+  font-family: 'JetBrains Mono', monospace; font-size: .6rem; color: var(--dim);
+}
+
+.btn-util {
+  width: 100%; padding: .5rem .8rem; margin-bottom: .4rem;
+  font-family: 'JetBrains Mono', monospace; font-size: .68rem;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r);
+  color: var(--muted); cursor: pointer; transition: all .2s; text-align: left;
+}
+.btn-util:hover { border-color: var(--gold-dim); color: var(--gold); background: var(--gold-bg); }
+
+/* ── CONTENT ── */
+.res-meta {
+  font-family: 'JetBrains Mono', monospace; font-size: .7rem; color: var(--muted);
+  margin-bottom: 1.2rem; padding-bottom: .7rem; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem;
+}
+.res-meta strong { color: var(--text); }
+
+/* ── HADITH CARD ── */
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  margin-bottom: 1rem;
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color .2s, box-shadow .2s;
+  animation: up .3s ease both;
+}
+.card:hover { border-color: var(--border-hi); box-shadow: var(--sh); }
+@keyframes up { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+.card-top {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .6rem 1.1rem;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap; gap: .4rem;
+}
+.badge {
+  font-family: 'JetBrains Mono', monospace; font-size: .63rem; font-weight: 500;
+  padding: .18rem .5rem; border-radius: 3px;
+  background: var(--gold-bg); color: var(--gold); border: 1px solid var(--gold-dim);
+}
+.no {
+  font-family: 'JetBrains Mono', monospace; font-size: .65rem; color: var(--dim);
+}
+.grade {
+  font-family: 'JetBrains Mono', monospace; font-size: .6rem;
+  padding: .13rem .45rem; border-radius: 3px;
+}
+.g-s { background: var(--green-bg); color: var(--green); border: 1px solid #1E3D28; }
+.g-h { background: #0E1420; color: #5A7AAA; border: 1px solid #1E2D40; }
+.g-o { background: var(--panel); color: var(--muted); border: 1px solid var(--border); }
+.book-name {
+  font-family: 'JetBrains Mono', monospace; font-size: .6rem; color: var(--dim);
+}
+
+.card-body { padding: 1.3rem 1.5rem; }
+
+/* Arabic */
+.ara-toggle {
+  display: block; margin-bottom: .9rem;
+  font-family: 'JetBrains Mono', monospace; font-size: .62rem;
+  color: var(--gold-dim); background: none; border: none; cursor: pointer; padding: 0;
+  transition: color .2s;
+}
+.ara-toggle:hover { color: var(--gold); }
+.ara-box {
+  display: none;
+  font-family: 'Amiri', serif; font-size: 1.6rem; line-height: 2.5;
+  direction: rtl; text-align: right; color: var(--arabic);
+  margin-bottom: 1.2rem; padding-bottom: 1.2rem; border-bottom: 1px solid var(--border);
+}
+
+/* Turkish text */
+.tur-text {
+  font-family: 'Crimson Pro', serif; font-size: 1.05rem; line-height: 1.9;
+  color: var(--text);
+}
+.hl { background: var(--gold-bg); color: var(--gold); border-radius: 2px; padding: 0 .12em; }
+
+.card-bot {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .55rem 1.1rem; background: var(--panel); border-top: 1px solid var(--border);
+  flex-wrap: wrap; gap: .4rem;
+}
+.ref-txt {
+  font-family: 'JetBrains Mono', monospace; font-size: .6rem; color: var(--dim);
+  max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.btn-copy {
+  font-family: 'JetBrains Mono', monospace; font-size: .62rem;
+  padding: .22rem .55rem;
+  background: none; border: 1px solid var(--border); border-radius: 3px;
+  color: var(--muted); cursor: pointer; transition: all .2s; flex-shrink: 0;
+}
+.btn-copy:hover { border-color: var(--gold-dim); color: var(--gold); }
+.btn-copy.ok { background: var(--green-bg); border-color: #1E3D28; color: var(--green); }
+
+/* ── DAILY BOX ── */
+.daily {
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--r);
+  padding: 1.4rem 1.6rem 1.4rem 2rem;
+  margin-bottom: 2rem;
+  background: var(--gold-bg);
+  position: relative; overflow: hidden;
+}
+.daily::before {
+  content: '❝'; position: absolute;
+  top: -.8rem; left: .6rem;
+  font-size: 5rem; color: var(--gold-dim); opacity: .3;
+  font-family: serif; line-height: 1;
+}
+.daily-lbl {
+  font-family: 'JetBrains Mono', monospace; font-size: .6rem;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--gold); margin-bottom: .7rem;
+}
+.daily-text {
+  font-family: 'Crimson Pro', serif; font-style: italic; font-size: 1.1rem; line-height: 1.85;
+  color: var(--text); margin-bottom: .55rem;
+}
+.daily-src {
+  font-family: 'JetBrains Mono', monospace; font-size: .63rem; color: var(--muted);
+}
+
+/* ── LOADING / EMPTY ── */
+.loading { text-align: center; padding: 3.5rem; color: var(--muted); font-style: italic; }
+.spin {
+  display: inline-block; width: 18px; height: 18px;
+  border: 2px solid var(--border); border-top-color: var(--gold);
+  border-radius: 50%; animation: spin .7s linear infinite; margin-bottom: .8rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty { text-align: center; padding: 3.5rem; color: var(--muted); }
+.empty-ara {
+  font-family: 'Amiri', serif; font-size: 2rem; direction: rtl;
+  display: block; margin-bottom: .7rem; opacity: .25; color: var(--gold);
+}
+
+/* ── PAGE NAV ── */
+.pager {
+  display: flex; justify-content: center; align-items: center; gap: .6rem;
+  margin: 1.5rem 0 .5rem;
+}
+.pg-btn {
+  padding: .38rem .85rem;
+  font-family: 'JetBrains Mono', monospace; font-size: .7rem;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+  color: var(--muted); cursor: pointer; transition: all .2s;
+}
+.pg-btn:hover:not(:disabled) { border-color: var(--gold-dim); color: var(--gold); }
+.pg-btn:disabled { opacity: .35; cursor: not-allowed; }
+.pg-info { font-family: 'JetBrains Mono', monospace; font-size: .68rem; color: var(--muted); }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 1.8rem 0;
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+}
+.f-left { font-family: 'JetBrains Mono', monospace; font-size: .68rem; color: var(--muted); }
+.f-right { font-family: 'JetBrains Mono', monospace; font-size: .6rem; color: var(--dim); }
+.f-right a { color: var(--dim); }
+.f-right a:hover { color: var(--gold); }
+
+@media (max-width: 680px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; }
+  .hero { padding: 2.2rem 0 2rem; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="nav-row">
+    <a href="index.html" class="logo">F.<em>G</em></a>
+    <nav>
+      <a href="makaleler.html">/makaleler</a>
+      <a href="laboratuvar.html">/laboratuvar</a>
+      <a href="kuran-analiz-v2/">/kök-analiz</a>
+      <a href="kitap-kulubu/">/kitap-kulübü</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+  <h1>Hadis <strong>Arama</strong></h1>
+  <p class="hero-sub">Kütüb-i Sitte — Türkçe tam metin araması</p>
+
+  <div class="search-wrap">
+    <div class="search-field">
+      <input id="q" type="text" placeholder="sabır, namaz, ilim, ölüm…" autocomplete="off" spellcheck="false"/>
+      <button class="btn-search" id="btnSearch">→ ARA</button>
+    </div>
+    <div class="hint">Enter veya butona tıklayın · Arapça veya Türkçe kelime</div>
+
+    <div class="chips" id="chips">
+      <button class="chip on" data-book="all">Tümü</button>
+      <button class="chip" data-book="tur-bukhari">Buhari</button>
+      <button class="chip" data-book="tur-muslim">Müslim</button>
+      <button class="chip" data-book="tur-abudawud">Ebu Davud</button>
+      <button class="chip" data-book="tur-tirmidhi">Tirmizi</button>
+      <button class="chip" data-book="tur-ibnmajah">İbn Mace</button>
+      <button class="chip" data-book="tur-nasai">Nesai</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-section">
+      <div class="sb-label">// Kitaplar</div>
+      <ul class="sb-list" id="sbBooks">
+        <li><button class="sb-btn on" data-book="all">Tüm Kitaplar</button></li>
+        <li><button class="sb-btn" data-book="tur-bukhari">Buhari <span class="sb-cnt">7563</span></button></li>
+        <li><button class="sb-btn" data-book="tur-muslim">Müslim <span class="sb-cnt">7453</span></button></li>
+        <li><button class="sb-btn" data-book="tur-abudawud">Ebu Davud <span class="sb-cnt">5274</span></button></li>
+        <li><button class="sb-btn" data-book="tur-tirmidhi">Tirmizi <span class="sb-cnt">3956</span></button></li>
+        <li><button class="sb-btn" data-book="tur-ibnmajah">İbn Mace <span class="sb-cnt">4341</span></button></li>
+        <li><button class="sb-btn" data-book="tur-nasai">Nesai <span class="sb-cnt">5761</span></button></li>
+      </ul>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-label">// Keşfet</div>
+      <button class="btn-util" id="btnRandom">↻ Rastgele hadis</button>
+      <button class="btn-util" id="btnDaily">★ Günün hadisi</button>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-label">// Hızlı ara</div>
+      <ul class="sb-list" id="sbQuick">
+        <li><button class="sb-btn" data-q="sabır">sabır</button></li>
+        <li><button class="sb-btn" data-q="namaz">namaz</button></li>
+        <li><button class="sb-btn" data-q="ilim">ilim</button></li>
+        <li><button class="sb-btn" data-q="dua">dua</button></li>
+        <li><button class="sb-btn" data-q="oruç">oruç</button></li>
+        <li><button class="sb-btn" data-q="anne">anne baba</button></li>
+        <li><button class="sb-btn" data-q="ölüm">ölüm</button></li>
+        <li><button class="sb-btn" data-q="zekat">zekat</button></li>
+        <li><button class="sb-btn" data-q="cennet">cennet</button></li>
+        <li><button class="sb-btn" data-q="adalet">adalet</button></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main>
+    <div id="daily"></div>
+    <div id="meta"></div>
+    <div id="list"></div>
+    <div id="pager"></div>
+  </main>
+</div>
+
+<footer>
+  <div class="f-left">© 2026 Furkan Güven · /hadis-arama</div>
+  <div class="f-right">
+    veri: <a href="https://github.com/fawazahmed0/hadith-api" target="_blank" rel="noopener">fawazahmed0/hadith-api</a>
+    &nbsp;·&nbsp; kaynak: sunnah.com
+  </div>
+</footer>
+</div><!-- /wrap -->
+
+<script>
+(function(){
+'use strict';
+
+const CDN = 'https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions';
+const BOOKS = {
+  'tur-bukhari':  { name:'Sahih-i Buhari',     short:'Buhari',    ara:'ara-bukhari'  },
+  'tur-muslim':   { name:'Sahih-i Müslim',      short:'Müslim',    ara:'ara-muslim'   },
+  'tur-abudawud': { name:'Sünen-i Ebu Davud',   short:'Ebu Davud', ara:'ara-abudawud' },
+  'tur-tirmidhi': { name:'Sünen-i Tirmizi',     short:'Tirmizi',   ara:'ara-tirmidhi' },
+  'tur-ibnmajah': { name:'Sünen-i İbn Mace',    short:'İbn Mace',  ara:'ara-ibnmajah' },
+  'tur-nasai':    { name:'Sünen-i Nesai',        short:'Nesai',     ara:'ara-nasai'    },
+};
+const ORDER = Object.keys(BOOKS);
+
+const $ = id => document.getElementById(id);
+const cache = {};
+
+let S = { q:'', book:'all', results:[], page:0, perPage:12 };
+
+// ── Fetch with cache ──
+async function load(ed) {
+  if (cache[ed]) return cache[ed];
+  const r = await fetch(`${CDN}/${ed}.min.json`);
+  if (!r.ok) throw new Error(ed);
+  const d = await r.json();
+  cache[ed] = d;
+  return d;
+}
+
+// ── Search ──
+async function search(q, book) {
+  S.results = []; S.page = 0;
+  setLoading('Hadisler aranıyor…');
+  const term = q.trim().toLowerCase();
+  if (term.length < 2) { setEmpty('En az 2 karakter girin.'); return; }
+
+  const books = book === 'all' ? ORDER : [book];
+  let all = [];
+  for (const bk of books) {
+    try {
+      const d = await load(bk);
+      for (const h of (d.hadiths || [])) {
+        if ((h.text||'').toLowerCase().includes(term)) {
+          all.push({ bk, no:h.hadithnumber, text:h.text||'', grades:h.grades||[], ref:h.reference||null });
+        }
+      }
+    } catch(e){ /* skip */ }
+  }
+  S.results = all;
+  render(q);
+}
+
+// ── Browse ──
+async function browse(book) {
+  S.results = []; S.page = 0;
+  setLoading('Kitap yükleniyor…');
+  try {
+    const d = await load(book);
+    S.results = (d.hadiths||[]).map(h => ({ bk:book, no:h.hadithnumber, text:h.text||'', grades:h.grades||[], ref:h.reference||null }));
+    render('');
+  } catch(e) { setEmpty('Kitap yüklenemedi.'); }
+}
+
+// ── Render ──
+function render(q) {
+  const total = S.results.length;
+  const start = S.page * S.perPage;
+  const end   = Math.min(start + S.perPage, total);
+  const slice = S.results.slice(start, end);
+  const pages = Math.ceil(total / S.perPage);
+
+  if (total === 0) { setEmpty(q ? `"${esc(q)}" için sonuç bulunamadı.` : 'Sonuç yok.'); $('meta').innerHTML=''; return; }
+
+  $('meta').innerHTML = `<div class="res-meta">
+    <span><strong>${total}</strong> hadis${q?` — "<em>${esc(q)}</em>"`:''}${S.book!=='all'?' · '+BOOKS[S.book].name:''}</span>
+    <span>${start+1}–${end} / ${total}</span>
+  </div>`;
+
+  const frag = document.createDocumentFragment();
+  slice.forEach((h,i) => frag.appendChild(buildCard(h, q, i)));
+  $('list').innerHTML = '';
+  $('list').appendChild(frag);
+
+  // Pager
+  if (pages > 1) {
+    $('pager').innerHTML = `<div class="pager">
+      <button class="pg-btn" id="pp" ${S.page===0?'disabled':''}>← Önceki</button>
+      <span class="pg-info">${S.page+1} / ${pages}</span>
+      <button class="pg-btn" id="pn" ${S.page>=pages-1?'disabled':''}>Sonraki →</button>
+    </div>`;
+    $('pp')?.addEventListener('click',()=>{ S.page--; render(q); scrollTo({top:200,behavior:'smooth'}); });
+    $('pn')?.addEventListener('click',()=>{ S.page++; render(q); scrollTo({top:200,behavior:'smooth'}); });
+  } else $('pager').innerHTML = '';
+}
+
+// ── Card ──
+function buildCard(h, q, i) {
+  const B = BOOKS[h.bk] || {name:h.bk, short:h.bk};
+  const grade = h.grades[0]?.grade || '';
+  const gc = grade.toLowerCase().includes('sahih') ? 'g-s'
+    : (grade.toLowerCase().includes('hasan')||grade.toLowerCase().includes('hasen')) ? 'g-h' : 'g-o';
+  const hiText = q
+    ? h.text.replace(new RegExp(`(${escRe(q)})`, 'gi'), '<span class="hl">$1</span>')
+    : h.text;
+
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.style.animationDelay = (i*0.04)+'s';
+  div.innerHTML = `
+    <div class="card-top">
+      <div style="display:flex;align-items:center;gap:.5rem;">
+        <span class="badge">${B.short}</span>
+        <span class="no">#${h.no}</span>
+        ${grade?`<span class="grade ${gc}">${esc(grade)}</span>`:''}
+      </div>
+      <span class="book-name">${B.name}</span>
+    </div>
+    <div class="card-body">
+      <button class="ara-toggle" data-bk="${h.bk}" data-no="${h.no}">+ Arapça metni göster</button>
+      <div class="ara-box"></div>
+      <div class="tur-text">${hiText}</div>
+    </div>
+    <div class="card-bot">
+      <span class="ref-txt">${h.ref ? refStr(h.ref) : ''}</span>
+      <button class="btn-copy" data-t="${escAttr(h.text)}">kopyala</button>
+    </div>
+  `;
+
+  // Arabic toggle
+  div.querySelector('.ara-toggle').addEventListener('click', async function(){
+    const box = this.nextElementSibling;
+    if (box.style.display === 'block') {
+      box.style.display = 'none'; this.textContent = '+ Arapça metni göster'; return;
+    }
+    this.textContent = '…';
+    try {
+      const araKey = BOOKS[h.bk]?.ara;
+      const d = await load(araKey);
+      const found = (d.hadiths||[]).find(x=>x.hadithnumber==h.no);
+      box.textContent = found ? found.text : '—';
+    } catch(e) { box.textContent = 'Yüklenemedi.'; }
+    box.style.display = 'block';
+    this.textContent = '− Arapça metni gizle';
+  });
+
+  // Copy
+  div.querySelector('.btn-copy').addEventListener('click', function(){
+    navigator.clipboard.writeText(this.dataset.t).then(()=>{
+      this.textContent='✓ kopyalandı'; this.classList.add('ok');
+      setTimeout(()=>{ this.textContent='kopyala'; this.classList.remove('ok'); }, 2000);
+    });
+  });
+
+  return div;
+}
+
+// ── Daily hadith ──
+async function showDaily() {
+  const box = $('daily');
+  const doy = Math.floor((new Date() - new Date(new Date().getFullYear(),0,0)) / 86400000);
+  try {
+    const d = await load('tur-bukhari');
+    const h = (d.hadiths||[])[doy % (d.hadiths||[]).length];
+    if (!h) return;
+    const now = new Date();
+    box.innerHTML = `<div class="daily">
+      <div class="daily-lbl">// Günün Hadisi — ${now.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})}</div>
+      <div class="daily-text">${esc(h.text.length>320 ? h.text.slice(0,320)+'…' : h.text)}</div>
+      <div class="daily-src">Sahih-i Buhari · #${h.hadithnumber}</div>
+    </div>`;
+  } catch(e){ box.innerHTML=''; }
+}
+
+// ── Random ──
+async function showRandom() {
+  $('list').innerHTML=''; $('meta').innerHTML=''; $('pager').innerHTML='';
+  setLoading('Yükleniyor…');
+  const bk = ORDER[Math.floor(Math.random()*ORDER.length)];
+  try {
+    const d = await load(bk);
+    const h = (d.hadiths||[])[Math.floor(Math.random()*(d.hadiths||[]).length)];
+    $('meta').innerHTML=`<div class="res-meta"><span>Rastgele — <strong>${BOOKS[bk].name}</strong></span></div>`;
+    $('list').innerHTML='';
+    $('list').appendChild(buildCard({bk,no:h.hadithnumber,text:h.text||'',grades:h.grades||[],ref:h.reference||null},'',0));
+    $('pager').innerHTML='';
+  } catch(e){ setEmpty('Yüklenemedi.'); }
+}
+
+// ── Helpers ──
+function setLoading(msg){ $('meta').innerHTML=''; $('pager').innerHTML=''; $('list').innerHTML=`<div class="loading"><div class="spin"></div><br>${msg}</div>`; }
+function setEmpty(msg){ $('list').innerHTML=`<div class="empty"><span class="empty-ara">لا توجد نتائج</span>${esc(msg)}</div>`; }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(s){ return esc(s).replace(/'/g,'&#39;'); }
+function escRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+function refStr(r){
+  if (typeof r==='string') return r;
+  return Object.entries(r).map(([k,v])=>`${k}: ${v}`).join(' · ');
+}
+
+function setActiveBook(book) {
+  S.book = book;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.book===book));
+  document.querySelectorAll('#sbBooks .sb-btn').forEach(b=>b.classList.toggle('on',b.dataset.book===book));
+}
+
+// ── Events ──
+function triggerSearch(){
+  const q = $('q').value.trim();
+  if (!q) return;
+  S.q = q; search(q, S.book);
+}
+
+$('btnSearch').addEventListener('click', triggerSearch);
+$('q').addEventListener('keydown', e=>{ if(e.key==='Enter') triggerSearch(); });
+
+$('chips').addEventListener('click', e=>{
+  const c = e.target.closest('.chip'); if(!c) return;
+  setActiveBook(c.dataset.book);
+  if (S.q) search(S.q, S.book);
+  else if (S.book !== 'all') browse(S.book);
+});
+
+$('sbBooks').addEventListener('click', e=>{
+  const b = e.target.closest('.sb-btn'); if(!b||!b.dataset.book) return;
+  setActiveBook(b.dataset.book);
+  if (S.q) search(S.q, S.book);
+  else if (S.book !== 'all') browse(S.book);
+  else { $('list').innerHTML=''; $('meta').innerHTML=''; showDaily(); }
+});
+
+$('sbQuick').addEventListener('click', e=>{
+  const b = e.target.closest('.sb-btn'); if(!b||!b.dataset.q) return;
+  $('q').value = b.dataset.q; S.q = b.dataset.q; search(b.dataset.q, S.book);
+});
+
+$('btnRandom').addEventListener('click', showRandom);
+$('btnDaily').addEventListener('click', ()=>{ $('list').innerHTML=''; $('meta').innerHTML=''; showDaily(); });
+
+// ── Init ──
+showDaily();
+$('list').innerHTML = `<div class="empty">
+  <span class="empty-ara">اطلبوا العلم</span>
+  Yukarıdan arama yapın veya sol menüden kitap seçin.
+</div>`;
+
+})();
+</script>
+</body>
+</html>

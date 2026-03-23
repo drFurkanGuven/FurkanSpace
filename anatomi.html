@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anatomi Pratik Sınavı</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,600;1,300&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --card: #1a2235;
+    --accent: #4ade80;
+    --accent2: #60a5fa;
+    --warn: #f59e0b;
+    --danger: #f87171;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --border: #1e2d45;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(74,222,128,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74,222,128,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .site-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0 1.5rem;
+    border-bottom: 1px solid rgba(74,222,128,0.15);
+    margin-bottom: 2rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+  }
+  .site-nav a { color: rgba(74,222,128,0.6); text-decoration: none; transition: color 0.2s; }
+  .site-nav a:hover { color: var(--accent); }
+  .site-nav .logo { font-weight: 700; font-size: 0.92rem; color: var(--accent); }
+  .site-nav-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+
+  header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(74,222,128,0.1);
+    border: 1px solid rgba(74,222,128,0.3);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    padding: 0.3rem 0.9rem;
+    border-radius: 2px;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    font-size: 2.4rem;
+    font-weight: 300;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  h1 span {
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+    font-weight: 300;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    background: var(--border);
+    border-radius: 2px;
+    height: 3px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.6rem 1.2rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+  }
+
+  .stat-val {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent2);
+  }
+
+  .stat-val.green { color: var(--accent); }
+  .stat-val.orange { color: var(--warn); }
+
+  /* TOPIC FILTER */
+  .filter-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+
+  .filter-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    background: rgba(74,222,128,0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* CARD */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    animation: fadeIn 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    opacity: 0.5;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+  }
+
+  .topic-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.7rem;
+    border-radius: 2px;
+    border: 1px solid;
+  }
+
+  .tag-vasc { color: #f87171; border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.07); }
+  .tag-brain { color: #a78bfa; border-color: rgba(167,139,250,0.3); background: rgba(167,139,250,0.07); }
+  .tag-eye { color: #38bdf8; border-color: rgba(56,189,248,0.3); background: rgba(56,189,248,0.07); }
+  .tag-nerve { color: #fb923c; border-color: rgba(251,146,60,0.3); background: rgba(251,146,60,0.07); }
+  .tag-other { color: #4ade80; border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.07); }
+
+  .year-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+  }
+
+  .structure-name {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.01em;
+  }
+
+  .hint-text {
+    color: var(--muted);
+    font-size: 1rem;
+    font-style: italic;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Image placeholder / diagram area */
+  .diagram-area {
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .diagram-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .diagram-label {
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Answer reveal */
+  .answer-section {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .answer-section.visible { display: block; }
+
+  .answer-block {
+    background: var(--surface);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .answer-block h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 0.6rem;
+  }
+
+  .answer-block p {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .answer-block.warn { border-left-color: var(--warn); }
+  .answer-block.warn h4 { color: var(--warn); }
+  .answer-block.blue { border-left-color: var(--accent2); }
+  .answer-block.blue h4 { color: var(--accent2); }
+
+  .key-points {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+  }
+
+  .key-point {
+    background: rgba(74,222,128,0.1);
+    border: 1px solid rgba(74,222,128,0.2);
+    color: var(--accent);
+    font-size: 0.85rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 20px;
+  }
+
+  /* Buttons */
+  .btn-row {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .btn-reveal {
+    background: rgba(74,222,128,0.15);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+  }
+
+  .btn-reveal:hover {
+    background: rgba(74,222,128,0.25);
+    transform: translateY(-1px);
+  }
+
+  .btn-next {
+    background: var(--accent);
+    color: #0a0e1a;
+    font-weight: 700;
+  }
+
+  .btn-next:hover {
+    background: #86efac;
+    transform: translateY(-1px);
+  }
+
+  .btn-known {
+    background: rgba(96,165,250,0.1);
+    border: 1px solid var(--accent2);
+    color: var(--accent2);
+  }
+
+  .btn-unknown {
+    background: rgba(248,113,113,0.1);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+  }
+
+  /* Self-rating */
+  .self-rate {
+    display: none;
+    margin-top: 1rem;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .self-rate.visible { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+
+  .self-rate p {
+    width: 100%;
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+  }
+
+  /* Complete screen */
+  .complete-screen {
+    display: none;
+    text-align: center;
+    padding: 3rem 2rem;
+  }
+
+  .complete-screen.visible { display: block; }
+
+  .score-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(74,222,128,0.05);
+  }
+
+  /* Navigation arrows */
+  .nav-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .dot.current { background: var(--accent); transform: scale(1.3); }
+  .dot.known { background: #4ade80; }
+  .dot.unknown { background: #f87171; }
+  .dot.skipped { background: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <nav class="site-nav">
+    <a href="index.html" class="logo">F. Güven</a>
+    <div class="site-nav-links">
+      <a href="makaleler.html">/makaleler</a>
+      <a href="laboratuvar.html">/laboratuvar</a>
+      <a href="hadis-arama.html">/hadis</a>
+      <a href="kuran-analiz-v2/">/kök-analiz</a>
+      <a href="kitap-kulubu/">/kitap-kulübü</a>
+    </div>
+  </nav>
+  <header>
+    <div class="badge">4. Komite · Pratik Sınav</div>
+    <h1>Anatomi <span>Flash Cards</span></h1>
+    <p class="subtitle">23-24 & 24-25 sınav yapıları</p>
+  </header>
+
+  <div class="stats-row">
+    <div class="stat">
+      <span class="stat-val" id="statTotal">25</span>
+      Toplam
+    </div>
+    <div class="stat">
+      <span class="stat-val green" id="statKnown">0</span>
+      Biliyorum ✓
+    </div>
+    <div class="stat">
+      <span class="stat-val orange" id="statUnknown">0</span>
+      Çalışacak ✗
+    </div>
+    <div class="stat">
+      <span class="stat-val" id="statCurrent">1</span>
+      Şu an
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar" id="progressBar" style="width:4%"></div>
+  </div>
+
+  <div class="filter-row">
+    <button class="filter-btn active" onclick="filterTopic('all')">Tümü</button>
+    <button class="filter-btn" onclick="filterTopic('vasc')">🩸 Vasküler</button>
+    <button class="filter-btn" onclick="filterTopic('brain')">🧠 Beyin / SSS</button>
+    <button class="filter-btn" onclick="filterTopic('eye')">👁 Göz</button>
+    <button class="filter-btn" onclick="filterTopic('nerve')">⚡ Sinir</button>
+    <button class="filter-btn" onclick="filterTopic('other')">📍 Diğer</button>
+  </div>
+
+  <!-- Quiz card -->
+  <div id="quizArea">
+    <div class="card" id="mainCard">
+      <div class="card-meta">
+        <span class="topic-tag" id="topicTag">-</span>
+        <span class="year-badge" id="yearBadge">-</span>
+      </div>
+      <div class="structure-name" id="structureName">–</div>
+      <div class="hint-text" id="hintText">–</div>
+
+      <div class="diagram-area">
+        <span class="diagram-icon" id="diagramIcon">🔬</span>
+        <div class="diagram-label" id="diagramLabel">Yapıyı düşün, konumunu ve özelliklerini hatırlamaya çalış...</div>
+      </div>
+
+      <!-- Answer section -->
+      <div class="answer-section" id="answerSection">
+        <div class="answer-block" id="locationBlock">
+          <h4>📍 Lokalizasyon</h4>
+          <p id="locationText">–</p>
+        </div>
+        <div class="answer-block blue" id="functionBlock">
+          <h4>⚙️ Fonksiyon / Klinik Önem</h4>
+          <p id="functionText">–</p>
+        </div>
+        <div class="answer-block warn" id="examBlock">
+          <h4>🎯 Sınav İpucu</h4>
+          <p id="examText">–</p>
+        </div>
+        <div class="key-points" id="keyPoints"></div>
+
+        <div class="self-rate visible" id="selfRate" style="margin-top:1.2rem;">
+          <p>Kendini değerlendir:</p>
+          <button class="btn btn-known" onclick="rateCard('known')">✓ Bildim</button>
+          <button class="btn btn-unknown" onclick="rateCard('unknown')">✗ Çalışacak</button>
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top:1.2rem;" id="btnRow">
+        <button class="btn btn-reveal" id="revealBtn" onclick="revealAnswer()">Cevabı Göster</button>
+        <button class="btn btn-next" onclick="nextCard()">Sonraki →</button>
+      </div>
+    </div>
+
+    <div class="nav-dots" id="navDots"></div>
+  </div>
+
+  <!-- Complete screen -->
+  <div class="complete-screen card" id="completeScreen">
+    <div class="score-circle" id="scoreCircle">-</div>
+    <h2 style="font-size:1.8rem; margin-bottom:0.5rem;">Tamamlandı! 🎉</h2>
+    <p style="color:var(--muted); margin-bottom:1.5rem;" id="completeMsg">–</p>
+    <button class="btn btn-next" style="max-width:250px; margin:0 auto;" onclick="restartQuiz()">Tekrar Başla</button>
+    <button class="btn btn-known" style="max-width:250px; margin:0.8rem auto 0;" onclick="reviewWrong()">Yanlışları Tekrarla</button>
+  </div>
+</div>
+
+<script>
+const CARDS = [
+  // ── VASKÜLER ──
+  {
+    name: "A. communicans posterior",
+    topic: "vasc", topicLabel: "Vasküler", year: "23-24",
+    hint: "Willis poligonunun kritik bir parçası",
+    icon: "🩸",
+    diagramLabel: "Willis poligonunu zihninde canlandır — hangi arterler birleşiyor?",
+    location: "İnternal karotid arteri (A. carotis interna) ile A. cerebri posterior'u birleştirir. Willis poligonunun lateral köşesinde yer alır.",
+    function: "Ön ve arka serebral dolaşım arasında anastomoz sağlar. Tıkanıklıklarda kollateral kan akımı için kritik. Anevrizma bölgesi olarak önemlidir — N. oculomotorius (CN III) ile komşuluğu nedeniyle anevrizmada göz bulguları görülür.",
+    examTip: "CN III ile komşuluğu sınav favorisi! Anevrizma → ptosis + mydriasis + 'down and out' göz pozisyonu. Willis poligonunun şematik çiziminde tanı.",
+    keys: ["Willis poligonu", "CN III ilişkisi", "Anevrizma", "A. carotis interna"]
+  },
+  {
+    name: "V. vorticosa",
+    topic: "vasc", topicLabel: "Vasküler", year: "23-24",
+    hint: "Gözün arka segmentinden venöz drenaj",
+    icon: "👁",
+    diagramLabel: "Gözün ekvator bölgesini düşün — sklera üzerindeki venöz çıkışlar",
+    location: "Uveal venöz drenajı sağlar. Sklera'yı delerek çıkar, genellikle 4 adet (her kadrantta 1) bulunur, ekvatora yakın yerleşir.",
+    function: "Koroid, iris ve silyer cismin venöz kanını V. ophthalmica'ya taşır. Göz içi basınç regülasyonunda rol oynar.",
+    examTip: "Kadavra pratiğinde gözün arkasında sklera üzerinde görülen şeritsi venler. 'Vortex ven' olarak da bilinir. Sayısı (4) sık sorulan detay.",
+    keys: ["Uveal drenaj", "4 adet", "Sklera perforasyonu", "V. ophthalmica"]
+  },
+  {
+    name: "V. ophthalmica",
+    topic: "vasc", topicLabel: "Vasküler", year: "23-24",
+    hint: "Orbit'in venöz drenajı — cavernous sinüs bağlantısı",
+    icon: "🩸",
+    diagramLabel: "Orbita boşluğunu düşün — fissura orbitalis superior'dan geçiş",
+    location: "Orbita içinde seyreder. V. ophthalmica superior: fissura orbitalis superior'dan geçerek sinus cavernosus'a drene olur. V. ophthalmica inferior: fissura orbitalis inferior'dan plexus pterygoideus'a bağlanır.",
+    function: "Orbital yapıların venöz drenajı. Yüz yüzeyel venleri (angular ven) ile intrakraniyal sinüsleri bağlar → enfeksiyon yayılım yolu! Tromboz önemli klinik.",
+    examTip: "Yüz enfeksiyonlarının sinüs trombozu yapabileceği yol buradan geçer. Sinus cavernosus thrombosis'in nedeni. Fissura orbitalis superior'dan geçer.",
+    keys: ["Sinus cavernosus", "Fissura orbitalis superior", "Enfeksiyon yayılımı", "Angular ven"]
+  },
+  {
+    name: "Sinus petrosus superior",
+    topic: "vasc", topicLabel: "Vasküler", year: "23-24",
+    hint: "Petröz kemik kenarında seyreden sinüs",
+    icon: "🩸",
+    diagramLabel: "Temporal kemiğin petröz parçasını düşün — üst kenarında seyreden kanal",
+    location: "Sinus cavernosus'tan başlar, temporal kemiğin petrous parçasının üst kenarında seyreder, sinus transversus ile birleşir. Tentorium cerebelli'nin eklenme yerindedir.",
+    function: "Sinus cavernosus'un drenaj yolu. CN V (trigeminal) ile komşuluğu önemlidir.",
+    examTip: "Sinus cavernosus → S. petrosus superior → S. transversus → S. sigmoideus → V. jugularis interna. Bu drenaj zinciri sınav klasiği!",
+    keys: ["Sinus cavernosus", "Drenaj zinciri", "Tentorium", "Petrous ridge"]
+  },
+  {
+    name: "A. cerebri posterior",
+    topic: "vasc", topicLabel: "Vasküler", year: "24-25",
+    hint: "Baziler arterin terminal dalı",
+    icon: "🩸",
+    diagramLabel: "Beyin tabanını düşün — baziler arterin ikiye ayrılması",
+    location: "A. basilaris'in terminal dalıdır. Willis poligonunun arka kısmını oluşturur. A. communicans posterior ile internal karotid ile anastomoz yapar.",
+    function: "Oksipital lob (görme korteksi), temporal lobun alt kısmı, talamus ve mezensefalonu besler. Tıkanıklığı → homonim hemianopsi, talamus sendromu.",
+    examTip: "Görme korteksini besler → tıkanıklıkta görme kaybı ama makular görme KORUNUR (çift beslenme). PCA sendromu = görsel + duyusal bulgular.",
+    keys: ["Baziler arter", "Oksipital lob", "Görme korteksi", "Willis poligonu"]
+  },
+  {
+    name: "A. pericallosa",
+    topic: "vasc", topicLabel: "Vasküler", year: "24-25",
+    hint: "Korpus kallozumun üzerinde seyreden arter",
+    icon: "🩸",
+    diagramLabel: "Sagital kesitte korpus kallozumu düşün — tam üzerinde seyreden damar",
+    location: "A. cerebri anterior'un dalıdır. Corpus callosum'un dorsal yüzü boyunca seyreder, sulcus corporis callosi içinde ilerler.",
+    function: "Corpus callosum ve medial frontal lob korteksini besler. Parasentral lobülü (bacak motor + duyusu) beslemesi klinik önem taşır.",
+    examTip: "Tıkanıklık → bacak paralizisi (parasentral lobül). A. cerebri anterior'un dalı olarak şematik çizimlerde tanınmalı. Corpus callosum ile birlikte şekillerde gösterilir.",
+    keys: ["A. cerebri anterior", "Corpus callosum", "Parasentral lobül", "Bacak paralizisi"]
+  },
+  {
+    name: "Sinus sphenoparietalis",
+    topic: "vasc", topicLabel: "Vasküler", year: "24-25",
+    hint: "Sfenoid kemik küçük kanadının altında seyreden sinüs",
+    icon: "🩸",
+    diagramLabel: "Kafatası tabanını düşün — sfenoid kemiğin küçük kanadı altı",
+    location: "Os sphenoidale'nin ala minor'u boyunca seyreder. Sinus cavernosus'a drene olur. V. meningea media ile anastomoz yapar.",
+    function: "Frontal ve parietal bölge venöz drenajının sinus cavernosus'a iletilmesi.",
+    examTip: "Sinüslerin birbirlerine bağlantı noktaları sık sorulur. S. sphenoparietalis → S. cavernosus bağlantısını bil. Os sphenoidale'nin ala minor kenarında yerleşir.",
+    keys: ["Ala minor", "Sinus cavernosus", "Os sphenoidale", "V. meningea media"]
+  },
+
+  // ── BEYİN / SSS ──
+  {
+    name: "Genu capsula interna",
+    topic: "brain", topicLabel: "Beyin / SSS", year: "23-24",
+    hint: "İç kapsülün diz şeklindeki bölümü",
+    icon: "🧠",
+    diagramLabel: "Yatay beyin kesitini düşün — bazal ganglia arasındaki beyaz madde bandı",
+    location: "Capsula interna'nın crus anterius ile crus posterius arasındaki diz kısmı. Nucleus caudatus ile putamen/globus pallidus arasında yer alır.",
+    function: "Corticobulbar lifler burada seyreder → yüz, dil, yutma kasları motor kontrolü. Tractus corticonuclearis'in geçiş bölgesi.",
+    examTip: "Genu = corticobulbar (yüz kasları). Crus posterior = corticospinal (kol-bacak). Genu lezyonu → kontralateral yüz paralizisi + dizartri. Yatay kesit şekillerinde genu'nun 'boomerang' şekli tanınmalı.",
+    keys: ["Corticobulbar", "Yüz kasları", "Yatay kesit", "Capsula interna"]
+  },
+  {
+    name: "Gyrus precentralis",
+    topic: "brain", topicLabel: "Beyin / SSS", year: "23-24",
+    hint: "Primer motor korteks",
+    icon: "🧠",
+    diagramLabel: "Lateral beyin yüzeyinde sulcus centralis'in önündeki girus",
+    location: "Sulcus centralis'in önünde, frontalis lobunda yer alır. Brodmann alan 4'e karşılık gelir.",
+    function: "Primer motor korteks — kontralateral vücut hareketlerinin istemli kontrolü. Homunculus motor burada temsil edilir.",
+    examTip: "Homunculus: en çok yüz + el temsili (en büyük alan). Sulcus centralis'in hemen önü. Lezyonda üst motor nöron bulguları (spastisite, hiperrefleksi). Brodmann 4.",
+    keys: ["Brodmann 4", "Primer motor korteks", "Motor homunculus", "Sulcus centralis"]
+  },
+  {
+    name: "Brachium colliculi inferioris",
+    topic: "brain", topicLabel: "Beyin / SSS", year: "23-24",
+    hint: "İşitsel yolun mezensefalondaki komponenti",
+    icon: "🧠",
+    diagramLabel: "Mezensefalonun dorsal yüzünü düşün — colliculus inferior'dan çıkan bant",
+    location: "Colliculus inferior'dan çıkar, corpus geniculatum mediale (CGM) ile colliculus inferior arasında uzanır. Mezensefalonun dorsal yüzünde seyreder.",
+    function: "İşitsel refleks yolunun parçası. Alt işitsel merkezlerden (colliculus inf.) üst merkezlere (CGM → korteks) işitsel sinyallerin iletimi.",
+    examTip: "İşitsel yol: Koklea → CN VIII → Nuc. cochlearis → Corp. trapezoideum → Lemniscus lateralis → Colliculus inferior → Brachium col. inf. → CGM → Korteks. Bu zincir kritik!",
+    keys: ["İşitsel yol", "Colliculus inferior", "CGM", "Mezensefalon"]
+  },
+  {
+    name: "Nucleus lentiformis + Putamen",
+    topic: "brain", topicLabel: "Beyin / SSS", year: "24-25",
+    hint: "Bazal ganglia — mercek şeklindeki çekirdek kompleksi",
+    icon: "🧠",
+    diagramLabel: "Yatay kesit — capsula interna'nın lateralindeki mercek şekli",
+    location: "Nucleus lentiformis = Putamen + Globus pallidus. Capsula interna'nın lateralinde yer alır. Putamen en lateral parçadır, globus pallidus medialindedir.",
+    function: "Bazal ganglia devresi — istemli hareketlerin düzenlenmesi, motor öğrenme. Putamen özellikle motor striatum olarak çalışır.",
+    examTip: "Nucleus lentiformis içinde putamen lateral, globus pallidus medial. Parkinson (substantia nigra → striatum), Huntington (kaudat+putamen dejenerasyonu) bağlantısı sık sorulan.",
+    keys: ["Bazal ganglia", "Putamen lateral", "Globus pallidus medial", "Capsula interna lateral"]
+  },
+  {
+    name: "Aquaeductus mesencephali",
+    topic: "brain", topicLabel: "Beyin / SSS", year: "24-25",
+    hint: "Sylvius kanalı — BOS'un orta hatadan geçişi",
+    icon: "🧠",
+    diagramLabel: "Mezensefalon sagital kesit — 3. ve 4. ventrikülü birleştiren kanal",
+    location: "Mezensefalon içinde, 3. ventrikülü 4. ventriküle bağlar (Sylvius kanalı). Periaqueductal gri madde (PAG) tarafından çevrilir.",
+    function: "BOS sirkülasyonu için kritik geçiş noktası. Tıkanıklık → obstrüktif hidrosefali (3. ve yan ventriküller genişler, 4. normal). PAG: ağrı modülasyonu.",
+    examTip: "Tıkanıklık → supratentorial hidrosefali. Parinaud sendromu (yukarı bakış paralizisi) — aquaductus etrafındaki yapı lezyonu. Sylvius kanalı adıyla da bilinir.",
+    keys: ["Sylvius kanalı", "BOS", "Obstrüktif hidrosefali", "PAG", "Parinaud"]
+  },
+  {
+    name: "Adhesio interthalamica",
+    topic: "brain", topicLabel: "Beyin / SSS", year: "24-25",
+    hint: "Talamusları 3. ventrikül içinde birleştiren köprü",
+    icon: "🧠",
+    diagramLabel: "Sagital kesit — 3. ventrikül içinde iki talamusu birleştiren gri madde köprüsü",
+    location: "3. ventrikül içinde, sağ ve sol talamusları birbirine bağlayan gri madde köprüsü. Massa intermedia olarak da bilinir.",
+    function: "İki talamik çekirdek kitlesi arasında bağlantı. %30 olguda yoktur (normal varyant). Klinik önemi tartışmalıdır.",
+    examTip: "Massa intermedia = Adhesio interthalamica. 3. ventrikül içinde görülen gri madde köprüsü. MR görüntülemede tanı. Yokluğu normal varyant olabilir — bunu bil!",
+    keys: ["Massa intermedia", "3. ventrikül", "Talamus", "Normal varyant"]
+  },
+  {
+    name: "Cuneus",
+    topic: "brain", topicLabel: "Beyin / SSS", year: "24-25",
+    hint: "Oksipital lob medial yüzünde kama şekilli girus",
+    icon: "🧠",
+    diagramLabel: "Medial beyin yüzeyi sagital kesit — calcarine sulcus ile sulcus parietooccipitalis arasındaki alan",
+    location: "Oksipital lobun medial yüzünde, sulcus calcarinus'un üstünde ve sulcus parietooccipitalis'in arkasında yer alır.",
+    function: "Görsel alan temsili — özellikle alt görsel alan bilgisi burada işlenir (üst retina → cuneus). Brodmann 17-18 içerir.",
+    examTip: "Calcarine sulcus: üstü cuneus (alt görsel alan), altı lingualis girus (üst görsel alan). Kama şekli medialde karakteristik. A. cerebri posterior besler.",
+    keys: ["Calcarine sulcus üstü", "Alt görsel alan", "A. cerebri posterior", "Brodmann 17-18"]
+  },
+  {
+    name: "Forceps occipitalis (posterior)",
+    topic: "brain", topicLabel: "Beyin / SSS", year: "24-25",
+    hint: "Splenium'dan çıkan korpus kallozum lifleri",
+    icon: "🧠",
+    diagramLabel: "Aksiyal MR/kesit — oksipital loba doğru açılan beyaz madde yelpazesi",
+    location: "Corpus callosum'un splenium'undan çıkan transvers lifler, oksipital lobun beyaz maddesine yayılır. Occipital hornun yanından geçer.",
+    function: "İki oksipital lobu birbirine bağlar. Görsel bilginin iki hemisfer arasında transferi.",
+    examTip: "Forceps minor = genu'dan çıkar (frontal). Forceps major = splenium'dan çıkar (oksipital). Forceps posterior = major ile aynı şey. Aksiyal kesitte 'ters C' şeklinde görünür.",
+    keys: ["Splenium", "Forceps major", "Oksipital lob", "Görsel bilgi transferi"]
+  },
+  {
+    name: "Tonsilla cerebelli",
+    topic: "brain", topicLabel: "Beyin / SSS", year: "24-25",
+    hint: "Serebellar tonsil — foramen magnum komşuluğu",
+    icon: "🧠",
+    diagramLabel: "Serebellin alt yüzü — foramen magnum kenarında bademsi çıkıntılar",
+    location: "Serebellin alt yüzünde, her iki yanında, foramen magnum'un hemen yanında yer alır. Medulla oblongata ile komşudur.",
+    function: "Normal bir serebellar lob. Klinik önemi: Tonsillar herniasyon → Chiari malformasyonu / transtentorial herniasyon belirtisi.",
+    examTip: "(?) işareti ile verilmiş — kadavrada tanı zor olabiliyor. Herniasyon durumunda foramen magnum'a girer → vital merkezlere bası → ölüm. Chiari'de tonsiller 5mm↓ iner.",
+    keys: ["Foramen magnum", "Herniasyon", "Chiari malformasyonu", "Medulla oblongata komşuluğu"]
+  },
+
+  // ── GÖZ ──
+  {
+    name: "Ganglion ciliare",
+    topic: "eye", topicLabel: "Göz", year: "24-25",
+    hint: "Orbitada parasempatik ganglion",
+    icon: "👁",
+    diagramLabel: "Orbita içini düşün — optik sinir lateralinde küçük ganglion",
+    location: "Orbita içinde, optik sinirin lateralinde, N. nasociliaris ile A. ophthalmica arasında yer alır.",
+    function: "Parasempatik sinaps istasyonu: preganglionic lifler (CN III / Edinger-Westphal) burada sinapz yapar → postganglionic → M. sphincter pupillae + M. ciliaris (akkomodasyon + miyozis). Sempatik ve duyusal lifler sinaps yapmadan geçer.",
+    examTip: "CN III hasarı → midriyazis (Edinger-Westphal → ganglion ciliare → sfinkter pupillae devre dışı). Horner sendromu'nda sempatik lifler ganglion ciliare'den geçer. Parasempatik sinaps noktası.",
+    keys: ["CN III", "Edinger-Westphal", "Parasempatik sinaps", "Midriyazis", "M. sphincter pupillae"]
+  },
+  {
+    name: "Ora serrata retinae",
+    topic: "eye", topicLabel: "Göz", year: "24-25",
+    hint: "Retinanın anteriör sınırı — retina ile pars plana birleşimi",
+    icon: "👁",
+    diagramLabel: "Göz sagital kesit — ekvator önünde tırtıklı retina kenarı",
+    location: "Retinanın en ön ve çevresel sınırı. Pars plana (silyer cismin düz parçası) ile birleşir. Lens'in hemen arkasında, ekvatora yakın.",
+    function: "Nöroretina burada pigment epiteline dönüşür. Periferik retinal yırtıklar ve dekolmanlar sık bu bölgede başlar.",
+    examTip: "Adı tırtıklı yapıdan gelir (ora = kenar, serrata = tırtıklı). Retinal dekolman cerrahisinde önemli landmark. Oftalmoskopi ile görülebilen en periferik nokta.",
+    keys: ["Retina periferisi", "Pars plana birleşimi", "Retinal dekolman", "Tırtıklı kenar"]
+  },
+
+  // ── SİNİR ──
+  {
+    name: "Ganglion spinale",
+    topic: "nerve", topicLabel: "Sinir", year: "24-25",
+    hint: "Dorsal kök gangliyonu — duyusal nöron hücre gövdeleri",
+    icon: "⚡",
+    diagramLabel: "Spinal kanal kesiti — foramen intervertebrale'de şişlik",
+    location: "Foramen intervertebrale içinde, dorsal (arka) kökün üzerinde yer alır. Her spinal seviyede mevcuttur.",
+    function: "Psödounipolar duyusal nöronların hücre gövdelerini barındırır. 1. derece duyusal nöron. Periferik duyuyu (dokunma, ağrı, ısı, propriosepsiyon) omuriliğe iletir.",
+    examTip: "Herpes zoster (zona) virüsü burada latent kalır — reaktivasyonda dermatomal döküntü. Dorsal kök lezyonu → ipsilateral duyu kaybı (motor etkilenmez). DKG = Dorsal Kök Gangliyonu.",
+    keys: ["Psödounipolar nöron", "Dorsal kök", "Foramen intervertebrale", "Herpes zoster", "DKG"]
+  },
+  {
+    name: "N. hypoglossus (CN XII)",
+    topic: "nerve", topicLabel: "Sinir", year: "24-25",
+    hint: "Dil kaslarının motor siniri",
+    icon: "⚡",
+    diagramLabel: "Medulla oblongata anteriorunu düşün — hypoglossal kanaldan çıkış",
+    location: "Nucleus hypoglossalis: medulla oblongata'da, 4. ventrikül tabanında. Canalis hypoglossalis'ten çıkar, ön ve arkada dil kaslarına dağılır.",
+    function: "Tüm intrinsik dil kaslarını + hypoglossus kasını (M. genioglossus, hyoglossus, styloglossus) innerve eder. Saf motor sinir.",
+    examTip: "Lezyon → ipsilateral dil paralizisi ve atrofi. Dil lezyon tarafına döner (genioglossus karşı tarafa iter — sağlam taraf baskın). Alt motor nöron lezyonu: atrofi + fasikülasyon.",
+    keys: ["Dil motor siniri", "İpsilateral dönme", "Canalis hypoglossalis", "CN XII", "Genioglossus"]
+  },
+
+  // ── DİĞER ──
+  {
+    name: "Lobulus semilunaris superior",
+    topic: "other", topicLabel: "Diğer", year: "23-24",
+    hint: "Serebellin arka lobunun üst yüzünde yarım ay şekilli lobul",
+    icon: "🔬",
+    diagramLabel: "Serebellin arka yüzü — lateralde yarım ay şeklindeki lobulus",
+    location: "Serebellum'un arka lobunun üst yüzünde, lobulus simplex'in lateralinde yer alır. Hemisfer üst yüzünün büyük bölümünü oluşturur.",
+    function: "Serebellar koordinasyon devrelerinin parçası. İpsilateral ekstremite koordinasyonuna katkı.",
+    examTip: "Semilunaris = yarım ay. 'Superior' versiyonu arka lobun üst yüzünde, inferior ise alt yüzünde. Kadavrada serebellar lobulasyonun tanınması sınavda çıkabilir.",
+    keys: ["Serebellum", "Arka lob", "Yarım ay şekli", "Hemisfer"]
+  },
+  {
+    name: "Cauda equina",
+    topic: "other", topicLabel: "Diğer", year: "23-24",
+    hint: "At kuyruğu — L2 altındaki spinal sinir kökleri",
+    icon: "🔬",
+    diagramLabel: "Lumbar kesit — dural kese içinde serbest yüzen sinir kökleri",
+    location: "Medulla spinalis L1-L2'de conus medullaris ile biter. Bunun altında L2-S5 spinal sinir kökleri dural kese içinde serbestçe yüzer — bu yapıya cauda equina denir.",
+    function: "Alt ekstremiteler, perine, mesane, rektum ve cinsel organların motor ve duyusal innervasyonu.",
+    examTip: "Cauda equina sendromu: alt ekstremite güçsüzlüğü + 'eyer anestezisi' (perine) + sfinkter disfonksiyonu (idrar-dışkı tutamama). Lomber disk hernisi sık nedeni. Alt motor nöron özellikleri.",
+    keys: ["Conus medullaris altı", "L2-S5", "Eyer anestezisi", "Sfinkter", "Alt motor nöron"]
+  },
+  {
+    name: "Eminentia pyramidalis",
+    topic: "other", topicLabel: "Diğer", year: "23-24",
+    hint: "Orta kulakta M. stapedius'u barındıran kemik çıkıntı",
+    icon: "🔬",
+    diagramLabel: "Orta kulak boşluğunu düşün — arka duvarda küçük kemik piramit",
+    location: "Orta kulak (cavitas tympani) arka duvarında (paries mastoideus) küçük kemik çıkıntı. M. stapedius içinde yer alır, tendonu stapes'in boynuna tutunur.",
+    function: "M. stapedius'u barındırır. Stapedius refleksi: yüksek sese karşı stapes'i stabil tutar → iç kulağı aşırı titreşimden korur. CN VII (fasiyal) innerve eder.",
+    examTip: "CN VII lezyonunda stapedius refleksi kaybolur → hiperakuzi (seslerin çok yüksek duyulması). Orta kulak cerrahisinde landmark. 'Piramit' şeklinden adını alır.",
+    keys: ["M. stapedius", "CN VII", "Hiperakuzi", "Stapedius refleksi", "Orta kulak arka duvar"]
+  },
+  {
+    name: "Promontorium",
+    topic: "other", topicLabel: "Diğer", year: "24-25",
+    hint: "Orta kulakta koklea bazal turuna ait kemik çıkıntı",
+    icon: "🔬",
+    diagramLabel: "Orta kulak iç duvarı (labyrinthic wall) — orta kısımdaki yuvarlak çıkıntı",
+    location: "Orta kulak medial duvarında (paries labyrinthicus) yer alan yuvarlak kemik çıkıntı. Kokleamın bazal turuna aittir.",
+    function: "Tympanic plexus (CN IX + sempatik) yüzeyi üzerinde bulunur. Önemli anatomik landmark.",
+    examTip: "Promontorium üzerinde plexus tympanicus seyreder (CN IX'dan = Jacobson siniri). Orta kulak cerrahisi ve temporal kemik anatomi şemalarında kritik referans noktası.",
+    keys: ["Koklea bazal tur", "Plexus tympanicus", "CN IX / Jacobson siniri", "Medial duvar"]
+  }
+];
+
+let filteredCards = [...CARDS];
+let currentIdx = 0;
+let results = {};
+let revealed = false;
+
+function init() {
+  buildDots();
+  showCard();
+  updateStats();
+}
+
+function filterTopic(topic) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  filteredCards = topic === 'all' ? [...CARDS] : CARDS.filter(c => c.topic === topic);
+  currentIdx = 0;
+  results = {};
+  buildDots();
+  showCard();
+  updateStats();
+}
+
+function buildDots() {
+  const container = document.getElementById('navDots');
+  container.innerHTML = '';
+  filteredCards.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === currentIdx ? ' current' : '');
+    dot.onclick = () => goTo(i);
+    container.appendChild(dot);
+  });
+}
+
+function updateDots() {
+  const dots = document.querySelectorAll('.dot');
+  dots.forEach((dot, i) => {
+    dot.className = 'dot';
+    if (i === currentIdx) dot.classList.add('current');
+    else if (results[i] === 'known') dot.classList.add('known');
+    else if (results[i] === 'unknown') dot.classList.add('unknown');
+    else if (results[i] === 'skip') dot.classList.add('skipped');
+  });
+}
+
+function showCard() {
+  if (currentIdx >= filteredCards.length) {
+    showComplete();
+    return;
+  }
+  
+  const card = filteredCards[currentIdx];
+  revealed = false;
+
+  const tagClass = {vasc:'tag-vasc', brain:'tag-brain', eye:'tag-eye', nerve:'tag-nerve', other:'tag-other'}[card.topic];
+  
+  document.getElementById('topicTag').className = 'topic-tag ' + tagClass;
+  document.getElementById('topicTag').textContent = card.topicLabel;
+  document.getElementById('yearBadge').textContent = card.year;
+  document.getElementById('structureName').textContent = card.name;
+  document.getElementById('hintText').textContent = card.hint;
+  document.getElementById('diagramIcon').textContent = card.icon;
+  document.getElementById('diagramLabel').textContent = card.diagramLabel;
+  document.getElementById('locationText').textContent = card.location;
+  document.getElementById('functionText').textContent = card.function;
+  document.getElementById('examText').textContent = card.examTip;
+
+  const kp = document.getElementById('keyPoints');
+  kp.innerHTML = card.keys.map(k => `<span class="key-point">${k}</span>`).join('');
+
+  document.getElementById('answerSection').classList.remove('visible');
+  document.getElementById('revealBtn').style.display = '';
+  document.getElementById('statCurrent').textContent = currentIdx + 1;
+
+  const progress = ((currentIdx) / filteredCards.length) * 100;
+  document.getElementById('progressBar').style.width = progress + '%';
+
+  document.getElementById('quizArea').style.display = '';
+  document.getElementById('completeScreen').classList.remove('visible');
+
+  updateDots();
+}
+
+function revealAnswer() {
+  document.getElementById('answerSection').classList.add('visible');
+  document.getElementById('revealBtn').style.display = 'none';
+  revealed = true;
+}
+
+function rateCard(rating) {
+  results[currentIdx] = rating;
+  updateStats();
+  updateDots();
+  
+  setTimeout(() => {
+    currentIdx++;
+    if (currentIdx >= filteredCards.length) {
+      showComplete();
+    } else {
+      showCard();
+    }
+  }, 300);
+}
+
+function nextCard() {
+  if (!revealed) {
+    results[currentIdx] = 'skip';
+  }
+  currentIdx++;
+  if (currentIdx >= filteredCards.length) {
+    showComplete();
+  } else {
+    showCard();
+  }
+  updateStats();
+}
+
+function goTo(idx) {
+  currentIdx = idx;
+  showCard();
+}
+
+function updateStats() {
+  const known = Object.values(results).filter(r => r === 'known').length;
+  const unknown = Object.values(results).filter(r => r === 'unknown').length;
+  document.getElementById('statKnown').textContent = known;
+  document.getElementById('statUnknown').textContent = unknown;
+  document.getElementById('statTotal').textContent = filteredCards.length;
+}
+
+function showComplete() {
+  const known = Object.values(results).filter(r => r === 'known').length;
+  const total = filteredCards.length;
+  const pct = Math.round((known / total) * 100);
+
+  document.getElementById('quizArea').style.display = 'none';
+  document.getElementById('completeScreen').classList.add('visible');
+  document.getElementById('scoreCircle').textContent = pct + '%';
+  
+  let msg = pct >= 80 ? '🎉 Harika! Sınava hazırsın!' : 
+            pct >= 60 ? '💪 İyi gidiyorsun, biraz daha tekrar!' : 
+                        '📚 Yanlışları tekrar et, başarırsın!';
+  document.getElementById('completeMsg').textContent = `${known}/${total} doğru · ${msg}`;
+
+  document.getElementById('progressBar').style.width = '100%';
+}
+
+function restartQuiz() {
+  currentIdx = 0;
+  results = {};
+  buildDots();
+  showCard();
+  updateStats();
+}
+
+function reviewWrong() {
+  const wrongIndices = Object.entries(results)
+    .filter(([i, r]) => r === 'unknown')
+    .map(([i]) => parseInt(i));
+  
+  if (wrongIndices.length === 0) {
+    alert('Hiç yanlış yok! 🎉');
+    return;
+  }
+  
+  filteredCards = wrongIndices.map(i => filteredCards[i]);
+  currentIdx = 0;
+  results = {};
+  buildDots();
+  showCard();
+  updateStats();
+}
+
+init();
+</script>
+</body>
+</html>

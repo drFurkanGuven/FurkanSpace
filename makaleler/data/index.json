@@ -1,0 +1,32 @@
+[
+  {
+    "slug": "kevser-epistemoloji",
+    "title": "Epistemolojik Travma ve Usulün Müdafaası",
+    "description": "Kendi devasa müktesebatından utanıp ithal bir zihin yapısına sığınan modern kriz. Çeviri üzerinden yürütülen asimilasyon projesi ve aklı devreden çıkaran bedevî literalizmin anatomisi.",
+    "date": "2026-03-08",
+    "tags": ["Epistemoloji", "Hadis Usulü", "Tarih Felsefesi"],
+    "readingTime": 5,
+    "legacy": true,
+    "legacyUrl": "makaleler/kevser-epistemoloji.html"
+  },
+  {
+    "slug": "sinir-iletim-matematik",
+    "title": "Biyolojik Devrelerden Silikon Ağlara: SNN ve FPGA",
+    "description": "Aksiyon potansiyelinin diferansiyel anatomisinden, silikon tabanlı nöromorfik mimarilere uzanan bir bilgi teorisi incelemesi. Neden standart yapay zeka beyni taklit edemez ve çözüm neden donanımdadır?",
+    "date": "2026-02-15",
+    "tags": ["Tıp", "Nörofizyoloji", "Donanım"],
+    "readingTime": 8,
+    "legacy": true,
+    "legacyUrl": "makaleler/sinir-iletim-matematik.html"
+  },
+  {
+    "slug": "paralaks-kozmik-olcek",
+    "title": "Kozmik Ölçeklerden Kuantum Tünellerine",
+    "description": "Paralaks ölçümleriyle başlayan evreni anlama çabamızın, Kuantum belirsizliği ve Hubble Gerilimi ile iflası. Meşşâî nedenselliğine karşı Ehl-i Sünnet kelâmcılarının modern fizikle çarpıcı kesişimi.",
+    "date": "2026-01-28",
+    "tags": ["Astronomi", "Fizik", "Kelam"],
+    "readingTime": 7,
+    "legacy": true,
+    "legacyUrl": "makaleler/paralaks-kozmik-olcek.html"
+  }
+]

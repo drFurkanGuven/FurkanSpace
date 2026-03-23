@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Klasik metodoloji ile modern diferansiyel trigonometrinin buluştuğu Dijital Usturlap." />
+  <title>Dijital Usturlap | FurkanLab</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Usturlap sayfasına özel ufak estetik dokunuşlar */
+    .usturlap-container {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      border-radius: 12px;
+      padding: 2.5rem;
+      margin-top: 3rem;
+      backdrop-filter: blur(10px);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .data-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px dashed #475569;
+      padding: 1.2rem 0;
+    }
+    .data-row:last-child { border-bottom: none; }
+    .gok-cismi { color: #f59e0b; font-weight: bold; font-size: 1.3rem; letter-spacing: 1px;}
+    .osmanlica-terim { color: #38bdf8; font-size: 0.85rem; margin-bottom: 0.4rem; display: block; text-transform: uppercase; letter-spacing: 0.5px;}
+    .bilimsel-veri { font-size: 1.2rem; color: #f8fafc; }
+    .koordinat-grubu { text-align: right; }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  </style>
+</head>
+<body>
+  <div class="scroll-progress"></div>
+
+  <div class="container">
+    <header>
+      <div class="nav-wrapper">
+        <a href="index.html" class="logo">F. Güven</a>
+        <nav aria-label="Ana navigasyon">
+          <ul>
+            <li><a href="makaleler.html">/makaleler</a></li>
+            <li><a href="laboratuvar.html">/laboratuvar</a></li>
+            <li><a href="hadis-arama.html">/hadis</a></li>
+            <li><a href="kuran-analiz-v2/">/kök-analiz</a></li>
+            <li><a href="kitap-kulubu/">/kitap-kulübü</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <section class="hero fade-in">
+      <h1>Dijital Usturlap</h1>
+      <p>
+        Gerçek zamanlı efemeris hesaplamaları ile gök cisimlerinin bulunduğunuz konuma göre anlık durumları. 
+        Klasik rasathane metodolojisi, modern diferansiyel matrislerle silikon üzerinde yeniden hayat buluyor.
+      </p>
+    </section>
+
+    <div class="usturlap-container fade-in" id="usturlap-ekrani">
+      <p style="text-align: center; color: #94a3b8; font-size: 1.1rem; animation: pulse 2s infinite;">
+        🔭 Arz (Enlem) ve Tul (Boylam) verileri hesaplanarak rasat başlatılıyor...
+      </p>
+    </div>
+  </div>
+
+  <!-- Astronomy Engine Kütüphanesi -->
+  <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2/astronomy.browser.js"></script>
+  
+  <!-- Usturlap Hesaplama Scripti -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const ekran = document.getElementById('usturlap-ekrani');
+
+      // Varsayılan konum (Elazığ)
+      const varsayilanArz = 38.6748; 
+      const varsayilanTul = 39.2225;
+
+      // Konum izni iste
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            console.log('Konum alındı:', position.coords.latitude, position.coords.longitude);
+            hesaplamalariBaslat(position.coords.latitude, position.coords.longitude);
+          },
+          (error) => {
+            console.warn('Konum izni alınamadı, varsayılan meridyen kullanılıyor.', error);
+            hesaplamalariBaslat(varsayilanArz, varsayilanTul);
+          }
+        );
+      } else {
+        console.warn('Geolocation API desteklenmiyor, varsayılan konum kullanılıyor.');
+        hesaplamalariBaslat(varsayilanArz, varsayilanTul);
+      }
+
+      function hesaplamalariBaslat(enlem, boylam) {
+        guncelle(enlem, boylam);
+        // Her saniye güncelle
+        setInterval(() => guncelle(enlem, boylam), 1000);
+      }
+
+      function guncelle(arz, tul) {
+        const simdi = new Date();
+        
+        try {
+          // 1. Rasat noktasını (Observer) tanımla
+          const rasid = new Astronomy.Observer(arz, tul, 0);
+          
+          // 2. Ekvatoryal koordinatları al
+          const semsEkvator = Astronomy.Equator('Sun', simdi, rasid, true, true);
+          const kamerEkvator = Astronomy.Equator('Moon', simdi, rasid, true, true);
+
+          // 3. Ufuk (Horizon) koordinatlarına çevir
+          const semsUfuk = Astronomy.Horizon(simdi, rasid, semsEkvator.ra, semsEkvator.dec, 'normal');
+          const kamerUfuk = Astronomy.Horizon(simdi, rasid, kamerEkvator.ra, kamerEkvator.dec, 'normal');
+
+          ekran.innerHTML = `
+            <div style="margin-bottom: 2.5rem; text-align: center; border-bottom: 1px solid rgba(51, 65, 85, 0.8); padding-bottom: 1.5rem;">
+              <span class="osmanlica-terim">Mahal-i Rasat (Gözlem Konumu)</span>
+              <div class="bilimsel-veri" style="color: #cbd5e1; margin: 0.5rem 0;">Arz: ${arz.toFixed(4)}° N &nbsp;|&nbsp; Tul: ${tul.toFixed(4)}° E</div>
+              <div style="font-size: 0.9rem; color: #64748b; font-weight: bold;">Vakt-i Hâl: ${simdi.toLocaleTimeString('tr-TR')}</div>
+            </div>
+
+            <div class="data-row">
+              <div class="gok-cismi">ŞEMS (Güneş)</div>
+              <div class="koordinat-grubu">
+                <span class="osmanlica-terim">İrtifa-i Kıyasi (Altitude)</span>
+                <span class="bilimsel-veri">${semsUfuk.altitude.toFixed(4)}°</span>
+              </div>
+              <div class="koordinat-grubu">
+                <span class="osmanlica-terim">Semt-i İtticah (Azimuth)</span>
+                <span class="bilimsel-veri">${semsUfuk.azimuth.toFixed(4)}°</span>
+              </div>
+            </div>
+
+            <div class="data-row">
+              <div class="gok-cismi">KAMER (Ay)</div>
+              <div class="koordinat-grubu">
+                <span class="osmanlica-terim">İrtifa-i Kıyasi (Altitude)</span>
+                <span class="bilimsel-veri">${kamerUfuk.altitude.toFixed(4)}°</span>
+              </div>
+              <div class="koordinat-grubu">
+                <span class="osmanlica-terim">Semt-i İtticah (Azimuth)</span>
+                <span class="bilimsel-veri">${kamerUfuk.azimuth.toFixed(4)}°</span>
+              </div>
+            </div>
+            
+            <div style="margin-top: 2rem; font-size: 0.85rem; color: #475569; text-align: center; line-height: 1.5;">
+              * İrtifa değeri negatifse, cisim ufuk çizgisinin altındadır.<br>
+              Hesaplamalar Astronomy Engine J2000.0 efemeris modeli kullanılarak yapılmaktadır.
+            </div>
+          `;
+        } catch (error) {
+          console.error('Hesaplama hatası:', error);
+          ekran.innerHTML = `
+            <div style="text-align: center; color: #ef4444; padding: 2rem;">
+              ⚠️ Efemeris hesaplaması başarısız oldu.<br>
+              <small style="color: #94a3b8; display: block; margin-top: 0.5rem;">${error.message}</small>
+            </div>
+          `;
+        }
+      }
+    });
+  </script>
+  
+  <!-- Ana sayfa scripti -->
+  <script src="js/main.js" defer></script>
+</body>
+</html>

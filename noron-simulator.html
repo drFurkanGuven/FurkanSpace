@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LIF Nöron Simülatörü | Furkan Güven</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050508;
+      --surface: #0d0d14;
+      --panel: #111118;
+      --border: #1e1e2e;
+      --border-bright: #2e2e4e;
+      --text: #e0e0f0;
+      --muted: #555570;
+      --dim: #333348;
+
+      --spike-color: #00ff88;
+      --spike-glow: rgba(0,255,136,0.4);
+      --membrane-color: #4a90e2;
+      --membrane-glow: rgba(74,144,226,0.3);
+      --threshold-color: #ff4a4a;
+      --refractory-color: #ff8c00;
+      --input-color: #c084fc;
+
+      --accent: #4a90e2;
+      --green: #00ff88;
+      --red: #ff4a4a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(74,144,226,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74,144,226,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 2rem 0 1.5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+
+    .nav-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .logo span { color: var(--accent); }
+
+    nav a {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      margin-left: 1.5rem;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      padding: 2rem 0 2.5rem;
+    }
+
+    .hero-label {
+      display: inline-block;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      border: 1px solid rgba(74,144,226,0.3);
+      padding: 0.3rem 0.8rem;
+      border-radius: 2px;
+      margin-bottom: 1.2rem;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.4rem, 4vw, 2.2rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.8rem;
+      letter-spacing: -0.03em;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--green);
+      text-shadow: 0 0 20px var(--spike-glow);
+    }
+
+    .hero p {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    .formula {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--dim);
+      margin-top: 1rem;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── STATUS BAR ── */
+    .status-bar {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      padding: 0.75rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      align-items: center;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+    }
+
+    .status-label { color: var(--muted); }
+    .status-value {
+      color: var(--text);
+      font-weight: 500;
+      min-width: 55px;
+    }
+
+    .state-badge {
+      display: inline-block;
+      padding: 0.15rem 0.6rem;
+      border-radius: 2px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .state-idle { background: rgba(74,144,226,0.15); color: var(--accent); }
+    .state-spike { background: rgba(0,255,136,0.15); color: var(--green); animation: pulse-green 0.3s ease; }
+    .state-refractory { background: rgba(255,140,0,0.15); color: var(--refractory-color); }
+
+    @keyframes pulse-green {
+      0% { box-shadow: 0 0 0 0 var(--spike-glow); }
+      100% { box-shadow: 0 0 0 8px transparent; }
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .sim-layout {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── CANVAS AREA ── */
+    .canvas-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .canvas-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .canvas-header strong { color: var(--text); font-weight: 500; }
+
+    .canvas-legend {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.68rem;
+    }
+
+    .legend-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      cursor: crosshair;
+    }
+
+    /* ── CONTROLS ── */
+    .controls-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .control-group-title {
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 0.7rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .control-item {
+      margin-bottom: 0.9rem;
+    }
+
+    .control-item:last-child { margin-bottom: 0; }
+
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .control-name { color: var(--text); }
+    .control-val { color: var(--accent); font-weight: 500; }
+
+    input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 3px;
+      background: var(--border-bright);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 6px var(--membrane-glow);
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.3);
+    }
+
+    .control-hint {
+      font-size: 0.62rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+      line-height: 1.4;
+    }
+
+    /* ── BUTTONS ── */
+    .btn-group {
+      display: flex;
+      gap: 0.5rem;
+      flex-direction: column;
+    }
+
+    .btn {
+      padding: 0.55rem 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      border-radius: 3px;
+      border: 1px solid var(--border-bright);
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      letter-spacing: 0.03em;
+    }
+
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .btn-primary {
+      background: rgba(74,144,226,0.12);
+      border-color: rgba(74,144,226,0.4);
+      color: var(--accent);
+    }
+    .btn-primary:hover { background: rgba(74,144,226,0.25); }
+
+    .btn-danger {
+      background: rgba(255,74,74,0.08);
+      border-color: rgba(255,74,74,0.3);
+      color: var(--red);
+    }
+    .btn-danger:hover { background: rgba(255,74,74,0.18); }
+
+    .btn-green {
+      background: rgba(0,255,136,0.08);
+      border-color: rgba(0,255,136,0.3);
+      color: var(--green);
+    }
+    .btn-green:hover { background: rgba(0,255,136,0.18); }
+
+    /* ── SPIKE COUNTER ── */
+    .spike-display {
+      text-align: center;
+      padding: 0.8rem;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+    }
+
+    .spike-count {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--green);
+      text-shadow: 0 0 15px var(--spike-glow);
+      line-height: 1;
+    }
+
+    .spike-label {
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── NEURON VISUAL ── */
+    .neuron-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .neuron-visual-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .neuron-svg-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── INFO PANEL ── */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.8rem;
+    }
+
+    .info-card-label {
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+
+    .info-card-val {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .info-card-unit {
+      font-size: 0.65rem;
+      color: var(--muted);
+      margin-left: 0.2rem;
+    }
+
+    /* ── SPIKE RASTER ── */
+    .raster-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── COMMUNITY PANEL ── */
+    .community-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .community-title {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .presets-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+    }
+
+    .preset-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0.7rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .preset-card:hover {
+      border-color: var(--accent);
+      background: rgba(74,144,226,0.05);
+    }
+
+    .preset-name {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+
+    .preset-desc {
+      font-size: 0.65rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .preset-tags {
+      display: flex;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+      margin-top: 0.4rem;
+    }
+
+    .preset-tag {
+      font-size: 0.6rem;
+      padding: 0.1rem 0.35rem;
+      border-radius: 2px;
+      background: rgba(74,144,226,0.1);
+      color: var(--accent);
+    }
+
+    /* ── TOOLTIP ── */
+    .tooltip {
+      position: fixed;
+      background: var(--panel);
+      border: 1px solid var(--border-bright);
+      padding: 0.4rem 0.7rem;
+      font-size: 0.72rem;
+      color: var(--text);
+      border-radius: 3px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 100;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* ── SPIKE FLASH OVERLAY ── */
+    .spike-flash {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,255,136,0.03);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 50;
+      transition: opacity 0.05s;
+    }
+
+    .spike-flash.active { opacity: 1; }
+
+    @media (max-width: 768px) {
+      .sim-layout { grid-template-columns: 1fr; }
+      .info-grid { grid-template-columns: repeat(2, 1fr); }
+      .presets-grid { grid-template-columns: repeat(2, 1fr); }
+      .neuron-visual-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="spike-flash" id="spikeFlash"></div>
+<div class="tooltip" id="tooltip"></div>
+
+<div class="container">
+  <header>
+    <div class="nav-wrapper">
+      <a href="index.html" class="logo">F.<span>G</span></a>
+      <nav>
+        <a href="makaleler.html">/makaleler</a>
+        <a href="laboratuvar.html">/laboratuvar</a>
+        <a href="hadis-arama.html">/hadis</a>
+        <a href="kuran-analiz-v2/">/kök-analiz</a>
+        <a href="kitap-kulubu/">/kitap-kulübü</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="hero-label">Laboratuvar / Nöromorfik Hesaplama</div>
+    <h1>Leaky Integrate-and-Fire<br><em>Nöron Simülatörü</em></h1>
+    <p>Biyolojik bir nöronun elektriksel davranışını gerçek zamanlı simüle edin. Parametreleri değiştirin, aksiyon potansiyeli ateşlemesini izleyin.</p>
+    <div class="formula">τ_m · dV/dt = -(V_m - E_rest) + R_m · I(t)</div>
+  </div>
+
+  <!-- STATUS -->
+  <div class="status-bar">
+    <div class="status-item">
+      <span class="status-label">Durum:</span>
+      <span id="stateLabel" class="state-badge state-idle">IDLE</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">V_mem:</span>
+      <span class="status-value" id="vmemVal">0.0 mV</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Eşik:</span>
+      <span class="status-value" id="thresholdDisplay">-55 mV</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Ateşleme Hızı:</span>
+      <span class="status-value" id="fireRateVal">0 Hz</span>
+    </div>
+    <div class="status-item" style="margin-left:auto;">
+      <span class="status-label">Zaman:</span>
+      <span class="status-value" id="timeVal">0 ms</span>
+    </div>
+  </div>
+
+  <!-- INFO CARDS -->
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-card-label">Toplam Spike</div>
+      <div class="info-card-val" id="totalSpikes">0</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">Zar Potansiyeli</div>
+      <div class="info-card-val" id="vmemCard">-70<span class="info-card-unit">mV</span></div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">Son Spike</div>
+      <div class="info-card-val" id="lastSpikeCard">—</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">ISI (ort.)</div>
+      <div class="info-card-val" id="isiCard">—<span class="info-card-unit">ms</span></div>
+    </div>
+  </div>
+
+  <!-- MAIN SIM -->
+  <div class="sim-layout">
+
+    <!-- CANVAS -->
+    <div class="canvas-panel">
+      <div class="canvas-header">
+        <strong>Zar Potansiyeli Trasyonu</strong>
+        <div class="canvas-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#4a90e2;box-shadow:0 0 4px #4a90e2"></div>
+            <span>V_mem</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#ff4a4a"></div>
+            <span>Eşik</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#00ff88;box-shadow:0 0 4px #00ff88"></div>
+            <span>Spike</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#c084fc"></div>
+            <span>I_ext</span>
+          </div>
+        </div>
+      </div>
+      <canvas id="mainCanvas" height="260"></canvas>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="controls-panel">
+
+      <div>
+        <div class="control-group-title">Nöron Parametreleri</div>
+
+        <div class="control-item">
+          <div class="control-label">
+            <span class="control-name">τ_m (Zaman Sabiti)</span>
+            <span class="control-val" id="tauVal">20 ms</span>
+          </div>
+          <input type="range" id="tauSlider" min="5" max="50" value="20" step="1">
+          <div class="control-hint">Sızıntı hızı. Yüksek → yavaş sönümleme</div>
+        </div>
+
+        <div class="control-item">
+          <div class="control-label">
+            <span class="control-name">V_thresh (Eşik)</span>
+            <span class="control-val" id="threshVal">-55 mV</span>
+          </div>
+          <input type="range" id="threshSlider" min="-65" max="-40" value="-55" step="1">
+          <div class="control-hint">Aksiyon potansiyeli tetikleme eşiği</div>
+        </div>
+
+        <div class="control-item">
+          <div class="control-label">
+            <span class="control-name">V_reset (Sıfırlama)</span>
+            <span class="control-val" id="resetVal">-70 mV</span>
+          </div>
+          <input type="range" id="resetSlider" min="-80" max="-60" value="-70" step="1">
+          <div class="control-hint">Spike sonrası hiperpolarizasyon</div>
+        </div>
+
+        <div class="control-item">
+          <div class="control-label">
+            <span class="control-name">t_ref (Refrakter)</span>
+            <span class="control-val" id="refVal">5 ms</span>
+          </div>
+          <input type="range" id="refSlider" min="1" max="20" value="5" step="1">
+          <div class="control-hint">Mutlak refrakter periyot süresi</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="control-group-title">Giriş Akımı</div>
+
+        <div class="control-item">
+          <div class="control-label">
+            <span class="control-name">I_ext (DC Akım)</span>
+            <span class="control-val" id="currentVal">2.5 nA</span>
+          </div>
+          <input type="range" id="currentSlider" min="0" max="6" value="2.5" step="0.1">
+          <div class="control-hint">Sürekli uyarıcı akım</div>
+        </div>
+
+        <div class="control-item">
+          <div class="control-label">
+            <span class="control-name">Gürültü σ</span>
+            <span class="control-val" id="noiseVal">0.5</span>
+          </div>
+          <input type="range" id="noiseSlider" min="0" max="3" value="0.5" step="0.1">
+          <div class="control-hint">Stokastik gürültü (biyolojik değişkenlik)</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="control-group-title">Kontrol</div>
+        <div class="btn-group">
+          <button class="btn btn-primary" id="btnToggle">⏸ Duraklat</button>
+          <button class="btn btn-green" id="btnPulse">⚡ Manuel Spike</button>
+          <button class="btn btn-danger" id="btnReset">↺ Sıfırla</button>
+        </div>
+      </div>
+
+      <div class="spike-display">
+        <div class="spike-count" id="spikeCountBig">0</div>
+        <div class="spike-label">TOPLAM SPİKE</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RASTER PLOT -->
+  <div class="raster-panel">
+    <div class="canvas-header">
+      <strong>Spike Raster & Ateşleme Hızı</strong>
+      <span style="font-size:0.68rem;color:var(--muted)">Son 5 saniye</span>
+    </div>
+    <canvas id="rasterCanvas" height="80"></canvas>
+  </div>
+
+  <!-- COMMUNITY PRESETS -->
+  <div class="community-panel">
+    <div class="community-title">// Biyolojik Reçeteler — Hazır Parametre Setleri</div>
+    <div class="presets-grid" id="presetGrid"></div>
+  </div>
+
+  <!-- NEURON ANATOMY -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1.2rem;margin-bottom:2rem;">
+    <div style="font-size:0.75rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1rem;">// Devre Analojisi</div>
+    <svg id="circuitSvg" viewBox="0 0 700 120" style="width:100%;max-width:700px;display:block;margin:0 auto;" fill="none">
+      <!-- Wire backbone -->
+      <line x1="50" y1="60" x2="650" y2="60" stroke="#1e1e2e" stroke-width="2"/>
+      
+      <!-- Current source -->
+      <circle cx="100" cy="60" r="22" stroke="#c084fc" stroke-width="1.5"/>
+      <text x="100" y="55" text-anchor="middle" fill="#c084fc" font-size="9" font-family="JetBrains Mono">I_ext</text>
+      <line x1="90" y1="62" x2="110" y2="62" stroke="#c084fc" stroke-width="1.2"/>
+      <line x1="100" y1="52" x2="100" y2="72" stroke="#c084fc" stroke-width="1.2"/>
+      <text x="100" y="95" text-anchor="middle" fill="#555570" font-size="8" font-family="JetBrains Mono">Giriş Akımı</text>
+      
+      <!-- R_m resistor -->
+      <rect x="200" y="50" width="60" height="20" rx="2" stroke="#4a90e2" stroke-width="1.5" fill="none"/>
+      <text x="230" y="63" text-anchor="middle" fill="#4a90e2" font-size="9" font-family="JetBrains Mono">R_m</text>
+      <text x="230" y="95" text-anchor="middle" fill="#555570" font-size="8" font-family="JetBrains Mono">Membran Direnci</text>
+      
+      <!-- C_m capacitor -->
+      <line x1="340" y1="40" x2="340" y2="80" stroke="#4a90e2" stroke-width="1.5"/>
+      <line x1="355" y1="40" x2="355" y2="80" stroke="#4a90e2" stroke-width="1.5"/>
+      <text x="347" y="33" text-anchor="middle" fill="#4a90e2" font-size="9" font-family="JetBrains Mono">C_m</text>
+      <text x="347" y="100" text-anchor="middle" fill="#555570" font-size="8" font-family="JetBrains Mono">Membran Kap.</text>
+      
+      <!-- Leak -->
+      <line x1="450" y1="60" x2="450" y2="90"/>
+      <line x1="430" y1="90" x2="470" y2="90" stroke="#555570" stroke-width="1.5"/>
+      <text x="450" y="108" text-anchor="middle" fill="#555570" font-size="8" font-family="JetBrains Mono">E_rest (Sızıntı)</text>
+      <rect x="430" y="52" width="40" height="16" rx="2" stroke="#555570" stroke-width="1.5" fill="none"/>
+      <text x="450" y="63" text-anchor="middle" fill="#555570" font-size="8" font-family="JetBrains Mono">g_L</text>
+      
+      <!-- Threshold comparator -->
+      <polygon points="560,45 590,60 560,75" stroke="#ff4a4a" stroke-width="1.5" fill="rgba(255,74,74,0.05)"/>
+      <text x="570" y="90" text-anchor="middle" fill="#ff4a4a" font-size="8" font-family="JetBrains Mono">V_thresh</text>
+      
+      <!-- Output spike -->
+      <line x1="590" y1="60" x2="630" y2="60" stroke="#00ff88" stroke-width="1.5"/>
+      <line x1="620" y1="60" x2="620" y2="30" stroke="#00ff88" stroke-width="1.5"/>
+      <line x1="620" y1="30" x2="635" y2="30" stroke="#00ff88" stroke-width="1.5"/>
+      <line x1="635" y1="30" x2="635" y2="60" stroke="#00ff88" stroke-width="1.5"/>
+      <text x="627" y="20" text-anchor="middle" fill="#00ff88" font-size="8" font-family="JetBrains Mono">SPIKE</text>
+      
+      <!-- Node voltage label -->
+      <circle cx="355" cy="60" r="4" fill="#4a90e2"/>
+      <text x="360" y="48" fill="#4a90e2" font-size="8" font-family="JetBrains Mono">V_m</text>
+    </svg>
+  </div>
+
+  <footer>
+    <div>© 2026 Furkan Güven · LIF Simülatörü v1.0</div>
+    <div>
+      <a href="laboratuvar.html">← laboratuvar</a>
+      &nbsp;·&nbsp;
+      <a href="makaleler/sinir-iletim-matematik.html">makaleyi oku</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ── Sim Parameters ──
+  const params = {
+    tau: 20,       // ms
+    thresh: -55,   // mV
+    vReset: -70,   // mV
+    vRest: -70,    // mV
+    vSpike: 30,    // mV (spike peak)
+    tRef: 5,       // ms refractory
+    iExt: 2.5,     // nA
+    noise: 0.5,
+    rm: 10,        // MOhm
+    dt: 0.25,      // ms timestep
+  };
+
+  let vmem = params.vRest;
+  let time = 0;
+  let spikeCount = 0;
+  let refractoryLeft = 0;
+  let running = true;
+  let lastSpikeTime = null;
+  let spikeTimes = [];
+  let isManualpulse = false;
+
+  // History buffers
+  const HISTORY = 1200; // 300ms @ 0.25dt
+  const vmHistory = new Float32Array(HISTORY);
+  const spikeHistory = new Uint8Array(HISTORY);
+  const timeHistory = new Float32Array(HISTORY);
+  let histIdx = 0;
+
+  // Raster store (last 5s of spikes as times)
+  const RASTER_WINDOW = 5000; // ms
+
+  // ── Canvas Setup ──
+  const mainCanvas = document.getElementById('mainCanvas');
+  const mainCtx = mainCanvas.getContext('2d');
+  const rasterCanvas = document.getElementById('rasterCanvas');
+  const rasterCtx = rasterCanvas.getContext('2d');
+
+  function resizeCanvases() {
+    const w = mainCanvas.parentElement.clientWidth;
+    mainCanvas.width = w;
+    rasterCanvas.width = w;
+  }
+  resizeCanvases();
+  window.addEventListener('resize', resizeCanvases);
+
+  // ── Presets ──
+  const presets = [
+    {
+      name: 'Hızlı Ateşleyen',
+      desc: 'Yüksek akım, düşük eşik. Korteks piramidal hücreleri',
+      tau: 15, thresh: -50, vReset: -65, tRef: 2, iExt: 4.5, noise: 0.3,
+      tags: ['korteks', 'hızlı']
+    },
+    {
+      name: 'Yavaş Adaptif',
+      desc: 'Düşük akım, yüksek tau. Beyin sapı nöronları',
+      tau: 40, thresh: -52, vReset: -72, tRef: 8, iExt: 1.8, noise: 0.8,
+      tags: ['adaptif', 'yavaş']
+    },
+    {
+      name: 'Kaotik / Gürültülü',
+      desc: 'Yüksek stokastik gürültü. Duyusal nöron modeli',
+      tau: 20, thresh: -56, vReset: -68, tRef: 4, iExt: 2.8, noise: 2.5,
+      tags: ['gürültü', 'stokastik']
+    },
+    {
+      name: 'Eşik Altı',
+      desc: 'Akım eşiği geçemiyor. Uyarılmamış nöron',
+      tau: 20, thresh: -55, vReset: -70, tRef: 5, iExt: 0.8, noise: 0.2,
+      tags: ['subthreshold']
+    },
+    {
+      name: 'Burst Modu',
+      desc: 'Kısa refrakter, yüksek akım. Talamik nöronlar',
+      tau: 12, thresh: -48, vReset: -60, tRef: 1.5, iExt: 5.5, noise: 0.5,
+      tags: ['burst', 'talamus']
+    },
+    {
+      name: 'Biyolojik Temel',
+      desc: 'HH modeline en yakın LIF parametresi',
+      tau: 20, thresh: -55, vReset: -70, tRef: 5, iExt: 2.5, noise: 0.5,
+      tags: ['HH', 'temel']
+    },
+  ];
+
+  // Build preset cards
+  const grid = document.getElementById('presetGrid');
+  presets.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = 'preset-card';
+    card.innerHTML = `
+      <div class="preset-name">${p.name}</div>
+      <div class="preset-desc">${p.desc}</div>
+      <div class="preset-tags">${p.tags.map(t => `<span class="preset-tag">${t}</span>`).join('')}</div>
+    `;
+    card.addEventListener('click', () => applyPreset(p));
+    grid.appendChild(card);
+  });
+
+  function applyPreset(p) {
+    params.tau = p.tau;
+    params.thresh = p.thresh;
+    params.vReset = p.vReset;
+    params.tRef = p.tRef;
+    params.iExt = p.iExt;
+    params.noise = p.noise;
+    // Update sliders
+    document.getElementById('tauSlider').value = p.tau;
+    document.getElementById('threshSlider').value = p.thresh;
+    document.getElementById('resetSlider').value = p.vReset;
+    document.getElementById('refSlider').value = p.tRef;
+    document.getElementById('currentSlider').value = p.iExt;
+    document.getElementById('noiseSlider').value = p.noise;
+    updateSliderLabels();
+    resetSim();
+  }
+
+  // ── Slider Bindings ──
+  function updateSliderLabels() {
+    document.getElementById('tauVal').textContent = params.tau + ' ms';
+    document.getElementById('threshVal').textContent = params.thresh + ' mV';
+    document.getElementById('resetVal').textContent = params.vReset + ' mV';
+    document.getElementById('refVal').textContent = params.tRef + ' ms';
+    document.getElementById('currentVal').textContent = params.iExt.toFixed(1) + ' nA';
+    document.getElementById('noiseVal').textContent = params.noise.toFixed(1);
+    document.getElementById('thresholdDisplay').textContent = params.thresh + ' mV';
+  }
+
+  function bindSlider(id, key, parse) {
+    document.getElementById(id).addEventListener('input', function() {
+      params[key] = parse(this.value);
+      updateSliderLabels();
+    });
+  }
+
+  bindSlider('tauSlider', 'tau', parseInt);
+  bindSlider('threshSlider', 'thresh', parseInt);
+  bindSlider('resetSlider', 'vReset', parseInt);
+  bindSlider('refSlider', 'tRef', parseInt);
+  bindSlider('currentSlider', 'iExt', parseFloat);
+  bindSlider('noiseSlider', 'noise', parseFloat);
+
+  updateSliderLabels();
+
+  // ── Controls ──
+  document.getElementById('btnToggle').addEventListener('click', function() {
+    running = !running;
+    this.textContent = running ? '⏸ Duraklat' : '▶ Devam';
+    this.className = running ? 'btn btn-primary' : 'btn btn-green';
+  });
+
+  document.getElementById('btnPulse').addEventListener('click', () => {
+    vmem = params.thresh + 5;
+    isManualpulse = true;
+  });
+
+  document.getElementById('btnReset').addEventListener('click', resetSim);
+
+  function resetSim() {
+    vmem = params.vRest;
+    time = 0;
+    spikeCount = 0;
+    refractoryLeft = 0;
+    lastSpikeTime = null;
+    spikeTimes = [];
+    vmHistory.fill(params.vRest);
+    spikeHistory.fill(0);
+    timeHistory.fill(0);
+    histIdx = 0;
+    document.getElementById('totalSpikes').textContent = '0';
+    document.getElementById('spikeCountBig').textContent = '0';
+    document.getElementById('lastSpikeCard').textContent = '—';
+    document.getElementById('isiCard').innerHTML = '—<span class="info-card-unit">ms</span>';
+  }
+
+  // ── Simulation Step ──
+  function step() {
+    if (!running) return;
+
+    const noise = (Math.random() - 0.5) * 2 * params.noise;
+    let spiked = false;
+
+    if (refractoryLeft > 0) {
+      refractoryLeft -= params.dt;
+      vmem = params.vReset;
+    } else {
+      // LIF equation: τ dV/dt = -(V - Vrest) + Rm * I
+      const dvdt = (-(vmem - params.vRest) + params.rm * params.iExt + noise) / params.tau;
+      vmem += dvdt * params.dt;
+
+      if (vmem >= params.thresh) {
+        vmem = params.vSpike;
+        spiked = true;
+        spikeCount++;
+        refractoryLeft = params.tRef;
+        spikeTimes.push(time);
+        // Keep only last 5s
+        const cutoff = time - RASTER_WINDOW;
+        while (spikeTimes.length > 0 && spikeTimes[0] < cutoff) spikeTimes.shift();
+        lastSpikeTime = time;
+        flashSpike();
+      }
+    }
+
+    // Store history
+    vmHistory[histIdx % HISTORY] = vmem;
+    spikeHistory[histIdx % HISTORY] = spiked ? 1 : 0;
+    timeHistory[histIdx % HISTORY] = time;
+    histIdx++;
+
+    time += params.dt;
+
+    // After spike, immediately reset for display next frame
+    if (spiked) {
+      vmem = params.vReset;
+    }
+
+    return spiked;
+  }
+
+  // ── Flash effect ──
+  let flashTimeout = null;
+  function flashSpike() {
+    const el = document.getElementById('spikeFlash');
+    el.classList.add('active');
+    clearTimeout(flashTimeout);
+    flashTimeout = setTimeout(() => el.classList.remove('active'), 80);
+  }
+
+  // ── Draw Main Canvas ──
+  function drawMain() {
+    const W = mainCanvas.width;
+    const H = mainCanvas.height;
+    const ctx = mainCtx;
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Background
+    ctx.fillStyle = '#070710';
+    ctx.fillRect(0, 0, W, H);
+
+    // Grid
+    ctx.strokeStyle = 'rgba(30,30,46,0.8)';
+    ctx.lineWidth = 1;
+    const vmMin = -85, vmMax = 40;
+    const vmRange = vmMax - vmMin;
+
+    // Horizontal grid lines
+    [-80, -70, -60, -50, -40, -20, 0, 20].forEach(v => {
+      const y = H - ((v - vmMin) / vmRange) * H;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+      ctx.fillStyle = '#333348';
+      ctx.font = '10px JetBrains Mono';
+      ctx.fillText(v + 'mV', 4, y - 3);
+    });
+
+    // Threshold line
+    const threshY = H - ((params.thresh - vmMin) / vmRange) * H;
+    ctx.strokeStyle = 'rgba(255,74,74,0.5)';
+    ctx.setLineDash([4, 4]);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, threshY);
+    ctx.lineTo(W, threshY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#ff4a4a';
+    ctx.font = '10px JetBrains Mono';
+    ctx.fillText('V_thresh', W - 65, threshY - 3);
+
+    // Resting line
+    const restY = H - ((params.vRest - vmMin) / vmRange) * H;
+    ctx.strokeStyle = 'rgba(85,85,112,0.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, restY);
+    ctx.lineTo(W, restY);
+    ctx.stroke();
+
+    // Draw membrane potential trace
+    const count = Math.min(histIdx, HISTORY);
+    if (count < 2) return;
+
+    // Voltage trace with glow
+    const drawTrace = (lineW, alpha) => {
+      ctx.lineWidth = lineW;
+      ctx.beginPath();
+      let started = false;
+      for (let i = 0; i < count; i++) {
+        const idx = (histIdx - count + i) % HISTORY;
+        const x = (i / (HISTORY - 1)) * W;
+        const v = vmHistory[idx];
+        const y = H - ((v - vmMin) / vmRange) * H;
+
+        if (!started) { ctx.moveTo(x, y); started = true; }
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    };
+
+    // Glow pass
+    ctx.strokeStyle = `rgba(74,144,226,0.15)`;
+    ctx.shadowColor = '#4a90e2';
+    ctx.shadowBlur = 8;
+    drawTrace(4, 0.15);
+
+    // Main line
+    ctx.strokeStyle = '#4a90e2';
+    ctx.shadowBlur = 0;
+    drawTrace(1.5, 1);
+
+    // Spike marks
+    ctx.shadowColor = '#00ff88';
+    ctx.shadowBlur = 6;
+    for (let i = 0; i < count; i++) {
+      const idx = (histIdx - count + i) % HISTORY;
+      if (spikeHistory[idx]) {
+        const x = (i / (HISTORY - 1)) * W;
+        ctx.fillStyle = '#00ff88';
+        ctx.beginPath();
+        ctx.arc(x, 8, 4, 0, Math.PI * 2);
+        ctx.fill();
+        // Vertical tick
+        ctx.strokeStyle = 'rgba(0,255,136,0.3)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, H);
+        ctx.stroke();
+      }
+    }
+    ctx.shadowBlur = 0;
+
+    // Current input indicator bar (top 6px)
+    const iNorm = Math.min(params.iExt / 6, 1);
+    ctx.fillStyle = `rgba(192,132,252,0.15)`;
+    ctx.fillRect(0, 0, W, 6);
+    ctx.fillStyle = `rgba(192,132,252,0.7)`;
+    ctx.fillRect(0, 0, W * iNorm, 6);
+  }
+
+  // ── Draw Raster ──
+  function drawRaster() {
+    const W = rasterCanvas.width;
+    const H = rasterCanvas.height;
+    const ctx = rasterCtx;
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#070710';
+    ctx.fillRect(0, 0, W, H);
+
+    // Time axis
+    const tNow = time;
+    const tStart = tNow - RASTER_WINDOW;
+
+    // Grid
+    ctx.strokeStyle = 'rgba(30,30,46,0.6)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 5; i++) {
+      const x = (i / 5) * W;
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, H);
+      ctx.stroke();
+      const tLabel = (tStart + (i / 5) * RASTER_WINDOW) / 1000;
+      ctx.fillStyle = '#333348';
+      ctx.font = '9px JetBrains Mono';
+      ctx.fillText(tLabel.toFixed(1) + 's', x + 2, H - 3);
+    }
+
+    // Spike bars
+    ctx.fillStyle = '#00ff88';
+    ctx.shadowColor = '#00ff88';
+    ctx.shadowBlur = 3;
+    spikeTimes.forEach(t => {
+      if (t >= tStart) {
+        const x = ((t - tStart) / RASTER_WINDOW) * W;
+        ctx.fillRect(x - 1, 10, 2, H - 25);
+      }
+    });
+    ctx.shadowBlur = 0;
+
+    // Fire rate indicator
+    const recentSpikes = spikeTimes.filter(t => t >= tNow - 1000).length;
+    const fireRate = recentSpikes;
+    ctx.fillStyle = 'rgba(0,255,136,0.08)';
+    const barH = (fireRate / 30) * (H - 20);
+    ctx.fillRect(W - 40, H - 15 - barH, 30, barH);
+    ctx.strokeStyle = 'rgba(0,255,136,0.4)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(W - 40, 8, 30, H - 23);
+    ctx.fillStyle = '#00ff88';
+    ctx.font = '9px JetBrains Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText(fireRate + 'Hz', W - 25, H - 3);
+    ctx.textAlign = 'left';
+  }
+
+  // ── Update UI ──
+  let frameCount = 0;
+  function updateUI() {
+    frameCount++;
+    if (frameCount % 4 !== 0) return; // throttle
+
+    const state = refractoryLeft > 0 ? 'REFRACTORY' : (vmem >= params.thresh - 2 ? 'NEAR-THRESH' : 'IDLE');
+    const stateEl = document.getElementById('stateLabel');
+
+    if (refractoryLeft > 0) {
+      stateEl.textContent = 'REFRACTORY';
+      stateEl.className = 'state-badge state-refractory';
+    } else {
+      stateEl.textContent = 'INTEGRATE';
+      stateEl.className = 'state-badge state-idle';
+    }
+
+    document.getElementById('vmemVal').textContent = vmem.toFixed(1) + ' mV';
+    document.getElementById('timeVal').textContent = Math.floor(time) + ' ms';
+    document.getElementById('totalSpikes').textContent = spikeCount;
+    document.getElementById('spikeCountBig').textContent = spikeCount;
+    document.getElementById('vmemCard').innerHTML = vmem.toFixed(1) + '<span class="info-card-unit">mV</span>';
+
+    const recent1s = spikeTimes.filter(t => t >= time - 1000).length;
+    document.getElementById('fireRateVal').textContent = recent1s + ' Hz';
+
+    if (lastSpikeTime !== null) {
+      document.getElementById('lastSpikeCard').innerHTML = lastSpikeTime.toFixed(0) + '<span class="info-card-unit">ms</span>';
+    }
+
+    if (spikeTimes.length >= 2) {
+      const diffs = [];
+      for (let i = 1; i < Math.min(spikeTimes.length, 10); i++) {
+        diffs.push(spikeTimes[i] - spikeTimes[i-1]);
+      }
+      const isi = diffs.reduce((a,b) => a+b, 0) / diffs.length;
+      document.getElementById('isiCard').innerHTML = isi.toFixed(1) + '<span class="info-card-unit">ms</span>';
+    }
+  }
+
+  // ── Animation Loop ──
+  const STEPS_PER_FRAME = 8;
+
+  function animate() {
+    for (let i = 0; i < STEPS_PER_FRAME; i++) {
+      step();
+    }
+    drawMain();
+    drawRaster();
+    updateUI();
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+
+})();
+</script>
+</body>
+</html>

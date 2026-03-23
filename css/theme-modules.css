@@ -1,0 +1,265 @@
+/* ══════════════════════════════════════════════════════════════
+   THEME-MODULES.CSS
+   /kitap-kulubu ve /kuran-analiz için paylaşılan görsel kimlik.
+   Mevcut global.css'e dokunulmaz; bu dosya yalnızca bu iki
+   modülün sayfalarında <link> ile yüklenir.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── AÇIK TEMA (Light Mode) ── */
+:root {
+  /* Arka plan & Yüzey */
+  --mod-bg:           #FDFCF0;
+  --mod-surface:      #F7F5EA;
+  --mod-border:       #E8E3D0;
+
+  /* Metin */
+  --mod-text-main:    #333333;
+  --mod-text-muted:   #7A7568;
+
+  /* Vurgu Renkleri — Pastel & Sade */
+  --mod-green:        #6B9B6B;   /* huzur verici pastel yeşil     */
+  --mod-green-soft:   #E4EFE4;   /* yeşil arka plan tonu           */
+  --mod-yellow:       #C4A35A;   /* kitap kağıdı sarısı            */
+  --mod-yellow-soft:  #F5EED4;   /* sarı arka plan tonu            */
+  --mod-blue:         #7BA7C2;   /* hafif gökyüzü mavisi           */
+  --mod-blue-soft:    #E4EEF5;   /* mavi arka plan tonu            */
+
+  /* Genel vurgu (birincil işlem rengi) */
+  --mod-accent:       #5C6B52;   /* olgun, sade yeşil-gri          */
+  --mod-accent-hover: #4A5842;
+
+  /* Arapça metin */
+  --mod-arabic:       #1A1A2E;
+
+  /* Gölge */
+  --mod-shadow-sm:    0 1px 3px rgba(0, 0, 0, 0.04);
+  --mod-shadow-md:    0 2px 8px rgba(0, 0, 0, 0.06);
+  --mod-shadow-hover: 0 4px 14px rgba(0, 0, 0, 0.07);
+
+  /* Radyus */
+  --mod-radius:       10px;
+  --mod-radius-sm:    6px;
+
+  /* İlerleme çubuğu */
+  --mod-progress-bg:  #EAE6D6;
+  --mod-progress-fill: linear-gradient(90deg, var(--mod-green), var(--mod-blue));
+
+  /* Geçiş */
+  --mod-transition:   0.25s ease;
+}
+
+/* ── KARANLIK TEMA (Dark Mode) ── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --mod-bg:           #151724;
+    --mod-surface:      #1C1F32;
+    --mod-border:       #2C2F45;
+
+    --mod-text-main:    #E0DED5;
+    --mod-text-muted:   #9B978A;
+
+    --mod-green:        #8FBC8B;
+    --mod-green-soft:   rgba(143, 188, 139, 0.1);
+    --mod-yellow:       #D4B86A;
+    --mod-yellow-soft:  rgba(212, 184, 106, 0.08);
+    --mod-blue:         #8FB8D4;
+    --mod-blue-soft:    rgba(143, 184, 212, 0.08);
+
+    --mod-accent:       #8FBC8B;
+    --mod-accent-hover: #A5CDA1;
+
+    --mod-arabic:       #EAE6D8;
+
+    --mod-shadow-sm:    0 1px 3px rgba(0, 0, 0, 0.2);
+    --mod-shadow-md:    0 2px 8px rgba(0, 0, 0, 0.25);
+    --mod-shadow-hover: 0 4px 14px rgba(0, 0, 0, 0.3);
+
+    --mod-progress-bg:  #252840;
+    --mod-progress-fill: linear-gradient(90deg, var(--mod-green), var(--mod-blue));
+  }
+}
+
+/* ── [data-theme="dark"] ile manuel geçiş desteği ── */
+[data-theme="dark"] {
+  --mod-bg:           #151724;
+  --mod-surface:      #1C1F32;
+  --mod-border:       #2C2F45;
+  --mod-text-main:    #E0DED5;
+  --mod-text-muted:   #9B978A;
+  --mod-green:        #8FBC8B;
+  --mod-green-soft:   rgba(143, 188, 139, 0.1);
+  --mod-yellow:       #D4B86A;
+  --mod-yellow-soft:  rgba(212, 184, 106, 0.08);
+  --mod-blue:         #8FB8D4;
+  --mod-blue-soft:    rgba(143, 184, 212, 0.08);
+  --mod-accent:       #8FBC8B;
+  --mod-accent-hover: #A5CDA1;
+  --mod-arabic:       #EAE6D8;
+  --mod-shadow-sm:    0 1px 3px rgba(0, 0, 0, 0.2);
+  --mod-shadow-md:    0 2px 8px rgba(0, 0, 0, 0.25);
+  --mod-shadow-hover: 0 4px 14px rgba(0, 0, 0, 0.3);
+  --mod-progress-bg:  #252840;
+  --mod-progress-fill: linear-gradient(90deg, var(--mod-green), var(--mod-blue));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TİPOGRAFİ KURALLARİ
+   ══════════════════════════════════════════════════════════════ */
+
+/* Serif — Başlıklar ve Arapça */
+.mod-heading,
+.mod-serif {
+  font-family: 'Playfair Display', 'Amiri', Georgia, serif;
+  font-weight: 700;
+}
+
+/* Sans-serif — Gövde metni */
+.mod-body {
+  font-family: 'Inter', 'Crimson Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.7;
+}
+
+/* Arapça lafız — normalden %20 büyük */
+.mod-arabic {
+  font-family: 'Amiri', serif;
+  font-size: 1.2em;           /* üst kapsayıcıya göre %20 büyük */
+  line-height: 2.2;
+  direction: rtl;
+  text-align: right;
+  color: var(--mod-arabic);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PAYLAŞILAN UI BİLEŞENLERİ
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Kart ── */
+.mod-card {
+  background: var(--mod-surface);
+  border: 1px solid var(--mod-border);
+  border-radius: var(--mod-radius);
+  box-shadow: var(--mod-shadow-sm);
+  transition: transform var(--mod-transition),
+              box-shadow var(--mod-transition);
+}
+.mod-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--mod-shadow-hover);
+}
+
+/* ── Arama Barı (clean) ── */
+.mod-search {
+  width: 100%;
+  padding: 0.85rem 1.2rem;
+  font-family: 'Inter', 'Crimson Pro', sans-serif;
+  font-size: 1rem;
+  color: var(--mod-text-main);
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid var(--mod-border);
+  outline: none;
+  transition: border-color var(--mod-transition);
+}
+.mod-search::placeholder {
+  color: var(--mod-text-muted);
+  opacity: 0.7;
+}
+.mod-search:focus {
+  border-bottom-color: var(--mod-accent);
+}
+
+/* Alternatif: hafif arka planlı arama */
+.mod-search--filled {
+  background: var(--mod-surface);
+  border: none;
+  border-radius: var(--mod-radius);
+  padding: 0.85rem 1.4rem;
+}
+.mod-search--filled:focus {
+  box-shadow: 0 0 0 2px rgba(107, 155, 107, 0.15);
+}
+
+/* ── İlerleme Çubuğu ── */
+.mod-progress-track {
+  width: 100%;
+  height: 5px;
+  background: var(--mod-progress-bg);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.mod-progress-fill {
+  height: 100%;
+  background: var(--mod-progress-fill);
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+
+/* ── Buton ── */
+.mod-btn {
+  display: inline-block;
+  padding: 0.65rem 1.4rem;
+  font-family: 'Inter', 'Crimson Pro', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #FDFCF0;
+  background: var(--mod-accent);
+  border: none;
+  border-radius: var(--mod-radius-sm);
+  cursor: pointer;
+  transition: background var(--mod-transition),
+              transform var(--mod-transition);
+}
+.mod-btn:hover {
+  background: var(--mod-accent-hover);
+  transform: translateY(-1px);
+}
+
+.mod-btn--outline {
+  background: transparent;
+  color: var(--mod-accent);
+  border: 1px solid var(--mod-accent);
+}
+.mod-btn--outline:hover {
+  background: var(--mod-accent);
+  color: #FDFCF0;
+}
+
+/* ── Etiket / Badge ── */
+.mod-badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 4px;
+  background: var(--mod-green-soft);
+  color: var(--mod-green);
+}
+.mod-badge--warm {
+  background: var(--mod-yellow-soft);
+  color: var(--mod-yellow);
+}
+.mod-badge--cool {
+  background: var(--mod-blue-soft);
+  color: var(--mod-blue);
+}
+
+/* ── Ayet / Alıntı Kutusu ── */
+.mod-verse-box {
+  background: var(--mod-surface);
+  border-left: 3px solid var(--mod-green);
+  padding: 0.8rem 1.2rem;
+  border-radius: 0 var(--mod-radius-sm) var(--mod-radius-sm) 0;
+  font-style: italic;
+  color: var(--mod-text-main);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   YARDIMCI SINIFLAR
+   ══════════════════════════════════════════════════════════════ */
+
+.mod-text-green  { color: var(--mod-green); }
+.mod-text-yellow { color: var(--mod-yellow); }
+.mod-text-blue   { color: var(--mod-blue); }
+.mod-bg-green    { background-color: var(--mod-green-soft); }
+.mod-bg-yellow   { background-color: var(--mod-yellow-soft); }
+.mod-bg-blue     { background-color: var(--mod-blue-soft); }

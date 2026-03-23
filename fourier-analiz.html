@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fourier Sinyal Analizi | Furkan Güven</title>
+  <meta name="description" content="Gerçek zamanlı Fourier dönüşümü, sinyal bileşimi, frekans spektrumu ve filtre tasarımı aracı."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@300;400;500;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #08080f;
+      --surface:   #0e0e1a;
+      --panel:     #12121f;
+      --border:    #1c1c30;
+      --border-hi: #2a2a48;
+      --text:      #dcdcf0;
+      --muted:     #50507a;
+      --dim:       #2a2a45;
+
+      /* Signal colors */
+      --c1: #f0a500;   /* harmonic 1 — amber */
+      --c2: #e05a5a;   /* harmonic 2 — red   */
+      --c3: #50c8a0;   /* harmonic 3 — teal  */
+      --c4: #7090e8;   /* harmonic 4 — blue  */
+      --c5: #c07cdc;   /* harmonic 5 — violet*/
+      --composite: #ffffff;
+      --filtered: #50c8a0;
+      --spectrum: #f0a500;
+
+      --radius: 3px;
+      --transition: 0.2s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inconsolata', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Subtle scanline texture */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.03) 2px,
+        rgba(0,0,0,0.03) 4px
+      );
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* ── HEADER ── */
+    header {
+      padding: 1.8rem 0 1.4rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.8rem;
+    }
+    .nav-wrapper { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .logo { font-size: 1rem; font-weight: 700; color: var(--text); text-decoration: none; letter-spacing: 0.05em; }
+    .logo em { font-style: normal; color: var(--c1); }
+    nav a { font-size: 0.78rem; color: var(--muted); text-decoration: none; margin-left: 1.4rem; transition: color var(--transition); }
+    nav a:hover { color: var(--text); }
+
+    /* ── HERO ── */
+    .hero { margin-bottom: 2rem; }
+    .hero-top {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem; margin-bottom: 0.5rem;
+    }
+    .hero-tag {
+      font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--c1); margin-bottom: 0.5rem;
+    }
+    .hero h1 {
+      font-size: clamp(1.3rem, 3vw, 2rem);
+      font-weight: 700; letter-spacing: -0.02em; line-height: 1.1;
+    }
+    .hero h1 span { color: var(--c1); }
+    .hero-desc {
+      font-family: 'Crimson Pro', serif;
+      font-size: 1rem; color: var(--muted); max-width: 500px;
+      line-height: 1.6;
+    }
+    .formula-strip {
+      font-size: 0.72rem; color: var(--dim);
+      border: 1px solid var(--border); padding: 0.4rem 0.8rem;
+      border-radius: var(--radius); white-space: nowrap;
+    }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex; gap: 0; border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    .tab {
+      padding: 0.55rem 1.2rem; font-family: 'Inconsolata', monospace;
+      font-size: 0.78rem; color: var(--muted); background: none;
+      border: none; border-bottom: 2px solid transparent;
+      margin-bottom: -1px; cursor: pointer;
+      transition: all var(--transition); letter-spacing: 0.03em;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--c1); border-bottom-color: var(--c1); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── LAYOUT ── */
+    .main-layout {
+      display: grid; grid-template-columns: 300px 1fr;
+      gap: 1.2rem; margin-bottom: 1.2rem;
+    }
+
+    /* ── PANEL BASE ── */
+    .panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+    }
+    .panel-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.55rem 0.9rem; border-bottom: 1px solid var(--border);
+      font-size: 0.72rem; color: var(--muted);
+    }
+    .panel-head strong { color: var(--text); font-weight: 600; font-size: 0.75rem; }
+    .panel-body { padding: 1rem; }
+
+    /* ── HARMONICS CONTROL ── */
+    .harmonics-list { display: flex; flex-direction: column; gap: 0.7rem; }
+
+    .harmonic-row {
+      display: grid; grid-template-columns: 14px 1fr;
+      gap: 0.6rem; align-items: start;
+      padding: 0.65rem 0.7rem;
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: border-color var(--transition);
+    }
+    .harmonic-row:hover { border-color: var(--border-hi); }
+    .harmonic-row.disabled { opacity: 0.35; }
+
+    .h-toggle {
+      width: 14px; height: 14px; border-radius: 2px;
+      border: 1px solid var(--border-hi);
+      background: none; cursor: pointer; margin-top: 2px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: all var(--transition);
+    }
+    .h-toggle.on { background: var(--c1); border-color: var(--c1); }
+    .h-toggle.on::after { content: '✓'; font-size: 9px; color: #000; }
+
+    .h-controls { display: flex; flex-direction: column; gap: 0.4rem; }
+    .h-label {
+      display: flex; justify-content: space-between;
+      font-size: 0.72rem;
+    }
+    .h-name { font-weight: 600; }
+    .h-val { color: var(--muted); font-size: 0.68rem; }
+
+    .h-sliders { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+    .slider-wrap label { font-size: 0.62rem; color: var(--muted); display: block; margin-bottom: 0.2rem; }
+
+    input[type="range"] {
+      width: 100%; -webkit-appearance: none; appearance: none;
+      height: 2px; border-radius: 1px; outline: none; cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 10px; height: 10px;
+      border-radius: 50%; cursor: pointer;
+      transition: transform 0.15s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.4); }
+
+    /* Per-harmonic colors */
+    .h-row-0 input[type="range"] { background: linear-gradient(to right, var(--c1) 0%, var(--border-hi) 0%); }
+    .h-row-0 input[type="range"]::-webkit-slider-thumb { background: var(--c1); }
+    .h-row-0 .h-toggle.on { background: var(--c1); border-color: var(--c1); }
+    .h-row-1 input[type="range"] { background: linear-gradient(to right, var(--c2) 0%, var(--border-hi) 0%); }
+    .h-row-1 input[type="range"]::-webkit-slider-thumb { background: var(--c2); }
+    .h-row-1 .h-toggle.on { background: var(--c2); border-color: var(--c2); }
+    .h-row-2 input[type="range"] { background: linear-gradient(to right, var(--c3) 0%, var(--border-hi) 0%); }
+    .h-row-2 input[type="range"]::-webkit-slider-thumb { background: var(--c3); }
+    .h-row-2 .h-toggle.on { background: var(--c3); border-color: var(--c3); }
+    .h-row-3 input[type="range"] { background: linear-gradient(to right, var(--c4) 0%, var(--border-hi) 0%); }
+    .h-row-3 input[type="range"]::-webkit-slider-thumb { background: var(--c4); }
+    .h-row-3 .h-toggle.on { background: var(--c4); border-color: var(--c4); }
+    .h-row-4 input[type="range"] { background: linear-gradient(to right, var(--c5) 0%, var(--border-hi) 0%); }
+    .h-row-4 input[type="range"]::-webkit-slider-thumb { background: var(--c5); }
+    .h-row-4 .h-toggle.on { background: var(--c5); border-color: var(--c5); }
+
+    /* ── WAVE TYPE SELECTOR ── */
+    .wave-types {
+      display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem;
+    }
+    .wave-btn {
+      padding: 0.3rem 0.7rem; font-family: 'Inconsolata', monospace;
+      font-size: 0.72rem; background: var(--panel);
+      border: 1px solid var(--border); color: var(--muted);
+      border-radius: var(--radius); cursor: pointer;
+      transition: all var(--transition);
+    }
+    .wave-btn:hover { border-color: var(--border-hi); color: var(--text); }
+    .wave-btn.active { background: rgba(240,165,0,0.1); border-color: var(--c1); color: var(--c1); }
+
+    /* ── CANVAS ── */
+    canvas { display: block; width: 100%; background: #07070e; }
+
+    /* ── STATS ROW ── */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(5, 1fr);
+      gap: 0.6rem; margin-bottom: 1.2rem;
+    }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 0.6rem 0.8rem;
+    }
+    .stat-label { font-size: 0.62rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.2rem; }
+    .stat-val { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+    .stat-unit { font-size: 0.62rem; color: var(--muted); margin-left: 0.15rem; }
+
+    /* ── FILTER SECTION ── */
+    .filter-layout {
+      display: grid; grid-template-columns: 260px 1fr;
+      gap: 1.2rem; margin-bottom: 1.2rem;
+    }
+    .filter-types { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+    .filter-btn {
+      padding: 0.45rem 0.8rem; font-family: 'Inconsolata', monospace;
+      font-size: 0.75rem; background: var(--panel);
+      border: 1px solid var(--border); color: var(--muted);
+      border-radius: var(--radius); cursor: pointer; text-align: left;
+      transition: all var(--transition);
+    }
+    .filter-btn:hover { border-color: var(--border-hi); color: var(--text); }
+    .filter-btn.active { background: rgba(80,200,160,0.08); border-color: var(--c3); color: var(--c3); }
+    .filter-btn small { display: block; font-size: 0.62rem; color: var(--muted); margin-top: 0.1rem; }
+
+    .filter-param { margin-bottom: 0.9rem; }
+    .filter-param label { font-size: 0.72rem; color: var(--muted); display: flex; justify-content: space-between; margin-bottom: 0.3rem; }
+    .filter-param label span { color: var(--c3); }
+
+    /* ── DFT TABLE ── */
+    .dft-table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+    th {
+      padding: 0.4rem 0.7rem; text-align: left;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted); font-weight: 600;
+      font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    td {
+      padding: 0.4rem 0.7rem; border-bottom: 1px solid var(--border);
+      color: var(--text); font-size: 0.78rem;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    .td-bar { width: 80px; }
+    .bar-inner { height: 4px; border-radius: 2px; background: var(--c1); }
+
+    /* ── BUTTONS ── */
+    .btn {
+      padding: 0.45rem 1rem; font-family: 'Inconsolata', monospace;
+      font-size: 0.78rem; border-radius: var(--radius);
+      border: 1px solid var(--border-hi); background: var(--panel);
+      color: var(--text); cursor: pointer; transition: all var(--transition);
+    }
+    .btn:hover { border-color: var(--c1); color: var(--c1); }
+    .btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    /* ── NOISE SECTION ── */
+    .noise-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 0.8rem; }
+
+    /* ── INFO BOX ── */
+    .info-box {
+      background: var(--panel); border-left: 2px solid var(--c1);
+      padding: 0.7rem 1rem; border-radius: 0 var(--radius) var(--radius) 0;
+      font-family: 'Crimson Pro', serif; font-size: 0.92rem;
+      color: var(--muted); line-height: 1.6; margin-top: 0.8rem;
+    }
+    .info-box strong { color: var(--text); font-weight: 600; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border); padding: 1.4rem 0;
+      margin-top: 2rem; display: flex; justify-content: space-between;
+      align-items: center; font-size: 0.72rem; color: var(--muted);
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 860px) {
+      .main-layout, .filter-layout { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 540px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="nav-wrapper">
+      <a href="index.html" class="logo">F.<em>G</em></a>
+      <nav>
+        <a href="makaleler.html">/makaleler</a>
+        <a href="laboratuvar.html">/laboratuvar</a>
+        <a href="noron-simulator.html">/nöron-sim</a>
+        <a href="kitap-kulubu/">/kitap-kulübü</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="hero-top">
+      <div>
+        <div class="hero-tag">Laboratuvar / Sinyal İşleme & DSP</div>
+        <h1>Fourier <span>Sinyal Analizi</span></h1>
+      </div>
+      <div class="formula-strip">X(f) = ∫ x(t)·e^(-j2πft) dt</div>
+    </div>
+    <p class="hero-desc">Harmonikleri bileştir, DFT spektrumunu hesapla, filtre uygula. Gerçek sayısal sinyal işleme — sıfır kütüphane.</p>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" data-tab="composer">/ Sinyal Bileştirici</button>
+    <button class="tab" data-tab="spectrum">/ DFT Spektrumu</button>
+    <button class="tab" data-tab="filter">/ Filtre Tasarımı</button>
+    <button class="tab" data-tab="noise">/ Gürültü Analizi</button>
+  </div>
+
+  <!-- ══ TAB 1: COMPOSER ══ -->
+  <div class="tab-panel active" id="tab-composer">
+    <div class="main-layout">
+
+      <!-- LEFT: Controls -->
+      <div>
+        <div class="panel" style="margin-bottom:0.8rem;">
+          <div class="panel-head"><strong>Hazır Dalga Formları</strong></div>
+          <div class="panel-body">
+            <div class="wave-types" id="waveTypes">
+              <button class="wave-btn" data-wave="sine">Sinüs</button>
+              <button class="wave-btn" data-wave="square">Kare</button>
+              <button class="wave-btn" data-wave="sawtooth">Testere</button>
+              <button class="wave-btn" data-wave="triangle">Üçgen</button>
+              <button class="wave-btn" data-wave="custom">Özel</button>
+            </div>
+            <div class="info-box" id="waveInfo">
+              <strong>Özel mod:</strong> Aşağıdaki harmonikleri manuel ayarlayın.
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <strong>Harmonikler</strong>
+            <span style="font-size:0.65rem;">Genlik · Faz</span>
+          </div>
+          <div class="panel-body">
+            <div class="harmonics-list" id="harmonicsList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Canvas -->
+      <div style="display:flex;flex-direction:column;gap:0.8rem;">
+        <div class="panel">
+          <div class="panel-head">
+            <strong>Bileşik Sinyal — Zaman Bölgesi</strong>
+            <div style="display:flex;gap:0.8rem;font-size:0.65rem;">
+              <span style="color:var(--muted)">— Harmonikler</span>
+              <span style="color:var(--composite);font-weight:700;">— Bileşik</span>
+            </div>
+          </div>
+          <canvas id="compositeCanvas" height="200"></canvas>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><strong>Faz Uzayı (Phase Space)</strong></div>
+          <canvas id="phaseCanvas" height="160"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Temel Frekans</div>
+        <div class="stat-val" id="statF0">1.00<span class="stat-unit">Hz</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">RMS Değeri</div>
+        <div class="stat-val" id="statRMS">—<span class="stat-unit">V</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Tepe Genlik</div>
+        <div class="stat-val" id="statPeak">—<span class="stat-unit">V</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">THD</div>
+        <div class="stat-val" id="statTHD">—<span class="stat-unit">%</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Aktif Harmonik</div>
+        <div class="stat-val" id="statHarmonics">—</div>
+      </div>
+    </div>
+
+    <!-- Base freq -->
+    <div class="panel">
+      <div class="panel-head"><strong>Temel Parametre</strong></div>
+      <div class="panel-body" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.3rem;">
+            Temel Frekans f₀ &nbsp;<span id="f0Val" style="color:var(--c1);">1.0 Hz</span>
+          </div>
+          <input type="range" id="f0Slider" min="0.5" max="5" value="1" step="0.1"
+            style="background:linear-gradient(to right,var(--c1) 0%,var(--border-hi) 0%)">
+        </div>
+        <div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.3rem;">
+            Örnekleme Noktaları &nbsp;<span id="nVal" style="color:var(--c1);">512</span>
+          </div>
+          <input type="range" id="nSlider" min="64" max="2048" value="512" step="64"
+            style="background:linear-gradient(to right,var(--c1) 0%,var(--border-hi) 0%)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 2: DFT SPECTRUM ══ -->
+  <div class="tab-panel" id="tab-spectrum">
+    <div class="panel" style="margin-bottom:1rem;">
+      <div class="panel-head">
+        <strong>DFT Genlik Spektrumu |X(f)|</strong>
+        <span style="font-size:0.65rem;color:var(--muted);">Gerçek DFT — Goertzel algoritması</span>
+      </div>
+      <canvas id="spectrumCanvas" height="280"></canvas>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+      <div class="panel">
+        <div class="panel-head"><strong>Faz Spektrumu ∠X(f)</strong></div>
+        <canvas id="phaseSpecCanvas" height="160"></canvas>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><strong>Güç Spektral Yoğunluğu (PSD)</strong></div>
+        <canvas id="psdCanvas" height="160"></canvas>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><strong>DFT Katsayı Tablosu</strong></div>
+      <div class="panel-body dft-table-wrap">
+        <table id="dftTable">
+          <thead>
+            <tr>
+              <th>k</th>
+              <th>Frekans (Hz)</th>
+              <th>|X(k)|</th>
+              <th>∠X(k)</th>
+              <th>Re{X(k)}</th>
+              <th>Im{X(k)}</th>
+              <th class="td-bar">Görece Güç</th>
+            </tr>
+          </thead>
+          <tbody id="dftTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 3: FILTER ══ -->
+  <div class="tab-panel" id="tab-filter">
+    <div class="filter-layout">
+      <div>
+        <div class="panel" style="margin-bottom:0.8rem;">
+          <div class="panel-head"><strong>Filtre Tipi</strong></div>
+          <div class="panel-body">
+            <div class="filter-types" id="filterTypes">
+              <button class="filter-btn active" data-filter="lowpass">
+                Alçak Geçiren (LPF)
+                <small>f &lt; fc geçirir, üstünü keser</small>
+              </button>
+              <button class="filter-btn" data-filter="highpass">
+                Yüksek Geçiren (HPF)
+                <small>f &gt; fc geçirir, altını keser</small>
+              </button>
+              <button class="filter-btn" data-filter="bandpass">
+                Bant Geçiren (BPF)
+                <small>f1 &lt; f &lt; f2 aralığını geçirir</small>
+              </button>
+              <button class="filter-btn" data-filter="bandstop">
+                Bant Durduran (Notch)
+                <small>Belirli frekansı siler (50Hz gürültü)</small>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><strong>Filtre Parametreleri</strong></div>
+          <div class="panel-body">
+            <div class="filter-param">
+              <label>Kesim Frekansı f_c <span id="fcVal">2.0 Hz</span></label>
+              <input type="range" id="fcSlider" min="0.1" max="10" value="2" step="0.1"
+                style="background:linear-gradient(to right,var(--c3) 0%,var(--border-hi) 0%)">
+            </div>
+            <div class="filter-param" id="bwParam">
+              <label>Bant Genişliği BW <span id="bwVal">1.0 Hz</span></label>
+              <input type="range" id="bwSlider" min="0.1" max="5" value="1" step="0.1"
+                style="background:linear-gradient(to right,var(--c3) 0%,var(--border-hi) 0%)">
+            </div>
+            <div class="filter-param">
+              <label>Filtre Mertebesi N <span id="orderVal">4</span></label>
+              <input type="range" id="orderSlider" min="1" max="8" value="4" step="1"
+                style="background:linear-gradient(to right,var(--c3) 0%,var(--border-hi) 0%)">
+            </div>
+
+            <div class="info-box" id="filterInfo" style="border-color:var(--c3);">
+              <strong>Alçak Geçiren Filtre:</strong> Kesim frekansının altındaki bileşenleri geçirir. EMG/EEG sinyallerinde yüksek frekanslı gürültüyü temizlemek için kullanılır.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:0.8rem;">
+        <div class="panel">
+          <div class="panel-head">
+            <strong>Frekans Yanıtı |H(f)|</strong>
+            <span style="font-size:0.65rem;color:var(--muted);">Butterworth yaklaşımı</span>
+          </div>
+          <canvas id="freqRespCanvas" height="180"></canvas>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <strong>Filtrelenmiş Sinyal</strong>
+            <div style="font-size:0.65rem;display:flex;gap:0.8rem;">
+              <span style="color:var(--muted);">— Orijinal</span>
+              <span style="color:var(--c3);font-weight:700;">— Filtrelenmiş</span>
+            </div>
+          </div>
+          <canvas id="filteredCanvas" height="160"></canvas>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><strong>Attenuation Analizi</strong></div>
+          <div class="panel-body">
+            <table style="font-size:0.75rem;width:100%">
+              <thead>
+                <tr>
+                  <th>Harmonik</th><th>f (Hz)</th>
+                  <th>Giriş Genliği</th><th>Çıkış Genliği</th>
+                  <th>Zayıflama (dB)</th>
+                </tr>
+              </thead>
+              <tbody id="attenTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 4: NOISE ══ -->
+  <div class="tab-panel" id="tab-noise">
+    <div class="main-layout">
+      <div>
+        <div class="panel" style="margin-bottom:0.8rem;">
+          <div class="panel-head"><strong>Gürültü Modeli</strong></div>
+          <div class="panel-body">
+            <div class="noise-row">
+              <div>
+                <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.3rem;">
+                  Tip <span id="noiseTypeLabel" style="color:var(--c2);">AWGN</span>
+                </div>
+                <select id="noiseType" style="width:100%;background:var(--panel);border:1px solid var(--border);color:var(--text);padding:0.3rem;font-family:inherit;font-size:0.75rem;border-radius:var(--radius);">
+                  <option value="white">Beyaz (AWGN)</option>
+                  <option value="pink">Pembe (1/f)</option>
+                  <option value="impulse">Darbe (Spike)</option>
+                  <option value="powerline">Şebeke (50Hz)</option>
+                </select>
+              </div>
+              <div>
+                <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.3rem;">
+                  SNR <span id="snrVal" style="color:var(--c2);">20 dB</span>
+                </div>
+                <input type="range" id="snrSlider" min="0" max="40" value="20" step="1"
+                  style="background:linear-gradient(to right,var(--c2) 0%,var(--border-hi) 0%)">
+              </div>
+            </div>
+            <div class="info-box" style="border-color:var(--c2);" id="noiseInfo">
+              <strong>AWGN:</strong> Additive White Gaussian Noise. Tüm frekanslarda eşit güç dağılımı. Elektronik devre gürültüsü modeli.
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><strong>Gürültü İstatistikleri</strong></div>
+          <div class="panel-body">
+            <table style="font-size:0.75rem;width:100%">
+              <tbody id="noiseStatsTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:0.8rem;">
+        <div class="panel">
+          <div class="panel-head">
+            <strong>Gürültülü Sinyal</strong>
+            <div style="font-size:0.65rem;display:flex;gap:0.8rem;">
+              <span style="color:var(--muted);">— Temiz</span>
+              <span style="color:var(--c2);font-weight:700;">— Gürültülü</span>
+            </div>
+          </div>
+          <canvas id="noiseCanvas" height="180"></canvas>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><strong>Gürültü Spektrumu (Karşılaştırma)</strong></div>
+          <canvas id="noiseSpecCanvas" height="160"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div>© 2026 Furkan Güven · Fourier Analiz Aracı v1.0 · Sıfır kütüphane, saf JS DFT</div>
+    <div>
+      <a href="laboratuvar.html">← laboratuvar</a> &nbsp;·&nbsp;
+      <a href="noron-simulator.html">nöron-sim</a>
+    </div>
+  </footer>
+
+</div><!-- /container -->
+
+<script>
+(function() {
+'use strict';
+
+// ══ STATE ══
+const N_HARMONICS = 5;
+const HARMONIC_COLORS = ['#f0a500','#e05a5a','#50c8a0','#7090e8','#c07cdc'];
+
+let state = {
+  f0: 1.0,
+  nSamples: 512,
+  harmonics: [
+    { enabled: true,  amp: 1.0,  freq: 1, phase: 0 },
+    { enabled: false, amp: 0.5,  freq: 3, phase: 0 },
+    { enabled: false, amp: 0.33, freq: 5, phase: 0 },
+    { enabled: false, amp: 0.25, freq: 7, phase: 0 },
+    { enabled: false, amp: 0.2,  freq: 9, phase: 0 },
+  ],
+  filter: { type: 'lowpass', fc: 2.0, bw: 1.0, order: 4 },
+  noise: { type: 'white', snr: 20 },
+};
+
+// ══ CANVAS HELPERS ══
+function getCtx(id, h) {
+  const c = document.getElementById(id);
+  if (!c) return null;
+  const w = c.parentElement.clientWidth || 600;
+  c.width = w; if (h) c.height = h;
+  return c.getContext('2d');
+}
+
+function resizeAll() {
+  ['compositeCanvas','phaseCanvas','spectrumCanvas',
+   'phaseSpecCanvas','psdCanvas','freqRespCanvas',
+   'filteredCanvas','noiseCanvas','noiseSpecCanvas'].forEach(id => {
+    const c = document.getElementById(id);
+    if (!c) return;
+    c.width = c.parentElement.clientWidth || 600;
+  });
+  drawAll();
+}
+window.addEventListener('resize', resizeAll);
+
+// ══ SIGNAL GENERATION ══
+function generateSignal(nSamples) {
+  const sig = new Float64Array(nSamples);
+  const T = 1 / state.f0;
+  for (let i = 0; i < nSamples; i++) {
+    const t = (i / nSamples) * T;
+    let v = 0;
+    state.harmonics.forEach(h => {
+      if (h.enabled) v += h.amp * Math.sin(2 * Math.PI * h.freq * state.f0 * t + h.phase);
+    });
+    sig[i] = v;
+  }
+  return sig;
+}
+
+// ══ DFT (Cooley-Tukey style, direct) ══
+function computeDFT(sig) {
+  const N = sig.length;
+  const re = new Float64Array(N);
+  const im = new Float64Array(N);
+  // Compute only first N/2 bins (positive freqs)
+  const limit = Math.min(N / 2, 50);
+  for (let k = 0; k < limit; k++) {
+    let rk = 0, ik = 0;
+    for (let n = 0; n < N; n++) {
+      const angle = -2 * Math.PI * k * n / N;
+      rk += sig[n] * Math.cos(angle);
+      ik += sig[n] * Math.sin(angle);
+    }
+    re[k] = rk / N;
+    im[k] = ik / N;
+  }
+  return { re, im };
+}
+
+function dftMagnitude(re, im, k) {
+  const mag = Math.sqrt(re[k]*re[k] + im[k]*im[k]);
+  return k === 0 ? mag : mag * 2; // two-sided → one-sided
+}
+
+function dftPhase(re, im, k) {
+  return Math.atan2(im[k], re[k]) * 180 / Math.PI;
+}
+
+// ══ FILTER (Butterworth frequency-domain) ══
+function butterworthH(f, fc, order, type, bw) {
+  if (type === 'lowpass') {
+    return 1 / Math.sqrt(1 + Math.pow(f / fc, 2 * order));
+  } else if (type === 'highpass') {
+    if (f === 0) return 0;
+    return 1 / Math.sqrt(1 + Math.pow(fc / f, 2 * order));
+  } else if (type === 'bandpass') {
+    if (f === 0) return 0;
+    const Q = fc / bw;
+    const x = Q * (f/fc - fc/f);
+    return 1 / Math.sqrt(1 + Math.pow(x, 2 * order));
+  } else if (type === 'bandstop') {
+    if (f === 0) return 1;
+    const Q = fc / bw;
+    const x = Q * (f/fc - fc/f);
+    return Math.abs(x) / Math.sqrt(1 + x*x);
+  }
+  return 1;
+}
+
+function applyFilter(sig) {
+  const N = sig.length;
+  const { re, im } = computeDFT(sig);
+  const out = new Float64Array(N);
+  // Build frequency-domain representation, apply H(f), inverse
+  const T = 1 / state.f0;
+  const df = 1 / T;
+  // Simple convolution in freq domain (approx for display)
+  const filtered = new Float64Array(N);
+  const { filter: f } = state;
+  for (let i = 0; i < N; i++) {
+    const t = (i / N) * T;
+    let v = 0;
+    const limit = Math.min(N / 2, 50);
+    for (let k = 1; k < limit; k++) {
+      const freq = k * df;
+      const H = butterworthH(freq, f.fc, f.order, f.type, f.bw);
+      const mag = dftMagnitude(re, im, k);
+      const phase = Math.atan2(im[k], re[k]);
+      v += H * mag * Math.cos(2 * Math.PI * freq * t + phase);
+    }
+    // DC
+    const H0 = butterworthH(0, f.fc, f.order, f.type, f.bw);
+    filtered[i] = H0 * re[0] + v;
+  }
+  return filtered;
+}
+
+// ══ NOISE GENERATION ══
+function generateNoise(N, type, snrDb) {
+  const sig = generateSignal(N);
+  const sigPower = sig.reduce((a, v) => a + v*v, 0) / N;
+  const snrLinear = Math.pow(10, snrDb / 10);
+  const noisePower = sigPower / snrLinear;
+  const noiseAmp = Math.sqrt(noisePower);
+
+  const noise = new Float64Array(N);
+
+  if (type === 'white') {
+    // Box-Muller
+    for (let i = 0; i < N; i += 2) {
+      const u1 = Math.random() || 1e-10;
+      const u2 = Math.random();
+      const z0 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+      const z1 = Math.sqrt(-2 * Math.log(u1)) * Math.sin(2 * Math.PI * u2);
+      noise[i] = z0 * noiseAmp;
+      if (i+1 < N) noise[i+1] = z1 * noiseAmp;
+    }
+  } else if (type === 'pink') {
+    // Voss algorithm (simplified)
+    let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+    for (let i = 0; i < N; i++) {
+      const w = (Math.random() * 2 - 1);
+      b0 = 0.99886*b0 + w*0.0555179;
+      b1 = 0.99332*b1 + w*0.0750759;
+      b2 = 0.96900*b2 + w*0.1538520;
+      b3 = 0.86650*b3 + w*0.3104856;
+      b4 = 0.55000*b4 + w*0.5329522;
+      b5 = -0.7616*b5 - w*0.0168980;
+      noise[i] = (b0+b1+b2+b3+b4+b5+b6+w*0.5362) * 0.11 * noiseAmp;
+      b6 = w * 0.115926;
+    }
+  } else if (type === 'impulse') {
+    const impulseRate = 0.02;
+    for (let i = 0; i < N; i++) {
+      noise[i] = Math.random() < impulseRate ? (Math.random() > 0.5 ? 1 : -1) * noiseAmp * 5 : 0;
+    }
+  } else if (type === 'powerline') {
+    const T = 1 / state.f0;
+    for (let i = 0; i < N; i++) {
+      const t = (i / N) * T;
+      noise[i] = noiseAmp * 2 * Math.sin(2 * Math.PI * 50 * t);
+    }
+  }
+  return { sig, noise, noisy: sig.map((v,i) => v + noise[i]) };
+}
+
+// ══ DRAWING FUNCTIONS ══
+function drawGrid(ctx, W, H, xMin, xMax, yMin, yMax, color='#1c1c30') {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 0.5;
+  // Horizontal
+  for (let v = Math.ceil(yMin); v <= Math.floor(yMax); v += 0.5) {
+    const y = H - ((v - yMin) / (yMax - yMin)) * H;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+  // Vertical
+  const xStep = (xMax - xMin) / 8;
+  for (let i = 0; i <= 8; i++) {
+    const x = (i / 8) * W;
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+}
+
+function drawSignalLine(ctx, data, W, H, yMin, yMax, color, lineW=1.5, alpha=1) {
+  const N = data.length;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineW;
+  ctx.globalAlpha = alpha;
+  ctx.beginPath();
+  for (let i = 0; i < N; i++) {
+    const x = (i / (N-1)) * W;
+    const y = H - ((data[i] - yMin) / (yMax - yMin)) * H;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+}
+
+function axisLabel(ctx, text, x, y, color='#50507a') {
+  ctx.fillStyle = color;
+  ctx.font = '10px Inconsolata';
+  ctx.fillText(text, x, y);
+}
+
+// ── Composite Canvas ──
+function drawComposite() {
+  const ctx = getCtx('compositeCanvas');
+  if (!ctx) return;
+  const W = ctx.canvas.width, H = ctx.canvas.height;
+  ctx.fillStyle = '#07070e'; ctx.fillRect(0,0,W,H);
+
+  const sig = generateSignal(state.nSamples);
+  const yMax = 2.2, yMin = -2.2;
+  const T = 1 / state.f0;
+
+  drawGrid(ctx, W, H, 0, T, yMin, yMax);
+
+  // Zero line
+  ctx.strokeStyle = '#2a2a45'; ctx.lineWidth = 1;
+  const y0 = H - ((0 - yMin) / (yMax - yMin)) * H;
+  ctx.beginPath(); ctx.moveTo(0,y0); ctx.lineTo(W,y0); ctx.stroke();
+
+  // Individual harmonics
+  state.harmonics.forEach((h, hi) => {
+    if (!h.enabled) return;
+    const hSig = new Float64Array(state.nSamples);
+    for (let i = 0; i < state.nSamples; i++) {
+      const t = (i / state.nSamples) * T;
+      hSig[i] = h.amp * Math.sin(2*Math.PI*h.freq*state.f0*t + h.phase);
+    }
+    drawSignalLine(ctx, hSig, W, H, yMin, yMax, HARMONIC_COLORS[hi], 1, 0.5);
+  });
+
+  // Composite glow
+  ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 4;
+  drawSignalLine(ctx, sig, W, H, yMin, yMax, '#ffffff', 2);
+  ctx.shadowBlur = 0;
+
+  // Y-axis labels
+  [-2,-1,0,1,2].forEach(v => {
+    const y = H - ((v - yMin) / (yMax - yMin)) * H;
+    axisLabel(ctx, v + 'V', 3, y - 3);
+  });
+}
+
+// ── Phase Canvas ──
+function drawPhase() {
+  const ctx = getCtx('phaseCanvas');
+  if (!ctx) return;
+  const W = ctx.canvas.width, H = ctx.canvas.height;
+  ctx.fillStyle = '#07070e'; ctx.fillRect(0,0,W,H);
+
+  const sig = generateSignal(state.nSamples);
+  const N = sig.length;
+
+  // derivative (velocity)
+  const vel = new Float64Array(N);
+  for (let i = 1; i < N-1; i++) vel[i] = (sig[i+1] - sig[i-1]) * N / 2;
+  vel[0] = vel[1]; vel[N-1] = vel[N-2];
+
+  let xMin = Infinity, xMax = -Infinity, yMin = Infinity, yMax = -Infinity;
+  for (let i = 0; i < N; i++) {
+    xMin = Math.min(xMin, sig[i]); xMax = Math.max(xMax, sig[i]);
+    yMin = Math.min(yMin, vel[i]); yMax = Math.max(yMax, vel[i]);
+  }
+  const pad = 0.1;
+  const xR = xMax - xMin || 1, yR = yMax - yMin || 1;
+
+  ctx.strokeStyle = '#f0a500'; ctx.lineWidth = 1; ctx.globalAlpha = 0.7;
+  ctx.beginPath();
+  for (let i = 0; i < N; i++) {
+    const x = ((sig[i] - xMin) / xR) * W * (1 - 2*pad) + W*pad;
+    const y = H - ((vel[i] - yMin) / yR) * H * (1-2*pad) - H*pad;
+    i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+  axisLabel(ctx, 'x(t)', W-28, H-6);
+  axisLabel(ctx, "x'(t)", 4, 14);
+}
+
+// ── Spectrum Canvas ──
+function drawSpectrum() {
+  const ctx = getCtx('spectrumCanvas');
+  if (!ctx) return;
+  const W = ctx.canvas.width, H = ctx.canvas.height;
+  ctx.fillStyle = '#07070e'; ctx.fillRect(0,0,W,H);
+
+  const sig = generateSignal(state.nSamples);
+  const { re, im } = computeDFT(sig);
+  const limit = Math.min(state.nSamples/2, 30);
+  const T = 1/state.f0;
+  const df = 1/T;
+
+  // Find max magnitude
+  let maxMag = 0;
+  for (let k = 1; k < limit; k++) maxMag = Math.max(maxMag, dftMagnitude(re, im, k));
+  if (maxMag === 0) maxMag = 1;
+
+  // Grid
+  ctx.strokeStyle = '#1c1c30'; ctx.lineWidth = 0.5;
+  [0.25,0.5,0.75,1.0].forEach(v => {
+    const y = H - v * (H-30) - 20;
+    ctx.beginPath(); ctx.moveTo(40, y); ctx.lineTo(W-10, y); ctx.stroke();
+    axisLabel(ctx, (v * maxMag).toFixed(2), 2, y+4);
+  });
+
+  // Bars
+  const barW = Math.max(2, (W - 60) / limit - 2);
+  for (let k = 1; k < limit; k++) {
+    const mag = dftMagnitude(re, im, k);
+    const freq = k * df;
+    const x = 40 + (k / limit) * (W - 60);
+    const barH = (mag / maxMag) * (H - 50);
+    const y = H - 20 - barH;
+
+    // Gradient bar
+    const grad = ctx.createLinearGradient(x, y, x, H-20);
+    grad.addColorStop(0, '#f0a500');
+    grad.addColorStop(1, 'rgba(240,165,0,0.1)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(x - barW/2, y, barW, barH);
+
+    // Glow on top
+    ctx.fillStyle = 'rgba(240,165,0,0.9)';
+    ctx.fillRect(x - barW/2, y, barW, 2);
+
+    // Freq label
+    if (k % 2 === 1 || limit < 15) {
+      ctx.fillStyle = '#50507a'; ctx.font = '9px Inconsolata';
+      ctx.textAlign = 'center';
+      ctx.fillText(freq.toFixed(1), x, H - 5);
+    }
+  }
+  ctx.textAlign = 'left';
+  axisLabel(ctx, '|X(f)|', 4, 16);
+  axisLabel(ctx, 'Hz', W - 20, H - 5);
+}
+
+// ── Phase Spectrum ──
+function drawPhaseSpec() {
+  const ctx = getCtx('phaseSpecCanvas');
+  if (!ctx) return;
+  const W = ctx.canvas.width, H = ctx.canvas.height;
+  ctx.fillStyle = '#07070e'; ctx.fillRect(0,0,W,H);
+
+  const sig = generateSignal(state.nSamples);
+  const { re, im } = computeDFT(sig);
+  const limit = Math.min(state.nSamples/2, 25);
+  const T = 1/state.f0, df = 1/T;
+
+  // Zero line
+  const y0 = H/2;
+  ctx.strokeStyle = '#2a2a45'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(40, y0); ctx.lineTo(W-10, y0); ctx.stroke();
+  axisLabel(ctx, '0°', 2, y0+4);
+  axisLabel(ctx, '180°', 2, 14);
+  axisLabel(ctx, '-180°', 2, H-4);
+
+  for (let k = 1; k < limit; k++) {
+    const mag = dftMagnitude(re, im, k);
+    if (mag < 0.01) continue;
+    const phase = dftPhase(re, im, k);
+    const x = 40 + (k / limit) * (W - 60);
+    const y = y0 - (phase / 180) * (H/2 - 15);
+
+    ctx.fillStyle = '#7090e8';
+    ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = '#7090e8'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x, y0); ctx.lineTo(x, y); ctx.stroke();
+  }
+  axisLabel(ctx, '∠X(f)', 4, 14);
+}
+
+// ── PSD ──
+function drawPSD() {
+  const ctx = getCtx('psdCanvas');
+  if (!ctx) return;
+  const W = ctx.canvas.width, H = ctx.canvas.height;
+  ctx.fillStyle = '#07070e'; ctx.fillRect(0,0,W,H);
+
+  const sig = generateSignal(state.nSamples);
+  const { re, im } = computeDFT(sig);
+  const limit = Math.min(state.nSamples/2, 30);
+  const T = 1/state.f0;
+
+  // PSD: |X(k)|^2 / N in dB
+  let maxPSD = -Infinity;
+  const psds = [];
+  for (let k = 1; k < limit; k++) {
+    const mag = dftMagnitude(re, im, k);
+    const psd = mag > 0 ? 10 * Math.log10(mag*mag) : -80;
+    psds.push(psd);
+    maxPSD = Math.max(maxPSD, psd);
+  }
+  const minPSD = maxPSD - 60;
+
+  ctx.strokeStyle = '#c07cdc'; ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  psds.forEach((psd, i) => {
+    const x = 40 + ((i+1) / limit) * (W-60);
+    const y = H - 20 - ((psd - minPSD) / (maxPSD - minPSD)) * (H-40);
+    i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  axisLabel(ctx, 'dB', 4, 14);
+  axisLabel(ctx, maxPSD.toFixed(0)+'dB', 4, 28);
+  axisLabel(ctx, minPSD.toFixed(0)+'dB', 4, H-6);
+}
+
+// ── DFT Table ──
+function buildDFTTable() {
+  const tbody = document.getElementById('dftTbody');
+  if (!tbody) return;
+  const sig = generateSignal(state.nSamples);
+  const { re, im } = computeDFT(sig);
+  const T = 1/state.f0, df = 1/T;
+  const limit = Math.min(state.nSamples/2, 20);
+
+  let maxMag = 0;
+  for (let k = 0; k < limit; k++) maxMag = Math.max(maxMag, dftMagnitude(re, im, k));
+
+  tbody.innerHTML = '';
+  for (let k = 0; k < Math.min(limit, 15); k++) {
+    const mag = dftMagnitude(re, im, k);
+    const phase = dftPhase(re, im, k);
+    const pct = maxMag > 0 ? (mag / maxMag * 100).toFixed(0) : 0;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${k}</td>
+      <td>${(k * df).toFixed(3)}</td>
+      <td style="color:var(--c1)">${mag.toFixed(4)}</td>
+      <td>${phase.toFixed(1)}°</td>
+      <td>${(re[k]*2).toFixed(4)}</td>
+      <td>${(im[k]*2).toFixed(4)}</td>
+      <td class="td-bar"><div class="bar-inner" style="width:${pct}%"></div></td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+// ── Frequency Response ──
+function drawFreqResponse() {
+  const ctx = getCtx('freqRespCanvas');
+  if (!ctx) return;
+  const W = ctx.canvas.width, H = ctx.canvas.height;
+  ctx.fillStyle = '#07070e'; ctx.fillRect(0,0,W,H);
+
+  const { filter: f } = state;
+  const fMax = state.f0 * 12;
+
+  // Grid
+  ctx.strokeStyle = '#1c1c30'; ctx.lineWidth = 0.5;
+  [0,0.25,0.5,0.75,1.0].forEach(v => {
+    const y = H - v * (H-20) - 10;
+    ctx.beginPath(); ctx.moveTo(40,y); ctx.lineTo(W-10,y); ctx.stroke();
+    axisLabel(ctx, v.toFixed(2), 2, y+4);
+  });
+
+  // H(f) curve
+  const grad = ctx.createLinearGradient(40, 0, W, 0);
+  grad.addColorStop(0, '#50c8a0');
+  grad.addColorStop(1, 'rgba(80,200,160,0.2)');
+
+  ctx.strokeStyle = '#50c8a0'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let px = 0; px < W-50; px++) {
+    const freq = (px / (W-50)) * fMax;
+    const H_val = butterworthH(freq, f.fc, f.order, f.type, f.bw);
+    const x = 40 + px;
+    const y = H - 10 - H_val * (H-20);
+    px === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // fc line
+  const fcX = 40 + (f.fc / fMax) * (W-50);
+  ctx.strokeStyle = 'rgba(255,74,74,0.4)'; ctx.setLineDash([3,3]); ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(fcX, 0); ctx.lineTo(fcX, H); ctx.stroke();
+  ctx.setLineDash([]);
+  axisLabel(ctx, 'fc', fcX+2, 14, '#e05a5a');
+
+  // -3dB line
+  const y3db = H - 10 - 0.707 * (H-20);
+  ctx.strokeStyle = 'rgba(240,165,0,0.3)'; ctx.setLineDash([2,4]); ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(40, y3db); ctx.lineTo(W-10, y3db); ctx.stroke();
+  ctx.setLineDash([]);
+  axisLabel(ctx, '-3dB', W-38, y3db-2, '#f0a500');
+
+  axisLabel(ctx, '|H(f)|', 4, 14);
+}
+
+// ── Filtered Signal ──
+function drawFiltered() {
+  const ctx = getCtx('filteredCanvas');
+  if (!ctx) return;
+  const W = ctx.canvas.width, H = ctx.canvas.height;
+  ctx.fillStyle = '#07070e'; ctx.fillRect(0,0,W,H);
+
+  const sig = generateSignal(state.nSamples);
+  const filtered = applyFilter(sig);
+
+  const yMax = 2.2, yMin = -2.2;
+  const y0 = H - ((0-yMin)/(yMax-yMin))*H;
+  ctx.strokeStyle = '#2a2a45'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0,y0); ctx.lineTo(W,y0); ctx.stroke();
+
+  drawSignalLine(ctx, sig, W, H, yMin, yMax, 'rgba(255,255,255,0.25)', 1);
+  ctx.shadowColor = '#50c8a0'; ctx.shadowBlur = 4;
+  drawSignalLine(ctx, filtered, W, H, yMin, yMax, '#50c8a0', 2);
+  ctx.shadowBlur = 0;
+}
+
+// ── Attenuation Table ──
+function buildAttenTable() {
+  const tbody = document.getElementById('attenTbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  const { filter: f } = state;
+
+  state.harmonics.forEach((h, hi) => {
+    if (!h.enabled) return;
+    const freq = h.freq * state.f0;
+    const H_val = butterworthH(freq, f.fc, f.order, f.type, f.bw);
+    const outAmp = h.amp * H_val;
+    const db = H_val > 0 ? 20*Math.log10(H_val) : -999;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span style="color:${HARMONIC_COLORS[hi]}">H${hi+1}</span></td>
+      <td>${freq.toFixed(2)}</td>
+      <td>${h.amp.toFixed(3)}</td>
+      <td style="color:var(--c3)">${outAmp.toFixed(3)}</td>
+      <td style="color:${db < -3 ? 'var(--c2)' : 'var(--text)'}">${db.toFixed(1)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ── Noise Canvas ──
+function drawNoise() {
+  const ctx = getCtx('noiseCanvas');
+  if (!ctx) return;
+  const W = ctx.canvas.width, H = ctx.canvas.height;
+  ctx.fillStyle = '#07070e'; ctx.fillRect(0,0,W,H);
+
+  const { sig, noisy } = generateNoise(state.nSamples, state.noise.type, state.noise.snr);
+  let yMax = 0;
+  for (let v of noisy) yMax = Math.max(yMax, Math.abs(v));
+  yMax = Math.max(yMax, 1.5) * 1.1;
+
+  drawSignalLine(ctx, sig, W, H, -yMax, yMax, 'rgba(255,255,255,0.3)', 1.5);
+  drawSignalLine(ctx, noisy, W, H, -yMax, yMax, '#e05a5a', 1, 0.7);
+}
+
+// ── Noise Spectrum ──
+function drawNoiseSpec() {
+  const ctx = getCtx('noiseSpecCanvas');
+  if (!ctx) return;
+  const W = ctx.canvas.width, H = ctx.canvas.height;
+  ctx.fillStyle = '#07070e'; ctx.fillRect(0,0,W,H);
+
+  const { sig, noise } = generateNoise(state.nSamples, state.noise.type, state.noise.snr);
+  const dftSig = computeDFT(sig);
+  const dftNoise = computeDFT(new Float64Array(noise));
+  const limit = Math.min(state.nSamples/2, 30);
+
+  let maxMag = 0;
+  for (let k=1; k<limit; k++) {
+    maxMag = Math.max(maxMag, dftMagnitude(dftSig.re, dftSig.im, k));
+    maxMag = Math.max(maxMag, dftMagnitude(dftNoise.re, dftNoise.im, k));
+  }
+  if (maxMag === 0) maxMag = 1;
+
+  const barW = Math.max(2, (W-60)/(limit*2) - 1);
+  for (let k=1; k<limit; k++) {
+    const x = 40 + (k/limit)*(W-60);
+    const mSig = dftMagnitude(dftSig.re, dftSig.im, k) / maxMag;
+    const mNoise = dftMagnitude(dftNoise.re, dftNoise.im, k) / maxMag;
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillRect(x-barW*1.1, H-20-mSig*(H-40), barW, mSig*(H-40));
+    ctx.fillStyle = 'rgba(224,90,90,0.7)';
+    ctx.fillRect(x+1, H-20-mNoise*(H-40), barW, mNoise*(H-40));
+  }
+  axisLabel(ctx, '□ Sinyal  □ Gürültü', 44, H-4, '#50507a');
+}
+
+// ── Noise Stats ──
+function buildNoiseStats() {
+  const tbody = document.getElementById('noiseStatsTbody');
+  if (!tbody) return;
+  const { sig, noise } = generateNoise(state.nSamples, state.noise.type, state.noise.snr);
+  const sigPow = sig.reduce((a,v)=>a+v*v,0)/sig.length;
+  const noisePow = noise.reduce((a,v)=>a+v*v,0)/noise.length;
+  const snrCalc = noisePow > 0 ? 10*Math.log10(sigPow/noisePow) : 999;
+  const noiseRms = Math.sqrt(noisePow);
+  const noisePeak = Math.max(...noise.map(Math.abs));
+
+  tbody.innerHTML = `
+    <tr><td style="color:var(--muted)">SNR (hesaplanan)</td><td style="color:var(--c2)">${snrCalc.toFixed(2)} dB</td></tr>
+    <tr><td style="color:var(--muted)">Gürültü RMS</td><td>${noiseRms.toFixed(4)} V</td></tr>
+    <tr><td style="color:var(--muted)">Gürültü Tepesi</td><td>${noisePeak.toFixed(4)} V</td></tr>
+    <tr><td style="color:var(--muted)">Sinyal Gücü</td><td>${sigPow.toFixed(4)} W</td></tr>
+    <tr><td style="color:var(--muted)">Gürültü Gücü</td><td>${noisePow.toFixed(6)} W</td></tr>
+  `;
+}
+
+// ── Stats ──
+function updateStats() {
+  const sig = generateSignal(state.nSamples);
+  const rms = Math.sqrt(sig.reduce((a,v)=>a+v*v,0)/sig.length);
+  const peak = Math.max(...sig.map(Math.abs));
+  const activeH = state.harmonics.filter(h=>h.enabled);
+  const f1 = activeH[0];
+  const thd = f1 && f1.amp > 0
+    ? 100 * Math.sqrt(activeH.slice(1).reduce((a,h)=>a+h.amp*h.amp,0)) / f1.amp
+    : 0;
+
+  document.getElementById('statF0').innerHTML = state.f0.toFixed(2)+'<span class="stat-unit">Hz</span>';
+  document.getElementById('statRMS').innerHTML = rms.toFixed(3)+'<span class="stat-unit">V</span>';
+  document.getElementById('statPeak').innerHTML = peak.toFixed(3)+'<span class="stat-unit">V</span>';
+  document.getElementById('statTHD').innerHTML = thd.toFixed(1)+'<span class="stat-unit">%</span>';
+  document.getElementById('statHarmonics').textContent = activeH.length;
+}
+
+// ══ DRAW ALL ══
+function drawAll() {
+  drawComposite();
+  drawPhase();
+  drawSpectrum();
+  drawPhaseSpec();
+  drawPSD();
+  buildDFTTable();
+  drawFreqResponse();
+  drawFiltered();
+  buildAttenTable();
+  drawNoise();
+  drawNoiseSpec();
+  buildNoiseStats();
+  updateStats();
+}
+
+// ══ BUILD HARMONICS UI ══
+function buildHarmonicsUI() {
+  const list = document.getElementById('harmonicsList');
+  list.innerHTML = '';
+
+  state.harmonics.forEach((h, hi) => {
+    const div = document.createElement('div');
+    div.className = `harmonic-row h-row-${hi}${h.enabled ? '' : ' disabled'}`;
+    div.innerHTML = `
+      <div class="h-toggle ${h.enabled ? 'on' : ''}" data-hi="${hi}"></div>
+      <div class="h-controls">
+        <div class="h-label">
+          <span class="h-name" style="color:${HARMONIC_COLORS[hi]}">H${hi+1} — ${h.freq}f₀</span>
+          <span class="h-val">${h.amp.toFixed(2)}V · ${(h.phase*180/Math.PI).toFixed(0)}°</span>
+        </div>
+        <div class="h-sliders">
+          <div class="slider-wrap">
+            <label>Genlik</label>
+            <input type="range" min="0" max="2" value="${h.amp}" step="0.05"
+              data-hi="${hi}" data-param="amp">
+          </div>
+          <div class="slider-wrap">
+            <label>Faz (rad)</label>
+            <input type="range" min="${-Math.PI}" max="${Math.PI}" value="${h.phase}" step="0.05"
+              data-hi="${hi}" data-param="phase">
+          </div>
+        </div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+
+  // Bind toggles
+  list.querySelectorAll('.h-toggle').forEach(el => {
+    el.addEventListener('click', () => {
+      const hi = +el.dataset.hi;
+      state.harmonics[hi].enabled = !state.harmonics[hi].enabled;
+      buildHarmonicsUI();
+      drawAll();
+    });
+  });
+
+  // Bind sliders
+  list.querySelectorAll('input[type="range"]').forEach(el => {
+    el.addEventListener('input', () => {
+      const hi = +el.dataset.hi;
+      const param = el.dataset.param;
+      state.harmonics[hi][param] = parseFloat(el.value);
+      // Update label
+      const row = el.closest('.harmonic-row');
+      const h = state.harmonics[hi];
+      row.querySelector('.h-val').textContent =
+        `${h.amp.toFixed(2)}V · ${(h.phase*180/Math.PI).toFixed(0)}°`;
+      drawAll();
+    });
+    // Update slider gradient
+    el.addEventListener('input', function() {
+      const pct = (this.value - this.min) / (this.max - this.min) * 100;
+      this.style.background = `linear-gradient(to right, ${HARMONIC_COLORS[+this.dataset.hi]} ${pct}%, var(--border-hi) ${pct}%)`;
+    });
+  });
+}
+
+// ══ WAVE PRESETS ══
+const WAVE_INFOS = {
+  sine: '<strong>Sinüs Dalgası:</strong> Tek harmonik, saf f₀. En temel periyodik sinyal. THD = %0.',
+  square: '<strong>Kare Dalga:</strong> Fourier serisi: Σ(1/k)·sin(kf₀), k=1,3,5… Keskin kenarlar sonsuz harmonik gerektirir.',
+  sawtooth: '<strong>Testere Dalgası:</strong> Fourier serisi: Σ(1/k)·sin(kf₀), k=1,2,3… Hem tek hem çift harmonikler.',
+  triangle: '<strong>Üçgen Dalga:</strong> Fourier serisi: Σ(1/k²)·sin(kf₀), k=1,3,5… Kare dalgadan daha düzgün.',
+  custom: '<strong>Özel mod:</strong> Harmonikleri manuel ayarlayın.',
+};
+
+document.querySelectorAll('.wave-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.wave-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const w = btn.dataset.wave;
+    document.getElementById('waveInfo').innerHTML = WAVE_INFOS[w] || '';
+
+    if (w === 'sine') {
+      state.harmonics = [
+        { enabled:true,  amp:1.0,  freq:1, phase:0 },
+        { enabled:false, amp:0,    freq:3, phase:0 },
+        { enabled:false, amp:0,    freq:5, phase:0 },
+        { enabled:false, amp:0,    freq:7, phase:0 },
+        { enabled:false, amp:0,    freq:9, phase:0 },
+      ];
+    } else if (w === 'square') {
+      state.harmonics = [
+        { enabled:true, amp:1.000, freq:1, phase:0 },
+        { enabled:true, amp:0.333, freq:3, phase:0 },
+        { enabled:true, amp:0.200, freq:5, phase:0 },
+        { enabled:true, amp:0.143, freq:7, phase:0 },
+        { enabled:true, amp:0.111, freq:9, phase:0 },
+      ];
+    } else if (w === 'sawtooth') {
+      state.harmonics = [
+        { enabled:true, amp:1.000, freq:1, phase:0 },
+        { enabled:true, amp:0.500, freq:2, phase:0 },
+        { enabled:true, amp:0.333, freq:3, phase:0 },
+        { enabled:true, amp:0.250, freq:4, phase:0 },
+        { enabled:true, amp:0.200, freq:5, phase:0 },
+      ];
+    } else if (w === 'triangle') {
+      state.harmonics = [
+        { enabled:true,  amp:1.000, freq:1, phase:0 },
+        { enabled:true,  amp:0.111, freq:3, phase:Math.PI },
+        { enabled:true,  amp:0.040, freq:5, phase:0 },
+        { enabled:true,  amp:0.020, freq:7, phase:Math.PI },
+        { enabled:false, amp:0.012, freq:9, phase:0 },
+      ];
+    }
+
+    buildHarmonicsUI();
+    drawAll();
+  });
+});
+
+// ══ FILTER BINDINGS ══
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.filter.type = btn.dataset.filter;
+
+    const infos = {
+      lowpass: '<strong>Alçak Geçiren:</strong> EMG/EEG sinyallerinde yüksek frekanslı gürültüyü temizler. Ses sistemlerinde bas bölgesi.',
+      highpass: '<strong>Yüksek Geçiren:</strong> DC offset ve düşük frekans salınımlarını keser. Mikrofon ön devreleri.',
+      bandpass: '<strong>Bant Geçiren:</strong> Belirli frekans bandını seçer. Radyo alıcıları, EEG alfa dalgası (8-12Hz).',
+      bandstop: '<strong>Notch Filtre:</strong> Şebeke gürültüsünü (50/60Hz) yok eder. Medikal cihaz zorunluluğu.',
+    };
+    document.getElementById('filterInfo').innerHTML = infos[state.filter.type] || '';
+
+    const bwParam = document.getElementById('bwParam');
+    bwParam.style.display = ['bandpass','bandstop'].includes(state.filter.type) ? 'block' : 'none';
+
+    drawAll();
+  });
+});
+
+['fcSlider','bwSlider','orderSlider'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('input', function() {
+    const v = parseFloat(this.value);
+    const pct = (this.value - this.min)/(this.max-this.min)*100;
+    this.style.background = `linear-gradient(to right, var(--c3) ${pct}%, var(--border-hi) ${pct}%)`;
+    if (id === 'fcSlider') { state.filter.fc = v; document.getElementById('fcVal').textContent = v.toFixed(1)+' Hz'; }
+    if (id === 'bwSlider') { state.filter.bw = v; document.getElementById('bwVal').textContent = v.toFixed(1)+' Hz'; }
+    if (id === 'orderSlider') { state.filter.order = v; document.getElementById('orderVal').textContent = v; }
+    drawAll();
+  });
+});
+
+// ══ NOISE BINDINGS ══
+document.getElementById('noiseType').addEventListener('change', function() {
+  state.noise.type = this.value;
+  document.getElementById('noiseTypeLabel').textContent = this.options[this.selectedIndex].text;
+  const noiseInfos = {
+    white: '<strong>AWGN:</strong> Additive White Gaussian Noise. Tüm frekanslarda eşit güç. Elektronik devre gürültüsü.',
+    pink: '<strong>Pembe Gürültü:</strong> 1/f spektrumu. Her oktavda eşit güç. EEG sinyallerinde yaygın.',
+    impulse: '<strong>Darbe Gürültüsü:</strong> Anlık yüksek genlikli kesintiler. EMG artefaktı, elektriksel müdahale.',
+    powerline: '<strong>Şebeke Gürültüsü:</strong> 50Hz baskın. Medikal cihazlarda en büyük bozucu. Notch filtre ile temizlenir.',
+  };
+  document.getElementById('noiseInfo').innerHTML = noiseInfos[this.value] || '';
+  drawAll();
+});
+
+document.getElementById('snrSlider').addEventListener('input', function() {
+  state.noise.snr = parseFloat(this.value);
+  document.getElementById('snrVal').textContent = this.value+' dB';
+  const pct = (this.value-this.min)/(this.max-this.min)*100;
+  this.style.background = `linear-gradient(to right,var(--c2) ${pct}%,var(--border-hi) ${pct}%)`;
+  drawAll();
+});
+
+// ══ BASE SLIDERS ══
+document.getElementById('f0Slider').addEventListener('input', function() {
+  state.f0 = parseFloat(this.value);
+  document.getElementById('f0Val').textContent = state.f0.toFixed(1)+' Hz';
+  const pct = (this.value-this.min)/(this.max-this.min)*100;
+  this.style.background = `linear-gradient(to right,var(--c1) ${pct}%,var(--border-hi) ${pct}%)`;
+  drawAll();
+});
+
+document.getElementById('nSlider').addEventListener('input', function() {
+  state.nSamples = parseInt(this.value);
+  document.getElementById('nVal').textContent = state.nSamples;
+  const pct = (this.value-this.min)/(this.max-this.min)*100;
+  this.style.background = `linear-gradient(to right,var(--c1) ${pct}%,var(--border-hi) ${pct}%)`;
+  drawAll();
+});
+
+// ══ TABS ══
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
+    setTimeout(drawAll, 50);
+  });
+});
+
+// ══ INIT ══
+buildHarmonicsUI();
+resizeAll();
+
+})();
+</script>
+</body>
+</html>

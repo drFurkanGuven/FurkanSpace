@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Furkan Güven'in tıp, nörofizyoloji, donanım mimarisi, teorik fizik ve İslami metodoloji üzerine yazdığı makaleler ve analizler." />
+  <meta name="author" content="Furkan Güven" />
+  <!-- Open Graph -->
+  <meta property="og:title" content="Makaleler | Furkan Güven" />
+  <meta property="og:description" content="Tıp, donanım mimarisi, teorik fizik ve İslami metodoloji üzerine makaleler ve analizler." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://furkanguven.space/makaleler.html" />
+  <meta property="og:locale" content="tr_TR" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Makaleler | Furkan Güven" />
+  <meta name="twitter:description" content="Tıp, donanım mimarisi, teorik fizik ve İslami metodoloji üzerine makaleler ve analizler." />
+  <title>Furkan Güven | Makaleler</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>F</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="scroll-progress"></div>
+  <div class="container">
+    <header>
+      <div class="nav-wrapper">
+        <a href="index.html" class="logo">F. Güven</a>
+        <nav aria-label="Ana navigasyon">
+          <ul>
+            <li><a href="makaleler.html" class="active">/makaleler</a></li>
+            <li><a href="laboratuvar.html">/laboratuvar</a></li>
+            <li><a href="hadis-arama.html">/hadis</a></li>
+            <li><a href="kuran-analiz-v2/">/kök-analiz</a></li>
+            <li><a href="kitap-kulubu/">/kitap-kulübü</a></li>
+            
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <h1 class="page-title fade-in">Yazılar & Analizler</h1>
+
+    <div class="article-list" id="articleList">
+      <p style="color:var(--text-muted);font-style:italic;font-size:0.9rem;">Yükleniyor…</p>
+    </div>
+
+    <script>
+    (function () {
+      function esc(s) {
+        return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      }
+      function formatDate(d) {
+        if (!d) return '';
+        return new Date(d).toLocaleDateString('tr-TR', { day:'numeric', month:'long', year:'numeric' });
+      }
+
+      fetch('makaleler/data/index.json?_=' + Date.now())
+        .then(function(r) { return r.json(); })
+        .then(function(articles) {
+          var list = document.getElementById('articleList');
+          if (!articles.length) {
+            list.innerHTML = '<p style="color:var(--text-muted)">Henüz makale yok.</p>';
+            return;
+          }
+          list.innerHTML = articles.map(function(a) {
+            var href = a.legacy ? a.legacyUrl : ('makaleler/article.html?slug=' + a.slug);
+            var tags = (a.tags || []).map(function(t) { return '[' + esc(t) + ']'; }).join(', ');
+            var reading = a.readingTime ? '~ ' + a.readingTime + ' dk' : '';
+            return '<article class="article-item fade-in">' +
+              '<div class="article-meta">' +
+                '<span>' + esc(formatDate(a.date)) + '</span>' +
+                (tags ? '<span>' + esc(tags) + '</span>' : '') +
+                (reading ? '<span>' + reading + '</span>' : '') +
+              '</div>' +
+              '<a href="' + esc(href) + '" class="article-title">' + esc(a.title) + '</a>' +
+              (a.description ? '<p class="article-excerpt">' + esc(a.description) + '</p>' : '') +
+              '<a href="' + esc(href) + '" class="read-more">→ devamını oku</a>' +
+            '</article>';
+          }).join('');
+        })
+        .catch(function() {
+          document.getElementById('articleList').innerHTML =
+            '<p style="color:#ff6b6b;font-family:monospace">Makale listesi yüklenemedi.</p>';
+        });
+    })();
+    </script>
+
+    <footer>
+      <div>© 2026 Furkan Güven</div>
+      <div><a href="https://github.com/drFurkanGuven" target="_blank" rel="noopener noreferrer">github</a></div>
+    </footer>
+  </div>
+
+  <a href="#" class="back-to-top" aria-label="Sayfanın başına dön">↑</a>
+  <script src="js/main.js" defer></script>
+</body>
+</html>

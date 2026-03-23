@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" id="metaDesc" content="" />
+  <meta name="author" content="Furkan Güven" />
+  <meta property="og:type" content="article" />
+  <meta property="og:locale" content="tr_TR" />
+  <meta property="og:title" id="ogTitle" content="" />
+  <meta property="og:description" id="ogDesc" content="" />
+  <meta name="twitter:card" content="summary" />
+  <title id="pageTitle">Yükleniyor… | Furkan Güven</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>F</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .article-body h2 { font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; color: var(--accent); margin: 2.5rem 0 1rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); }
+    .article-body h3 { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: #aaa; margin: 1.8rem 0 0.6rem; }
+    .article-body ul, .article-body ol { margin: 0 0 1.4rem 1.5rem; }
+    .article-body li { margin-bottom: 0.4rem; }
+    .article-body blockquote { border-left: 3px solid var(--highlight); margin: 1.5rem 0; padding: 0.8rem 1.2rem; background: var(--surface); color: var(--text-muted); font-style: italic; }
+    .article-body code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: var(--code-bg); border: 1px solid var(--border); padding: 0.15em 0.4em; border-radius: 3px; color: #79c0ff; }
+    .article-body pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: 1.2rem; overflow-x: auto; margin-bottom: 1.4rem; }
+    .article-body pre code { background: none; border: none; padding: 0; color: #e6edf3; font-size: 0.9rem; }
+    .article-body hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+    .article-body a { color: var(--highlight); }
+    .article-body strong { color: var(--accent); font-weight: 600; }
+    .article-body table { width: 100%; border-collapse: collapse; margin-bottom: 1.4rem; font-size: 0.92rem; }
+    .article-body th { background: var(--surface); border: 1px solid var(--border); padding: 0.6rem 1rem; text-align: left; font-family: 'JetBrains Mono', monospace; color: var(--accent); }
+    .article-body td { border: 1px solid var(--border); padding: 0.6rem 1rem; color: var(--text-muted); }
+    .reading-time { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--text-muted); margin-top: 0.6rem; }
+    .back-link { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 2rem; }
+    .back-link:hover { color: var(--accent); text-decoration: none; }
+    .article-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.8rem; }
+    .article-tag { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; background: var(--surface); border: 1px solid var(--border); padding: 0.2rem 0.6rem; border-radius: 3px; color: var(--text-muted); }
+    .loading-msg { color: var(--text-muted); font-style: italic; padding: 3rem 0; }
+    .error-msg { color: #ff6b6b; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; padding: 2rem 0; }
+  </style>
+</head>
+<body>
+  <div class="scroll-progress"></div>
+  <div class="container">
+    <header>
+      <div class="nav-wrapper">
+        <a href="../index.html" class="logo">F. Güven</a>
+        <nav aria-label="Ana navigasyon">
+          <ul>
+            <li><a href="../makaleler.html" class="active">/makaleler</a></li>
+            <li><a href="../laboratuvar.html">/laboratuvar</a></li>
+            <li><a href="../kuran-analiz-v2/">/kök-analiz</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <a href="../makaleler.html" class="back-link">← makaleler</a>
+
+    <div id="articleContainer">
+      <p class="loading-msg">Yükleniyor…</p>
+    </div>
+
+    <footer>
+      <div>© 2026 Furkan Güven</div>
+      <div><a href="https://github.com/drFurkanGuven" target="_blank" rel="noopener noreferrer">github</a></div>
+    </footer>
+  </div>
+
+  <a href="#" class="back-to-top" aria-label="Sayfanın başına dön">↑</a>
+
+  <!-- marked.js: Markdown → HTML -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+  <script src="../js/main.js" defer></script>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var slug = params.get('slug');
+      var container = document.getElementById('articleContainer');
+
+      if (!slug) {
+        container.innerHTML = '<p class="error-msg">Makale bulunamadı. <a href="../makaleler.html">Listeye dön →</a></p>';
+        return;
+      }
+
+      fetch('../makaleler/data/' + slug + '.json')
+        .then(function (r) {
+          if (!r.ok) throw new Error(r.status);
+          return r.json();
+        })
+        .then(function (article) {
+          // Meta etiketlerini güncelle
+          document.getElementById('pageTitle').textContent = article.title + ' | Furkan Güven';
+          document.getElementById('metaDesc').setAttribute('content', article.description || '');
+          document.getElementById('ogTitle').setAttribute('content', article.title);
+          document.getElementById('ogDesc').setAttribute('content', article.description || '');
+
+          // Tarih formatla
+          var dateStr = '';
+          if (article.date) {
+            var d = new Date(article.date);
+            dateStr = d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+          }
+
+          // Etiketler
+          var tagsHtml = '';
+          if (article.tags && article.tags.length) {
+            tagsHtml = '<div class="article-tags">' +
+              article.tags.map(function (t) { return '<span class="article-tag">[' + t + ']</span>'; }).join('') +
+              '</div>';
+          }
+
+          // Makale gövdesi (Markdown → HTML)
+          var bodyHtml = '';
+          if (article.body) {
+            marked.setOptions({ breaks: true, gfm: true });
+            bodyHtml = marked.parse(article.body);
+          }
+
+          container.innerHTML =
+            '<div class="article-header fade-in">' +
+              '<div class="article-meta">' +
+                (dateStr ? '<span>' + dateStr + '</span>' : '') +
+                (article.readingTime ? '<span>~ ' + article.readingTime + ' dk okuma</span>' : '') +
+              '</div>' +
+              tagsHtml +
+              '<h1>' + escHtml(article.title) + '</h1>' +
+              (article.description ? '<p class="article-desc">' + escHtml(article.description) + '</p>' : '') +
+            '</div>' +
+            '<div class="article-body fade-in">' + bodyHtml + '</div>';
+        })
+        .catch(function () {
+          container.innerHTML = '<p class="error-msg">Makale yüklenemedi. <a href="../makaleler.html">Listeye dön →</a></p>';
+        });
+
+      function escHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      }
+    })();
+  </script>
+</body>
+</html>

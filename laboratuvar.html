@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="FPGA üzerinde nöromorfik sentez, kozmik kızıla kayma simülasyonu ve biyomedikal sinyal işleme laboratuvarı." />
+  <meta name="author" content="Furkan Güven" />
+  <!-- Open Graph -->
+  <meta property="og:title" content="Laboratuvar | Furkan Güven" />
+  <meta property="og:description" content="FPGA üzerinde nöromorfik sentez, kozmik kızıla kayma simülasyonu ve biyomedikal sinyal işleme." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://furkanguven.space/laboratuvar.html" />
+  <meta property="og:locale" content="tr_TR" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Laboratuvar | Furkan Güven" />
+  <meta name="twitter:description" content="FPGA üzerinde nöromorfik sentez, kozmik kızıla kayma simülasyonu ve biyomedikal sinyal işleme." />
+  <title>Laboratuvar | Furkan Güven</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>F</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/style.css">
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <div class="scroll-progress"></div>
+  <div class="container">
+    <header>
+      <div class="nav-wrapper">
+        <a href="index.html" class="logo">F. Güven</a>
+        <nav aria-label="Ana navigasyon">
+          <ul>
+            <li><a href="makaleler.html">/makaleler</a></li>
+            <li><a href="laboratuvar.html" class="active">/laboratuvar</a></li>
+            <li><a href="hadis-arama.html">/hadis</a></li>
+            <li><a href="kuran-analiz-v2/">/kök-analiz</a></li>
+            <li><a href="kitap-kulubu/">/kitap-kulübü</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <h1 class="page-title fade-in">Sistem Sentezi & Donanım</h1>
+
+    <div class="lab-module fade-in">
+      <h2>1. Nöromorfik Sentez: FPGA Üzerinde SNN (LIF) Mimarisi</h2>
+      <p>
+        Biyolojik sinir sistemlerinin davranışını taklit eden <strong>Leaky Integrate-and-Fire (LIF)</strong> nöron modelinin saf donanım (VHDL) seviyesinde sentezlenmesi. Amaç, von Neumann darboğazını aşarak beynin paralel ve asenkron bilgi işleme (information theory) kapasitesini silikona kopyalamaktır.
+      </p>
+      
+      <div class="math-block">
+        $$ \tau_m \frac{dV_m}{dt} = -(V_m - E_{rest}) + R_m I(t) $$
+      </div>
+      
+      <p>
+        Yukarıdaki diferansiyel denklemin sürekli zamanlı (analog) yapısı, donanım kaynaklarını optimize etmek adına ayrık zamanlı (discrete) hale getirilmiş ve sızıntı (leak) faktörü, pahalı bölme işlemleri yerine "Arithmetic Shift Right" (srl) ile çözülmüştür.
+      </p>
+
+      
+
+      <div class="code-window">
+        <div class="code-header">
+          <span>lif_neuron_core.vhd</span>
+          <span>VHDL</span>
+        </div>
+<pre><code><span class="kw">library</span> IEEE;
+<span class="kw">use</span> IEEE.STD_LOGIC_1164.<span class="kw">ALL</span>;
+<span class="kw">use</span> IEEE.NUMERIC_STD.<span class="kw">ALL</span>;
+
+<span class="kw">entity</span> <span class="ty">LIF_Neuron</span> <span class="kw">is</span>
+    <span class="kw">Port</span> ( clk       : <span class="kw">in</span>  <span class="ty">STD_LOGIC</span>;
+           reset     : <span class="kw">in</span>  <span class="ty">STD_LOGIC</span>;
+           spike_in  : <span class="kw">in</span>  <span class="ty">STD_LOGIC</span>;
+           spike_out : <span class="kw">out</span> <span class="ty">STD_LOGIC</span> );
+<span class="kw">end</span> <span class="ty">LIF_Neuron</span>;
+
+<span class="kw">architecture</span> <span class="st">Behavioral</span> <span class="kw">of</span> <span class="ty">LIF_Neuron</span> <span class="kw">is</span>
+    <span class="kw">signal</span> v_mem : <span class="ty">unsigned</span>(15 <span class="kw">downto</span> 0) := (<span class="kw">others</span> => '0');
+    <span class="kw">constant</span> THRESHOLD : <span class="ty">unsigned</span>(15 <span class="kw">downto</span> 0) := to_unsigned(40000, 16);
+    <span class="kw">constant</span> LEAK_SHIFT : <span class="ty">integer</span> := 4; <span class="cm">-- tau = 16 cycle sızıntı sabiti</span>
+<span class="kw">begin</span>
+    <span class="kw">process</span>(clk, reset)
+    <span class="kw">begin</span>
+        <span class="kw">if</span> reset = '1' <span class="kw">then</span>
+            v_mem <= (<span class="kw">others</span> => '0');
+            spike_out <= '0';
+        <span class="kw">elsif</span> rising_edge(clk) <span class="kw">then</span>
+            <span class="cm">-- Zıt iyon pompası simülasyonu: Bit kaydırma ile V_mem düşürülür</span>
+            v_mem <= v_mem - (v_mem srl LEAK_SHIFT);
+            
+            <span class="kw">if</span> spike_in = '1' <span class="kw">then</span>
+                v_mem <= v_mem + 1500; <span class="cm">-- EPSP (Uyarıcı Postsinaptik Potansiyel)</span>
+            <span class="kw">end if</span>;
+
+            <span class="cm">-- Aksiyon Potansiyeli Ateşlemesi</span>
+            <span class="kw">if</span> v_mem >= THRESHOLD <span class="kw">then</span>
+                spike_out <= '1';
+                v_mem <= (<span class="kw">others</span> => '0'); <span class="cm">-- Hiperpolarizasyon (Reset)</span>
+            <span class="kw">else</span>
+                spike_out <= '0';
+            <span class="kw">end if</span>;
+        <span class="kw">end if</span>;
+    <span class="kw">end process</span>;
+<span class="kw">end</span> <span class="st">Behavioral</span>;</code></pre>
+      </div>
+        <a href="noron-simulator.html" class="error-link" style="display:inline-block;margin-top:1rem;">
+        → Simülatörü Dene
+      </a>
+    </div>
+
+    <div class="lab-module fade-in">
+      <h2>2. Veri Bilimi: Kozmik Kızıla Kayma (Redshift) ve Hubble Parametresi</h2>
+      <p>
+        Fizikteki <em>Hubble Gerilimi</em> makalemde bahsettiğim makro ölçekli ölçüm krizinin simülasyonu. Uzak galaksilerden gelen ışığın, evrenin genişlemesi nedeniyle elektromanyetik spektrumda kırmızıya doğru kaymasının ($z$) hesaplanması.
+      </p>
+
+      <div class="math-block">
+        $$ z = \frac{\lambda_{obs} - \lambda_{emit}}{\lambda_{emit}} \quad \Rightarrow \quad v \approx c \cdot z $$
+      </div>
+
+      <p>
+        Aşağıdaki algoritma, SDSS (Sloan Digital Sky Survey) spektroskopik veri setleri üzerinden hidrojenin alfa çizgisindeki (656.28 nm) kaymayı tespit edip galaksinin radyal uzaklaşma hızını hesaplayan basit bir Python modelidir.
+      </p>
+
+      
+
+      <div class="code-window">
+        <div class="code-header">
+          <span>redshift_analyzer.py</span>
+          <span>Python</span>
+        </div>
+<pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.signal <span class="kw">import</span> find_peaks
+
+<span class="kw">def</span> <span class="ty">calculate_recessional_velocity</span>(observed_spectrum, wavelengths):
+    <span class="cm"># Laboratuvar ortamında Hidrojen-Alpha emisyon çizgisi (nm)</span>
+    H_ALPHA_EMIT = <span class="st">656.28</span>  
+    SPEED_OF_LIGHT = <span class="st">299792</span>  <span class="cm"># km/s</span>
+
+    <span class="cm"># Spektrumdaki en yüksek piki (gözlemlenen dalga boyunu) bul</span>
+    peaks, _ = find_peaks(observed_spectrum, height=<span class="st">0.8</span>)
+    lambda_obs = wavelengths[peaks[<span class="st">0</span>]]
+
+    <span class="cm"># Kızıla kayma (z) formülü</span>
+    z = (lambda_obs - H_ALPHA_EMIT) / H_ALPHA_EMIT
+    
+    <span class="cm"># Klasik Doppler yaklaşımı ile uzaklaşma hızı</span>
+    velocity = z * SPEED_OF_LIGHT
+    
+    <span class="kw">return</span> z, velocity
+
+<span class="cm"># Örnek Çıktı: z = 0.024, v = 7195 km/s</span></code></pre>
+      </div>
+    </div>
+
+    <div class="lab-module fade-in">
+      <h2>3. Biyomedikal Sinyal İşleme (DSP): EMG Gürültü Filtreleme</h2>
+      <p>
+        Bir tıp öğrencisi olarak insan kas kasılmalarını incelerken (Elektromiyografi), elektrotlardan alınan sinyallerin aslında 50Hz/60Hz şebeke gürültüsü (Powerline Interference) ile ne kadar kirlendiğini görürüz. 
+      </p>
+      <p>
+        Bu problemi çözmek için saf bir algoritmik yaklaşım: Dijital sinyal işleme teknikleri kullanılarak tasarlanmış bir <strong>FIR (Finite Impulse Response) Notch Filtresi</strong>. Bu algoritma, donanımsal olarak C veya FPGA üzerinde koşacak şekilde dizayn edilmiştir.
+      </p>
+
+      <div class="math-block">
+        $$ y[n] = \sum_{k=0}^{N} b_k x[n-k] - \sum_{j=1}^{M} a_j y[n-j] $$
+      </div>
+
+    </div>
+
+    <footer>
+      <div>© 2026 Furkan Güven</div>
+      <div><a href="https://github.com/drFurkanGuven" target="_blank" rel="noopener noreferrer">github</a></div>
+    </footer>
+  </div>
+
+  <a href="#" class="back-to-top" aria-label="Sayfanın başına dön">↑</a>
+  <script src="js/main.js" defer></script>
+</body>
+</html>

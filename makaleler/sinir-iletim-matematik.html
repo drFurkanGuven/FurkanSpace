@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Aksiyon potansiyelinin diferansiyel anatomisinden, silikon tabanlı nöromorfik mimarilere uzanan bir bilgi teorisi incelemesi." />
+  <meta name="author" content="Furkan Güven" />
+  <!-- Open Graph -->
+  <meta property="og:title" content="Biyolojik Devrelerden Silikon Ağlara: SNN ve FPGA | Furkan Güven" />
+  <meta property="og:description" content="Hodgkin-Huxley, SNN ve FPGA Sentezi. Neden standart yapay zeka beyni taklit edemez ve çözüm neden donanımdadır?" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://furkanguven.space/makaleler/sinir-iletim-matematik.html" />
+  <meta property="og:locale" content="tr_TR" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Biyolojik Devrelerden Silikon Ağlara: SNN ve FPGA | Furkan Güven" />
+  <meta name="twitter:description" content="Hodgkin-Huxley, SNN ve FPGA Sentezi. Neden standart yapay zeka beyni taklit edemez ve çözüm neden donanımdadır?" />
+  <title>Biyolojik Devrelerden Silikon Ağlara: SNN ve FPGA | Furkan Güven</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>F</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../css/style.css">
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <div class="scroll-progress"></div>
+  <div class="container">
+    <header>
+      <div class="nav-wrapper">
+        <a href="../index.html" class="logo">F. Güven</a>
+        <nav aria-label="Ana navigasyon">
+          <ul>
+            <li><a href="../makaleler.html" class="active">/makaleler</a></li>
+            <li><a href="../laboratuvar.html">/laboratuvar</a></li>
+            <li><a href="../kitap-kulubu/">/kitap-kulübü</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <div class="article-header fade-in">
+      <div class="article-meta">
+        <span>08 Mart 2026</span>
+        <span>[Nörofizyoloji]</span>
+        <span>[Donanım Mimarisi]</span>
+        <span>[Biyomatematik]</span>
+      </div>
+      <h1>Biyolojik Devrelerden Silikon Ağlara: Hodgkin-Huxley, SNN ve FPGA Sentezi</h1>
+      <p class="article-desc">
+        Aksiyon potansiyelinin diferansiyel anatomisinden, silikon tabanlı nöromorfik mimarilere uzanan bir bilgi teorisi incelemesi. Neden standart yapay zeka beyni taklit edemez ve çözüm neden donanımdadır?
+      </p>
+      <p class="reading-time">~ 8 dk okuma süresi</p>
+    </div>
+
+    <div class="article-body">
+
+      <p>
+        Anatomi kitapları median sinirin trasesini ezberletirken, genellikle bu kabloların içinden akan o kusursuz bilgi teorisini (information theory) ıskalarlar. Tıp biliminin büyüleyiciliği, o ıslak ve kaotik biyolojik yapının aslında son derece deterministik, doğrusal olmayan (non-linear) bir matematiksel model üzerinde çalışmasında gizlidir.
+      </p>
+
+      <h2>// 1. Hücre Zarı Bir Kapasitör Müdür? (Matematiksel Mantık)</h2>
+
+      <p>
+        Evrendeki analog veriyi alıp, "ya hep ya hiç" kuralıyla dijital spike'lara (vuruşlara) çeviren o eşsiz işlemciyi, yani nöronu anlamak için 1952 yılına, Hodgkin ve Huxley'nin (HH) Nobel ödüllü modeline gitmemiz gerekir. Onlar nöronu biyolojik bir hücreden çok, bir elektrik devresi olarak okudular.
+      </p>
+
+      <p>
+        Bu modele göre hücre zarı bir <strong>kapasitör</strong> ($C_m$), voltaj kapılı iyon kanalları (Sodyum ve Potasyum) ise <strong>değişken dirençlerdi</strong>. Hücrenin anlık potansiyelini ifade eden o devasa diferansiyel denklem şuydu:
+      </p>
+
+      <div class="math-block">
+        $$ C_m \frac{dV_m}{dt} = -\bar{g}_{Na} m^3 h (V_m - E_{Na}) - \bar{g}_K n^4 (V_m - E_K) - g_L (V_m - E_L) + I_{ext} $$
+      </div>
+
+      <p>
+        Bu denklem dizisi son derece hassastır ancak hesaplanması muazzam bir işlem gücü gerektirir. HH modeli beynin nasıl çalıştığını kusursuz açıklar; fakat beyni bir bilgisayar üzerinde simüle etmek istediğimizde, bu dört diferansiyel denklemi milyarlarca nöron için her milisaniyede çözmek, günümüz süper bilgisayarlarını bile felç eder. İşte bu yüzden matematikte bir soyutlamaya, daha hafif ama biyolojik gerçekçiliğini (biological plausibility) koruyan bir modele ihtiyaç duyarız: <strong>Leaky Integrate-and-Fire (LIF)</strong>.
+      </p>
+
+      <h2>// 2. SNN (Spiking Neural Network) Nedir?</h2>
+
+      <p>
+        Bugün dünyayı kasıp kavuran Derin Öğrenme (Deep Learning) modelleri (ANN'ler), aslında beyni çok kaba ve yanlış bir şekilde taklit eder. Standart bir yapay zeka modelinde, veriler sürekli sayılardır (float) ve zaman kavramı yoktur. Nöronlar birbirleriyle "zaman" üzerinden değil, "ağırlık matrisleri" üzerinden konuşur.
+      </p>
+      
+      
+
+      <p>
+        Beyin ise böyle çalışmaz. Beyin <strong>zaman</strong> boyutunu kullanır. Bilgi, sinir hücresinin ne kadar şiddetli ateşlendiğiyle değil, <em>ne zaman</em> ateşlendiğiyle (spike timing) kodlanır. <strong>Spiking Neural Network (SNN)</strong>, nöronların yalnızca zar potansiyeli belirli bir eşiği (threshold) aştığında anlık bir sinyal (spike = 1) ürettiği, geri kalan zamanda ise tamamen sessiz (0) kaldığı, evrenin en enerji verimli ağ mimarisidir. SNN'ler asenkrondur; sadece veri geldiğinde uyanır, işlem yapar ve uykuya dönerler.
+      </p>
+
+      <h2>// 3. Neden CPU/GPU Değil de FPGA? (Silikonun Özgürlüğü)</h2>
+
+      <p>
+        Eğer SNN bu kadar iyiyse neden her yerde kullanmıyoruz? Çünkü modern bilgisayarlarımız (CPU ve GPU'lar) <strong>Von Neumann mimarisiyle</strong> çalışır. Bu mimaride işlemci ile hafıza (RAM) ayrı yerlerdedir. İşlemci sürekli hafızaya gidip veri almak (fetch), okumak (decode) ve yazmak (execute) zorundadır. Bu gidip gelme işlemine "Von Neumann Darboğazı" denir. 
+      </p>
+
+      <p>
+        Beyinde ise hafıza (sinaps) ve işlemci (soma) aynı yerdedir! Milyarlarca nöron tamamen paralel çalışır. Bir CPU'ya "milyarlarca nöronu aynı anda simüle et" derseniz, bunu sıraya koymak zorundadır (sequential processing). 
+      </p>
+      
+      
+
+      <p>
+        İşte <strong>FPGA (Field Programmable Gate Array - Alanda Programlanabilir Kapı Dizileri)</strong> burada devreye girer. FPGA bir işlemci değildir; içi boş, devasa bir mantık kapısı (LUTs, Flip-Flops) tarlasıdır. VHDL veya Verilog kodları yazarak bu tarlayı kelimenin tam anlamıyla <em>kablolarsınız</em> (rewiring). FPGA üzerinde binlerce SNN nöronu inşa ederseniz, hepsi beynimizdeki gibi <strong>gerçek zamanlı ve tamamen paralel</strong> çalışır. Hafıza ve işlemci donanımsal olarak iç içe geçer.
+      </p>
+
+      <h2>// 4. Biyolojik Refrakter Periyot vs. Donanımsal Clock Cycle</h2>
+
+      <p>
+        Nörofizyolojide <strong>Mutlak Refrakter Periyot</strong> dediğimiz kavram, nöronun ateşleme yaptıktan sonra sodyum kanallarının inaktive olması nedeniyle kısa bir süre duyarsız kalmasıdır. Bu biyolojik "reset" mekanizmasını, FPGA'de bir Durum Makinesi (State Machine) içindeki <code>WAIT_RESET</code> durumuna, yani belirli bir <strong>Clock Cycle (Saat Vuruşu)</strong> gecikmesine çeviririz.
+      </p>
+
+      <p>
+        Sürekli zamanlı LIF diferansiyel denklemi şudur:
+      </p>
+
+      <div class="math-block">
+        $$ \tau_m \frac{dV_m}{dt} = -(V_m - E_{rest}) + R_m I_{in}(t) $$
+      </div>
+
+      <p>
+        Bu denklemi FPGA'de hesaplarken, zamanı $\Delta t$ adımlarına böleriz. Sızıntıyı (leakage) temsil eden $-(V_m - E_{rest})$ kısmını, donanımda pahalı olan bölme (division) işlemi yerine, çok hızlı çalışan <strong>Bit Kaydırma (Shift Right Logic)</strong> ile simüle ederiz. Bu saf bir mühendislik optimizasyonudur.
+      </p>
+
+      <div class="code-window">
+        <div class="code-header">
+          <span>lif_neuron.vhd</span>
+          <span>VHDL (Snippet)</span>
+        </div>
+<pre><code><span class="kw">process</span>(clk, reset)
+<span class="kw">begin</span>
+    <span class="kw">if</span> reset = '1' <span class="kw">then</span>
+        membrane_potential <= 0;
+        state <= IDLE;
+    <span class="kw">elsif</span> rising_edge(clk) <span class="kw">then</span>
+        <span class="kw">case</span> state <span class="kw">is</span>
+            <span class="kw">when</span> IDLE =>
+                <span class="cm">-- Sızıntı (Leak) simülasyonu: Bölme yerine Arithmetic Shift Right (srl) kullanılarak donanım tasarrufu sağlandı</span>
+                membrane_potential <= membrane_potential - (membrane_potential srl LEAK_FACTOR) + incoming_spike;
+                
+                <span class="kw">if</span> membrane_potential >= THRESHOLD <span class="kw">then</span>
+                    spike_out <= '1'; <span class="cm">-- Aksiyon potansiyeli ateşlendi!</span>
+                    state <= REFRACTORY;
+                    refractory_counter <= 0;
+                <span class="kw">end if</span>;
+                
+            <span class="kw">when</span> REFRACTORY =>
+                <span class="cm">-- Biyolojik Mutlak Refrakter Periyodun Donanımsal Karşılığı</span>
+                spike_out <= '0';
+                membrane_potential <= RESTING_POTENTIAL;
+                
+                <span class="cm">-- Clock Cycle sayılarak nöron dinlendiriliyor</span>
+                <span class="kw">if</span> refractory_counter = MAX_REFRACTORY_CYCLES <span class="kw">then</span>
+                    state <= IDLE;
+                <span class="kw">else</span>
+                    refractory_counter <= refractory_counter + 1;
+                <span class="kw">end if</span>;
+        <span class="kw">end case</span>;
+    <span class="kw">end if</span>;
+<span class="kw">end process</span>;</code></pre>
+      </div>
+
+      <h2>// 5. Bu Tabanla Neler Yapılabilir? (Projeler ve Vizyon)</h2>
+
+      <p>
+        Biyolojinin matematiğini silikon üzerinde bu şekilde paralel bir mimariyle kurduğunuzda, yapabileceklerinizin sınırı, hayal gücünüz ve elinizdeki FPGA kartının LUT (Look-Up Table) kapasitesi kadardır. Bu laboratuvar altyapısı üzerine inşa edilebilecek somut akademik projeler şunlardır:
+      </p>
+
+      <ul>
+        <li><strong>Gerçek Zamanlı Nöroprotez Kontrolü:</strong> Geleneksel mikrodenetleyiciler (örneğin bir Arduino), koldan alınan yüzlerce EMG sinyalini aynı anda işleyip motorlara komut vermekte gecikir. FPGA tabanlı bir SNN, biyolojik kas sinyallerini (spike formunda) mikrosaniyeler içinde işleyerek protez bir eli sıfır gecikmeyle (zero-latency) hareket ettirebilir.</li>
+        <li><strong>Düşük Güçlü Edge AI (Sınır Bilişim):</strong> Kameralar veya tıbbi sensörler üzerine entegre edilmiş SNN çipler. Sadece kadrajda veya kalp ritminde bir anormallik olduğunda (spike ürettiğinde) enerji harcayan, pili yıllarca dayanan medikal implantlar (örneğin akıllı kalp pilleri veya derin beyin stimülatörleri).</li>
+        <li><strong>Beyin-Bilgisayar Arayüzleri (BCI):</strong> EEG dalgalarının SNN ağı tarafından doğrudan donanım seviyesinde sınıflandırılması. Hastanın düşünce komutlarının, yazılımsal bir yoruma ihtiyaç duymadan doğrudan donanım lojiğinde çözümlenmesi.</li>
+      </ul>
+
+      <h2>// Sonuç: Tıp ve Mühendisliğin Evliliği</h2>
+
+      <p>
+        Bir yanda sodyum-potasyum pompalarının ATP harcayarak yarattığı iyonik gradyan, diğer yanda FPGA içindeki flip-flopların ve mantık kapılarının mikrosaniyelik senkronizasyonu. Tıbbı sadece anatomiye, mühendisliği ise sadece koda hapsetmek, evrenin bu ortak ve zarif dilini sağırlaştırmaktır. Bir sistemi anlamanın en iyi yolu, onu laboratuvarda sıfırdan inşa etmektir.
+      </p>
+
+    </div>
+
+    <div class="article-nav">
+      <a href="kevser-epistemoloji.html">← önceki yazı</a>
+      <a href="paralaks-kozmik-olcek.html">sonraki yazı →</a>
+    </div>
+
+    <footer>
+      <div>© 2026 Furkan Güven</div>
+      <div><a href="https://github.com/drFurkanGuven" target="_blank" rel="noopener noreferrer">github</a></div>
+    </footer>
+  </div>
+
+  <a href="#" class="back-to-top" aria-label="Sayfanın başına dön">↑</a>
+  <script src="../js/main.js" defer></script>
+</body>
+</html>
