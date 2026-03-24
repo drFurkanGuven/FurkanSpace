@@ -70,7 +70,7 @@
             var href = a.legacy ? a.legacyUrl : ('makaleler/article.html?slug=' + a.slug);
             var tags = (a.tags || []).map(function(t) { return '[' + esc(t) + ']'; }).join(', ');
             var reading = a.readingTime ? '~ ' + a.readingTime + ' dk' : '';
-            return '<article class="article-item fade-in">' +
+            return '<article class="article-item">' +
               '<div class="article-meta">' +
                 '<span>' + esc(formatDate(a.date)) + '</span>' +
                 (tags ? '<span>' + esc(tags) + '</span>' : '') +
