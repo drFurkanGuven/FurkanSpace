@@ -20,10 +20,11 @@
 
 'use strict';
 
-const http = require('http');
-const fs   = require('fs');
-const path = require('path');
-const url  = require('url');
+const http   = require('http');
+const fs     = require('fs');
+const path   = require('path');
+const url    = require('url');
+const crypto = require('crypto');
 
 /* ── Ayarlar ── */
 const PORT         = process.env.PORT || 3001;
@@ -32,10 +33,32 @@ const SITE_ROOT    = path.resolve(__dirname, '..');
 const DATA_DIR     = path.join(SITE_ROOT, 'makaleler', 'data');
 const INDEX_FILE   = path.join(DATA_DIR, 'index.json');
 
+/* ── Kitap Kulübü Veri Dosyaları ── */
+const KK_DIR        = path.join(__dirname, 'data');
+const USERS_FILE    = path.join(KK_DIR, 'users.json');
+const EVENTS_FILE   = path.join(KK_DIR, 'events.json');
+const PROGRESS_FILE = path.join(KK_DIR, 'progress.json');
+const TOKENS_FILE   = path.join(KK_DIR, 'tokens.json');
+
+if (!fs.existsSync(KK_DIR)) fs.mkdirSync(KK_DIR, { recursive: true });
+function kkLoad(file) { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return []; } }
+function kkSave(file, data) { fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf8'); }
+function hashPass(pass) { return crypto.createHash('sha256').update(pass + 'fg_salt_2026').digest('hex'); }
+function genToken() { return crypto.randomBytes(32).toString('hex'); }
+function kkAuth(req) {
+  const h = req.headers['authorization'] || '';
+  const tok = h.replace(/^Bearer\s+/i, '');
+  if (!tok) return null;
+  const tokens = kkLoad(TOKENS_FILE);
+  const t = tokens.find(x => x.token === tok);
+  if (!t) return null;
+  const users = kkLoad(USERS_FILE);
+  return users.find(u => u.id === t.userId) || null;
+}
+function uid() { return crypto.randomBytes(8).toString('hex'); }
+
 if (!ADMIN_TOKEN) {
-  console.error('HATA: ADMIN_TOKEN çevre değişkeni ayarlanmamış!');
-  console.error('Örnek: ADMIN_TOKEN=güçlübirtokenyaz node api/server.js');
-  process.exit(1);
+  console.warn('UYARI: ADMIN_TOKEN ayarlanmamış — admin işlemleri devre dışı.');
 }
 
 /* ── CORS başlıkları ── */
@@ -224,6 +247,113 @@ const server = http.createServer(async (req, res) => {
     saveIndex(articles);
 
     console.log('[DELETE] Makale silindi:', slug);
+    return send(res, 200, { ok: true });
+  }
+
+  /* ══════════════════════════════════════════════
+     KİTAP KULÜBÜ API
+  ══════════════════════════════════════════════ */
+
+  /* Kayıt */
+  if (method === 'POST' && pathname === '/api/auth/register') {
+    let body; try { body = await readBody(req); } catch(e) { return sendError(res, 400, e.message); }
+    const { name, email, password } = body;
+    if (!name || !email || !password) return sendError(res, 400, 'Ad, e-posta ve şifre zorunludur');
+    if (password.length < 6) return sendError(res, 400, 'Şifre en az 6 karakter olmalı');
+    const users = kkLoad(USERS_FILE);
+    if (users.find(u => u.email === email)) return sendError(res, 409, 'Bu e-posta zaten kayıtlı');
+    const user = { id: uid(), name, email, passwordHash: hashPass(password), createdAt: new Date().toISOString() };
+    users.push(user);
+    kkSave(USERS_FILE, users);
+    const token = genToken();
+    const tokens = kkLoad(TOKENS_FILE);
+    tokens.push({ token, userId: user.id });
+    kkSave(TOKENS_FILE, tokens);
+    return send(res, 201, { token, user: { id: user.id, name: user.name, email: user.email } });
+  }
+
+  /* Giriş */
+  if (method === 'POST' && pathname === '/api/auth/login') {
+    let body; try { body = await readBody(req); } catch(e) { return sendError(res, 400, e.message); }
+    const { email, password } = body;
+    const users = kkLoad(USERS_FILE);
+    const user = users.find(u => u.email === email && u.passwordHash === hashPass(password));
+    if (!user) return sendError(res, 401, 'E-posta veya şifre hatalı');
+    const token = genToken();
+    const tokens = kkLoad(TOKENS_FILE);
+    tokens.push({ token, userId: user.id });
+    kkSave(TOKENS_FILE, tokens);
+    return send(res, 200, { token, user: { id: user.id, name: user.name, email: user.email } });
+  }
+
+  /* Mevcut kullanıcı */
+  if (method === 'GET' && pathname === '/api/auth/me') {
+    const user = kkAuth(req);
+    if (!user) return sendError(res, 401, 'Giriş yapılmamış');
+    return send(res, 200, { user: { id: user.id, name: user.name, email: user.email } });
+  }
+
+  /* Etkinlikler */
+  if (method === 'GET' && pathname === '/api/events') {
+    const user = kkAuth(req);
+    if (!user) return sendError(res, 401, 'Giriş yapılmamış');
+    const events = kkLoad(EVENTS_FILE);
+    const progress = kkLoad(PROGRESS_FILE);
+    const users = kkLoad(USERS_FILE);
+    const result = events.map(ev => {
+      const evProgress = progress.filter(p => p.eventId === ev.id).map(p => {
+        const u = users.find(x => x.id === p.userId);
+        return { ...p, user: u ? { id: u.id, name: u.name } : { id: p.userId, name: '?' } };
+      });
+      const creator = users.find(x => x.id === ev.creatorId);
+      return { ...ev, progress: evProgress, creator: creator ? { id: creator.id, name: creator.name } : null };
+    });
+    return send(res, 200, { events: result });
+  }
+
+  if (method === 'POST' && pathname === '/api/events') {
+    const user = kkAuth(req);
+    if (!user) return sendError(res, 401, 'Giriş yapılmamış');
+    let body; try { body = await readBody(req); } catch(e) { return sendError(res, 400, e.message); }
+    const { bookName, totalPages, duration, location, selectedVerse, selectedHadith } = body;
+    if (!bookName || !totalPages) return sendError(res, 400, 'Kitap adı ve sayfa sayısı zorunludur');
+    const events = kkLoad(EVENTS_FILE);
+    const ev = { id: uid(), bookName, totalPages, duration: duration || null, location: location || null, selectedVerse: selectedVerse || null, selectedHadith: selectedHadith || null, creatorId: user.id, createdAt: new Date().toISOString() };
+    events.unshift(ev);
+    kkSave(EVENTS_FILE, events);
+    return send(res, 201, { event: ev });
+  }
+
+  /* Etkinlik detayı */
+  if (method === 'GET' && pathname === '/api/event-detail') {
+    const user = kkAuth(req);
+    if (!user) return sendError(res, 401, 'Giriş yapılmamış');
+    const { id } = url.parse(req.url, true).query;
+    const events = kkLoad(EVENTS_FILE);
+    const ev = events.find(e => e.id === id);
+    if (!ev) return sendError(res, 404, 'Etkinlik bulunamadı');
+    const progress = kkLoad(PROGRESS_FILE);
+    const users = kkLoad(USERS_FILE);
+    const evProgress = progress.filter(p => p.eventId === id).map(p => {
+      const u = users.find(x => x.id === p.userId);
+      return { ...p, user: u ? { id: u.id, name: u.name } : { id: p.userId, name: '?' } };
+    });
+    const creator = users.find(x => x.id === ev.creatorId);
+    return send(res, 200, { event: { ...ev, progress: evProgress, creator: creator ? { id: creator.id, name: creator.name } : null } });
+  }
+
+  /* İlerleme güncelle */
+  if (method === 'POST' && pathname === '/api/progress') {
+    const user = kkAuth(req);
+    if (!user) return sendError(res, 401, 'Giriş yapılmamış');
+    let body; try { body = await readBody(req); } catch(e) { return sendError(res, 400, e.message); }
+    const { eventId, currentPage, notes } = body;
+    if (!eventId || currentPage === undefined) return sendError(res, 400, 'eventId ve currentPage zorunludur');
+    const progress = kkLoad(PROGRESS_FILE);
+    const idx = progress.findIndex(p => p.eventId === eventId && p.userId === user.id);
+    const entry = { id: idx >= 0 ? progress[idx].id : uid(), userId: user.id, eventId, currentPage, notes: notes || '', updatedAt: new Date().toISOString() };
+    if (idx >= 0) progress[idx] = entry; else progress.push(entry);
+    kkSave(PROGRESS_FILE, progress);
     return send(res, 200, { ok: true });
   }
 
