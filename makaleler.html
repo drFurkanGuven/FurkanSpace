@@ -55,8 +55,11 @@
         return new Date(d).toLocaleDateString('tr-TR', { day:'numeric', month:'long', year:'numeric' });
       }
 
-      fetch('makaleler/data/index.json?_=' + Date.now())
-        .then(function(r) { return r.json(); })
+      fetch('/makaleler/data/index.json?_=' + Date.now())
+        .then(function(r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
         .then(function(articles) {
           var list = document.getElementById('articleList');
           if (!articles.length) {
@@ -79,9 +82,9 @@
             '</article>';
           }).join('');
         })
-        .catch(function() {
+        .catch(function(err) {
           document.getElementById('articleList').innerHTML =
-            '<p style="color:#ff6b6b;font-family:monospace">Makale listesi yüklenemedi.</p>';
+            '<p style="color:#ff6b6b;font-family:monospace">Makale listesi yüklenemedi: ' + err.message + '</p>';
         });
     })();
     </script>
