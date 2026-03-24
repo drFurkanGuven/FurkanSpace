@@ -50,6 +50,14 @@
     return div.innerHTML;
   }
 
+  function linkify(str) {
+    if (!str) return "";
+    var escaped = escapeHtml(str);
+    return escaped.replace(/(https?:\/\/[^\s<]+)/g, function(url) {
+      return '<a href="' + url + '" target="_blank" rel="noopener noreferrer" style="color:#4a90e2;text-decoration:underline;">' + url + '</a>';
+    });
+  }
+
   function percentStr(current, total) {
     if (!total) return "0";
     return Math.min(100, Math.round((current / total) * 100));
@@ -331,13 +339,13 @@
     if (ev.selectedVerse) {
       detailsHtml +=
         '<div class="kk-verse-box"><span class="kk-verse-label">Ayet-i Kerime</span>' +
-        escapeHtml(ev.selectedVerse) +
+        linkify(ev.selectedVerse) +
         "</div>";
     }
     if (ev.selectedHadith) {
       detailsHtml +=
         '<div class="kk-verse-box"><span class="kk-verse-label">Hadis-i Şerif</span>' +
-        escapeHtml(ev.selectedHadith) +
+        linkify(ev.selectedHadith) +
         "</div>";
     }
 
@@ -453,13 +461,13 @@
       if (ev.selectedVerse) {
         verseHtml +=
           '<div class="kk-verse-box"><span class="kk-verse-label">Ayet-i Kerime</span>' +
-          escapeHtml(ev.selectedVerse) +
+          linkify(ev.selectedVerse) +
           "</div>";
       }
       if (ev.selectedHadith) {
         verseHtml +=
           '<div class="kk-verse-box"><span class="kk-verse-label">Hadis-i Şerif</span>' +
-          escapeHtml(ev.selectedHadith) +
+          linkify(ev.selectedHadith) +
           "</div>";
       }
 
