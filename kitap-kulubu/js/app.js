@@ -127,6 +127,9 @@
       case "event-detail":
         renderEventDetail(param);
         break;
+      case "event-edit":
+        renderEventEdit(param);
+        break;
       default:
         renderDashboard();
     }
@@ -285,11 +288,33 @@
       });
       html("#eventsList", cardsHtml);
 
-      // Add click handlers for detail links
+      // Detay
       document.querySelectorAll("[data-event-id]").forEach(function (el) {
         el.addEventListener("click", function (e) {
           e.preventDefault();
           navigate("event-detail", el.dataset.eventId);
+        });
+      });
+
+      // Düzenle
+      document.querySelectorAll("[data-edit-id]").forEach(function (el) {
+        el.addEventListener("click", function (e) {
+          e.preventDefault();
+          navigate("event-edit", el.dataset.editId);
+        });
+      });
+
+      // Sil
+      document.querySelectorAll("[data-delete-id]").forEach(function (el) {
+        el.addEventListener("click", async function (e) {
+          e.preventDefault();
+          if (!confirm("Bu etkinliği silmek istediğinize emin misiniz?")) return;
+          try {
+            await api("/events/" + el.dataset.deleteId, { method: "DELETE" });
+            renderDashboard();
+          } catch (err) {
+            alert("Silinemedi: " + err.message);
+          }
         });
       });
     } catch (err) {
@@ -376,10 +401,12 @@
         : "") +
       detailsHtml +
       progressHtml +
-      '<div style="margin-top:1rem;text-align:right;">' +
-      '<a href="#" data-event-id="' +
-      ev.id +
-      '" class="kk-btn kk-btn-secondary kk-btn-small">Detay &amp; Katıl</a>' +
+      '<div style="margin-top:1rem;text-align:right;display:flex;gap:.5rem;justify-content:flex-end;">' +
+      '<a href="#" data-event-id="' + ev.id + '" class="kk-btn kk-btn-secondary kk-btn-small">Detay &amp; Katıl</a>' +
+      (currentUser && ev.creator && ev.creator.id === currentUser.id
+        ? '<a href="#" data-edit-id="' + ev.id + '" class="kk-btn kk-btn-secondary kk-btn-small">Düzenle</a>' +
+          '<a href="#" data-delete-id="' + ev.id + '" class="kk-btn kk-btn-small" style="background:#ff5555;border-color:#ff5555;color:#fff;">Sil</a>'
+        : '') +
       "</div>" +
       "</div>"
     );
@@ -641,6 +668,116 @@
       show(errorEl);
       btn.disabled = false;
       btn.textContent = "Etkinlik Oluştur";
+    }
+  }
+
+  // ── Edit Event Form ──
+  async function renderEventEdit(eventId) {
+    html(
+      "#appContent",
+      '<a href="#" class="kk-back" id="backBtn">&#8592; Panele Dön</a>' +
+        '<div id="editFormWrapper" class="kk-loading">Yükleniyor...</div>'
+    );
+    $("#backBtn").addEventListener("click", function (e) {
+      e.preventDefault();
+      navigate("dashboard");
+    });
+
+    try {
+      var data = await api("/event-detail?id=" + String(eventId), { method: "GET" });
+      var ev = data.event;
+
+      // Only creator can edit
+      if (!currentUser || !ev.creator || ev.creator.id !== currentUser.id) {
+        html("#editFormWrapper", '<div class="kk-error" style="display:block">Bu etkinliği düzenleme yetkiniz yok.</div>');
+        return;
+      }
+
+      html(
+        "#editFormWrapper",
+        '<h1 class="kk-page-title">Etkinliği Düzenle</h1>' +
+          '<div class="kk-form-card">' +
+          '<div class="kk-error" id="editError" style="display:none"></div>' +
+          '<div class="kk-success-msg" id="editSuccess" style="display:none"></div>' +
+          '<form id="editForm">' +
+          '<div class="kk-form-group">' +
+          '<label for="editBookName">Kitap Adı *</label>' +
+          '<input type="text" id="editBookName" class="kk-input" value="' + escapeHtml(ev.bookName) + '" required />' +
+          "</div>" +
+          '<div class="kk-form-row">' +
+          '<div class="kk-form-group">' +
+          '<label for="editTotalPages">Toplam Sayfa *</label>' +
+          '<input type="number" id="editTotalPages" class="kk-input" value="' + ev.totalPages + '" min="1" required />' +
+          "</div>" +
+          '<div class="kk-form-group">' +
+          '<label for="editDuration">Süre / Bitiş Tarihi</label>' +
+          '<input type="text" id="editDuration" class="kk-input" value="' + escapeHtml(ev.duration || '') + '" placeholder="Ör: 30 gün veya 15 Nisan 2026" />' +
+          "</div>" +
+          "</div>" +
+          '<div class="kk-form-group">' +
+          '<label for="editLocation">Mekan</label>' +
+          '<input type="text" id="editLocation" class="kk-input" value="' + escapeHtml(ev.location || '') + '" placeholder="Ör: Online / Kütüphane" />' +
+          "</div>" +
+          '<hr class="kk-divider" />' +
+          '<div class="kk-form-group">' +
+          '<label for="editSelectedVerse">Ayet-i Kerime</label>' +
+          '<textarea id="editSelectedVerse" class="kk-input" rows="3">' + escapeHtml(ev.selectedVerse || '') + '</textarea>' +
+          "</div>" +
+          '<div class="kk-form-group">' +
+          '<label for="editSelectedHadith">Hadis-i Şerif</label>' +
+          '<textarea id="editSelectedHadith" class="kk-input" rows="3">' + escapeHtml(ev.selectedHadith || '') + '</textarea>' +
+          "</div>" +
+          '<div style="display:flex;gap:1rem;">' +
+          '<button type="submit" class="kk-btn" id="saveEditBtn">Kaydet</button>' +
+          '<button type="button" class="kk-btn kk-btn-secondary" id="cancelEditBtn">İptal</button>' +
+          "</div>" +
+          "</form>" +
+          "</div>"
+      );
+
+      $("#cancelEditBtn").addEventListener("click", function () {
+        navigate("dashboard");
+      });
+
+      $("#editForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        var errorEl = $("#editError");
+        var successEl = $("#editSuccess");
+        hide(errorEl);
+        hide(successEl);
+        var btn = $("#saveEditBtn");
+        btn.disabled = true;
+        btn.textContent = "Kaydediliyor...";
+
+        try {
+          await api("/events/" + String(eventId), {
+            method: "PUT",
+            body: JSON.stringify({
+              bookName: $("#editBookName").value.trim(),
+              totalPages: parseInt($("#editTotalPages").value, 10),
+              duration: $("#editDuration").value.trim() || null,
+              location: $("#editLocation").value.trim() || null,
+              selectedVerse: $("#editSelectedVerse").value.trim() || null,
+              selectedHadith: $("#editSelectedHadith").value.trim() || null,
+            }),
+          });
+          successEl.textContent = "Etkinlik güncellendi! Panele yönlendiriliyorsunuz...";
+          show(successEl);
+          setTimeout(function () {
+            navigate("dashboard");
+          }, 1000);
+        } catch (err) {
+          errorEl.textContent = err.message;
+          show(errorEl);
+          btn.disabled = false;
+          btn.textContent = "Kaydet";
+        }
+      });
+    } catch (err) {
+      html(
+        "#editFormWrapper",
+        '<div class="kk-error" style="display:block">' + escapeHtml(err.message) + "</div>"
+      );
     }
   }
 

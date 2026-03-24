@@ -357,6 +357,37 @@ const server = http.createServer(async (req, res) => {
     return send(res, 200, { ok: true });
   }
 
+  /* Etkinlik güncelle */
+  const evEditMatch = pathname.match(/^\/api\/events\/([a-f0-9]+)$/);
+  if (method === 'PUT' && evEditMatch) {
+    const user = kkAuth(req);
+    if (!user) return sendError(res, 401, 'Giriş yapılmamış');
+    let body; try { body = await readBody(req); } catch(e) { return sendError(res, 400, e.message); }
+    const events = kkLoad(EVENTS_FILE);
+    const idx = events.findIndex(e => e.id === evEditMatch[1]);
+    if (idx === -1) return sendError(res, 404, 'Etkinlik bulunamadı');
+    if (events[idx].creatorId !== user.id) return sendError(res, 403, 'Sadece oluşturan kişi düzenleyebilir');
+    const { bookName, totalPages, duration, location, selectedVerse, selectedHadith } = body;
+    if (!bookName || !totalPages) return sendError(res, 400, 'Kitap adı ve sayfa sayısı zorunludur');
+    events[idx] = { ...events[idx], bookName, totalPages, duration: duration || null, location: location || null, selectedVerse: selectedVerse || null, selectedHadith: selectedHadith || null };
+    kkSave(EVENTS_FILE, events);
+    return send(res, 200, { ok: true });
+  }
+
+  /* Etkinlik sil */
+  if (method === 'DELETE' && evEditMatch) {
+    const user = kkAuth(req);
+    if (!user) return sendError(res, 401, 'Giriş yapılmamış');
+    const events = kkLoad(EVENTS_FILE);
+    const ev = events.find(e => e.id === evEditMatch[1]);
+    if (!ev) return sendError(res, 404, 'Etkinlik bulunamadı');
+    if (ev.creatorId !== user.id) return sendError(res, 403, 'Sadece oluşturan kişi silebilir');
+    kkSave(EVENTS_FILE, events.filter(e => e.id !== evEditMatch[1]));
+    const progress = kkLoad(PROGRESS_FILE);
+    kkSave(PROGRESS_FILE, progress.filter(p => p.eventId !== evEditMatch[1]));
+    return send(res, 200, { ok: true });
+  }
+
   /* ── 404 ── */
   sendError(res, 404, 'Endpoint bulunamadı');
 });
