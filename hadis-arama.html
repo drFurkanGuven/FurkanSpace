@@ -594,6 +594,7 @@ function buildCard(h, q, i) {
     <div class="card-bot">
       <span class="ref-txt">${h.ref ? refStr(h.ref) : ''}</span>
       <button class="btn-copy" data-t="${escAttr(h.text)}">kopyala</button>
+      <button class="btn-copy btn-share" data-bk="${h.bk}" data-no="${h.no}">paylaş</button>
     </div>
   `;
 
@@ -619,6 +620,15 @@ function buildCard(h, q, i) {
     navigator.clipboard.writeText(this.dataset.t).then(()=>{
       this.textContent='✓ kopyalandı'; this.classList.add('ok');
       setTimeout(()=>{ this.textContent='kopyala'; this.classList.remove('ok'); }, 2000);
+    });
+  });
+
+  // Share
+  div.querySelector('.btn-share').addEventListener('click', function(){
+    const shareUrl = location.origin + location.pathname + '?bk=' + this.dataset.bk + '&no=' + this.dataset.no;
+    navigator.clipboard.writeText(shareUrl).then(()=>{
+      this.textContent='✓ link kopyalandı'; this.classList.add('ok');
+      setTimeout(()=>{ this.textContent='paylaş'; this.classList.remove('ok'); }, 2000);
     });
   });
 
@@ -708,11 +718,28 @@ $('btnRandom').addEventListener('click', showRandom);
 $('btnDaily').addEventListener('click', ()=>{ $('list').innerHTML=''; $('meta').innerHTML=''; showDaily(); });
 
 // ── Init ──
-showDaily();
-$('list').innerHTML = `<div class="empty">
+(async function(){
+  const params = new URLSearchParams(location.search);
+  const bk = params.get('bk');
+  const no = params.get('no');
+  if (bk && no) {
+    try {
+      const d = await load(bk);
+      const h = (d.hadiths||[]).find(x => String(x.hadithnumber) === String(no));
+      if (h) {
+        $('list').innerHTML = '';
+        $('meta').innerHTML = '';
+        $('list').appendChild(buildCard({...h, bk, no: h.hadithnumber}));
+        return;
+      }
+    } catch(e) {}
+  }
+  showDaily();
+  $('list').innerHTML = `<div class="empty">
   <span class="empty-ara">اطلبوا العلم</span>
   Yukarıdan arama yapın veya sol menüden kitap seçin.
 </div>`;
+})();
 
 })();
 </script>
