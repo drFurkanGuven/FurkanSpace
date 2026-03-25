@@ -324,7 +324,7 @@
       ].join('');
     }
 
-    fetch('ders-notlari/data/index.json?_=' + Date.now())
+    fetch('/ders-notlari/data/index.json?_=' + Date.now())
       .then(function (r) {
         if (!r.ok) throw new Error('HTTP ' + r.status);
         return r.json();
