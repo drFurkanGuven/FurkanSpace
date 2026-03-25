@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="2. Sınıf 5. Kurul ders notları — Fizyoloji, Anatomi, Biyokimya, Histoloji & Embriyoloji." />
+  <title>Ders Notları | Furkan Güven</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>F</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ── KURUL BADGE ── */
+    .kurul-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.4rem 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+    .kurul-badge span { color: var(--highlight); }
+
+    /* ── DERS KARTLARI ── */
+    .ders-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .ders-item {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .ders-item:hover { border-color: #444; }
+    .ders-item.acik { border-color: var(--highlight); }
+
+    .ders-baslik {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.1rem 1.4rem;
+      background: var(--surface);
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s;
+      gap: 1rem;
+    }
+    .ders-baslik:hover { background: #1a1a1a; }
+
+    .ders-baslik-sol {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+
+    .ders-icon {
+      font-size: 1.3rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .ders-adi {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--accent);
+    }
+
+    .ders-not-sayisi {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 0.15rem 0.55rem;
+      border-radius: 3px;
+    }
+
+    .ders-ok {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      transition: transform 0.25s ease;
+      flex-shrink: 0;
+    }
+    .ders-item.acik .ders-ok { transform: rotate(90deg); }
+
+    /* ── NOT LİSTESİ (ACCORDION) ── */
+    .not-listesi {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+      background: var(--bg);
+      border-top: 1px solid transparent;
+    }
+    .ders-item.acik .not-listesi {
+      max-height: 2000px;
+      border-top-color: var(--border);
+    }
+
+    .not-listesi-ici {
+      padding: 0.6rem 0;
+    }
+
+    /* Not satırı */
+    .not-satir {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 0.85rem 1.4rem;
+      border-bottom: 1px solid var(--border);
+      transition: padding-left 0.2s, background 0.15s;
+      text-decoration: none;
+    }
+    .not-satir:last-child { border-bottom: none; }
+    .not-satir:hover {
+      background: var(--surface);
+      padding-left: 1.8rem;
+    }
+
+    .not-satir-sol {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .not-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .not-baslik-link {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 0.35rem;
+      text-decoration: none;
+    }
+    .not-baslik-link:hover { color: var(--highlight); text-decoration: none; }
+
+    .not-aciklama {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .not-etiketler {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.5rem;
+    }
+    .etiket {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 0.15rem 0.45rem;
+      border-radius: 3px;
+      color: var(--text-muted);
+    }
+
+    .not-ok {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      align-self: center;
+      flex-shrink: 0;
+      opacity: 0;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .not-satir:hover .not-ok {
+      opacity: 1;
+      transform: translateX(3px);
+    }
+
+    /* Boş durum */
+    .bos-durum {
+      padding: 1.5rem 1.4rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-style: italic;
+    }
+
+    /* Yükleniyor */
+    .yukleniyor {
+      color: var(--text-muted);
+      font-style: italic;
+      font-size: 0.9rem;
+      padding: 2rem 0;
+    }
+
+    /* Renk dot */
+    .ders-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="scroll-progress"></div>
+  <div class="container">
+    <header>
+      <div class="nav-wrapper">
+        <a href="index.html" class="logo">F. Güven</a>
+        <nav aria-label="Ana navigasyon">
+          <ul>
+            <li><a href="makaleler.html">/makaleler</a></li>
+            <li><a href="ders-notlari.html" class="active">/ders-notları</a></li>
+            <li><a href="laboratuvar.html">/laboratuvar</a></li>
+            <li><a href="hadis-arama.html">/hadis</a></li>
+            <li><a href="kuran-analiz-v2/">/kök-analiz</a></li>
+            <li><a href="kitap-kulubu/">/kitap-kulübü</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <h1 class="page-title fade-in">Ders Notları</h1>
+
+    <div class="kurul-badge fade-in">
+      <span>●</span> 2. Sınıf — 5. Kurul
+    </div>
+
+    <div class="ders-grid" id="dersGrid">
+      <p class="yukleniyor">Yükleniyor…</p>
+    </div>
+
+    <footer>
+      <div>© 2026 Furkan Güven</div>
+      <div><a href="https://github.com/drFurkanGuven" target="_blank" rel="noopener noreferrer">github</a></div>
+    </footer>
+  </div>
+
+  <a href="#" class="back-to-top" aria-label="Sayfanın başına dön">↑</a>
+  <script src="js/main.js" defer></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    function esc(s) {
+      return String(s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function formatTarih(d) {
+      if (!d) return '';
+      return new Date(d).toLocaleDateString('tr-TR', {
+        day: 'numeric', month: 'long', year: 'numeric'
+      });
+    }
+
+    function dersiToggle(dersId) {
+      var item = document.getElementById('ders-' + dersId);
+      if (!item) return;
+      item.classList.toggle('acik');
+    }
+
+    function dersHTMLOlustur(ders) {
+      var notSayisi = ders.notlar ? ders.notlar.length : 0;
+      var renk = esc(ders.renk || '#4a90e2');
+
+      // Not satırları
+      var notlarHTML = '';
+      if (notSayisi === 0) {
+        notlarHTML = '<div class="bos-durum">Henüz not eklenmemiş.</div>';
+      } else {
+        ders.notlar.forEach(function (not) {
+          var etiketlerHTML = (not.etiketler || [])
+            .map(function (e) { return '<span class="etiket">' + esc(e) + '</span>'; })
+            .join('');
+
+          notlarHTML += [
+            '<a class="not-satir" href="ders-notlari/' + esc(not.dosya) + '">',
+              '<div class="not-satir-sol">',
+                '<div class="not-meta">',
+                  (not.tarih ? '<span>' + esc(formatTarih(not.tarih)) + '</span>' : ''),
+                '</div>',
+                '<span class="not-baslik-link">' + esc(not.baslik) + '</span>',
+                (not.aciklama ? '<div class="not-aciklama">' + esc(not.aciklama) + '</div>' : ''),
+                (etiketlerHTML ? '<div class="not-etiketler">' + etiketlerHTML + '</div>' : ''),
+              '</div>',
+              '<span class="not-ok">→</span>',
+            '</a>',
+          ].join('');
+        });
+      }
+
+      return [
+        '<div class="ders-item fade-in" id="ders-' + esc(ders.id) + '">',
+          '<div class="ders-baslik" onclick="dersiToggle(\'' + esc(ders.id) + '\')">',
+            '<div class="ders-baslik-sol">',
+              '<div class="ders-dot" style="background:' + renk + ';box-shadow:0 0 6px ' + renk + '44"></div>',
+              '<span class="ders-icon">' + esc(ders.icon || '📄') + '</span>',
+              '<span class="ders-adi" style="color:' + renk + '">' + esc(ders.adi) + '</span>',
+              '<span class="ders-not-sayisi">' + notSayisi + ' not</span>',
+            '</div>',
+            '<span class="ders-ok">›</span>',
+          '</div>',
+          '<div class="not-listesi">',
+            '<div class="not-listesi-ici">',
+              notlarHTML,
+            '</div>',
+          '</div>',
+        '</div>',
+      ].join('');
+    }
+
+    fetch('ders-notlari/data/index.json?_=' + Date.now())
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (dersler) {
+        var grid = document.getElementById('dersGrid');
+        if (!dersler || dersler.length === 0) {
+          grid.innerHTML = '<p style="color:var(--text-muted)">Henüz ders eklenmemiş.</p>';
+          return;
+        }
+        grid.innerHTML = dersler.map(dersHTMLOlustur).join('');
+
+        // Notu olan ilk dersi otomatik aç
+        dersler.forEach(function (ders) {
+          if (ders.notlar && ders.notlar.length > 0) {
+            var item = document.getElementById('ders-' + ders.id);
+            if (item) item.classList.add('acik');
+          }
+        });
+
+        // fade-in tetikle
+        setTimeout(function () {
+          document.querySelectorAll('.fade-in').forEach(function (el) {
+            el.classList.add('visible');
+          });
+        }, 60);
+      })
+      .catch(function (err) {
+        document.getElementById('dersGrid').innerHTML =
+          '<p style="color:#ff6b6b;font-family:monospace">Ders listesi yüklenemedi: ' + err.message + '</p>';
+      });
+
+    // Global erişim için
+    window.dersiToggle = dersiToggle;
+  })();
+  </script>
+</body>
+</html>

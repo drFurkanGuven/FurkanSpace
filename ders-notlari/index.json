@@ -1,0 +1,38 @@
+[
+  {
+    "id": "fizyoloji",
+    "adi": "Fizyoloji",
+    "icon": "🫀",
+    "renk": "#4a90e2",
+    "notlar": []
+  },
+  {
+    "id": "anatomi",
+    "adi": "Anatomi",
+    "icon": "🦴",
+    "renk": "#e27c4a",
+    "notlar": []
+  },
+  {
+    "id": "biyokimya",
+    "adi": "Biyokimya",
+    "icon": "⚗️",
+    "renk": "#50c878",
+    "notlar": [
+      {
+        "baslik": "Hormonların Sınıflandırılması ve Etki Mekanizmaları",
+        "aciklama": "Sinyal yolakları, hipofiz anatomisi, hipotalamus hormonları, POMC ailesi, ADH ve Oksitosin",
+        "dosya": "biyokimya/hormonlar.html",
+        "tarih": "2026-03-25",
+        "etiketler": ["Endokrinoloji", "Sinyal Yolakları", "Hipofiz"]
+      }
+    ]
+  },
+  {
+    "id": "histo-embriyoloji",
+    "adi": "Histoloji & Embriyoloji",
+    "icon": "🔬",
+    "renk": "#c084fc",
+    "notlar": []
+  }
+]

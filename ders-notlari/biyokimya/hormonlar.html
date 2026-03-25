@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hormonlar — Ders Notu</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2335;
+    --border: #2a3050;
+    --accent: #4fc3f7;
+    --accent2: #81c784;
+    --accent3: #ffb74d;
+    --accent4: #f06292;
+    --accent5: #ce93d8;
+    --text: #e8eaf0;
+    --text2: #9ca3c0;
+    --red: #ef5350;
+    --teal: #26c6da;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.75;
+    padding: 0 0 80px 0;
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #0d1b2a 0%, #1a1040 50%, #0a1628 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at center, rgba(79,195,247,0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+    opacity: 0.8;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #fff 0%, #4fc3f7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+  .hero-sub {
+    color: var(--text2);
+    font-size: 15px;
+    font-style: italic;
+  }
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 28px;
+  }
+  .hero-tag {
+    background: rgba(79,195,247,0.1);
+    border: 1px solid rgba(79,195,247,0.25);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+  }
+
+  /* NAV */
+  .toc {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 40px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .toc-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text2);
+    margin-right: 8px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .toc a {
+    color: var(--text2);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .toc a:hover { background: var(--border); color: var(--text); }
+
+  /* LAYOUT */
+  .wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* SECTIONS */
+  .section {
+    margin-top: 60px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--border);
+    line-height: 1;
+    min-width: 60px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .section-subtitle {
+    font-size: 13px;
+    color: var(--text2);
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  /* PART DIVIDER */
+  .part-divider {
+    background: linear-gradient(135deg, #0d1b2a 0%, #1a1040 100%);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin: 60px 0 0 0;
+    padding: 30px 40px;
+    text-align: center;
+  }
+  .part-divider h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--text);
+  }
+  .part-divider p {
+    color: var(--text2);
+    font-size: 14px;
+    margin-top: 8px;
+    font-style: italic;
+  }
+
+  /* TERM CARDS */
+  .term-group {
+    margin-bottom: 36px;
+  }
+  .term-group-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+    padding-left: 12px;
+    border-left: 2px solid var(--accent);
+  }
+  .term-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-bottom: 12px;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 20px;
+    transition: border-color 0.2s;
+  }
+  .term-card:hover { border-color: #3a4570; }
+  .term-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent3);
+    padding-top: 2px;
+    line-height: 1.4;
+  }
+  .term-name small {
+    display: block;
+    font-size: 11px;
+    color: var(--text2);
+    font-weight: 400;
+    margin-top: 4px;
+  }
+  .term-body {}
+  .term-def {
+    color: var(--text);
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+  .memory-trick {
+    background: rgba(129,199,132,0.08);
+    border: 1px solid rgba(129,199,132,0.2);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--accent2);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin-top: 8px;
+  }
+  .memory-trick::before { content: '🧠'; font-size: 14px; flex-shrink: 0; }
+  .clinical-note {
+    background: rgba(239,83,80,0.07);
+    border: 1px solid rgba(239,83,80,0.2);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #ff8a80;
+    margin-top: 8px;
+  }
+  .clinical-note::before { content: '🩺 KLİNİK: '; font-weight: 600; }
+
+  /* NOTES SECTIONS */
+  .note-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+  }
+  .note-block h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .note-block h3 .icon { font-size: 1.2rem; }
+  .note-block h4 {
+    font-family: 'Source Serif 4', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 18px 0 8px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 13px;
+  }
+  .note-block p { color: var(--text); margin-bottom: 10px; font-size: 16px; }
+  .note-block ul { padding-left: 22px; margin-bottom: 12px; }
+  .note-block li { color: var(--text); margin-bottom: 6px; font-size: 15.5px; }
+  .note-block li::marker { color: var(--accent); }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    margin: 0 2px;
+  }
+  .tag-camp { background: rgba(79,195,247,0.15); color: var(--accent); }
+  .tag-ip3 { background: rgba(206,147,216,0.15); color: var(--accent5); }
+  .tag-cgmp { background: rgba(255,183,77,0.15); color: var(--accent3); }
+  .tag-tyr { background: rgba(129,199,132,0.15); color: var(--accent2); }
+  .tag-sti { background: rgba(129,199,132,0.15); color: var(--accent2); }
+  .tag-inh { background: rgba(239,83,80,0.15); color: #ff8a80; }
+  .tag-acid { background: rgba(255,183,77,0.15); color: var(--accent3); }
+  .tag-baz { background: rgba(79,195,247,0.15); color: var(--accent); }
+  .tag-dis { background: rgba(239,83,80,0.15); color: #ff8a80; }
+
+  .highlight-box {
+    background: rgba(79,195,247,0.05);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-size: 15px;
+  }
+  .highlight-box.warning {
+    background: rgba(239,83,80,0.05);
+    border-left-color: var(--red);
+    color: #ffcdd2;
+  }
+  .highlight-box.success {
+    background: rgba(129,199,132,0.05);
+    border-left-color: var(--accent2);
+  }
+  .highlight-box strong { color: var(--accent); }
+  .highlight-box.warning strong { color: #ff8a80; }
+  .highlight-box.success strong { color: var(--accent2); }
+
+  /* TABLE */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 14px;
+  }
+  th {
+    background: var(--surface2);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(42,48,80,0.5);
+    vertical-align: top;
+    color: var(--text);
+  }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* PATHWAY VISUAL */
+  .pathway {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px;
+    background: var(--surface2);
+    border-radius: 10px;
+    margin: 12px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  .pathway-step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    color: var(--text);
+  }
+  .pathway-arrow { color: var(--accent); font-size: 16px; }
+  .pathway-step.sti { border-color: rgba(129,199,132,0.4); color: var(--accent2); }
+  .pathway-step.inh { border-color: rgba(239,83,80,0.4); color: #ff8a80; }
+  .pathway-step.key { border-color: rgba(79,195,247,0.4); color: var(--accent); }
+
+  .hormone-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+    margin: 3px;
+  }
+  .hormone-pill.s { border-color: rgba(129,199,132,0.3); color: var(--accent2); }
+  .hormone-pill.i { border-color: rgba(239,83,80,0.3); color: #ff8a80; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 14px 0;
+  }
+  .mini-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .mini-card-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent3);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .mini-card p, .mini-card li { font-size: 14px !important; }
+
+  .emoji-list { list-style: none; padding-left: 0; }
+  .emoji-list li { padding-left: 0; margin-bottom: 6px; }
+  .emoji-list li::before { content: ''; }
+
+  footer {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text2);
+    font-size: 13px;
+    font-style: italic;
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+
+  @media (max-width: 700px) {
+    .term-card { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+    .toc { padding: 12px 20px; }
+    .hero { padding: 40px 20px 36px; }
+    .wrapper { padding: 0 16px; }
+    .note-block { padding: 20px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">Fizyoloji · Endokrinoloji</div>
+  <h1>Hormonların Sınıflandırılması<br>ve Etki Mekanizmaları</h1>
+  <div class="hero-sub">Cornell tekniği ile terim sözlüğü + kapsamlı öğrenci notu</div>
+  <div class="hero-tags">
+    <span class="hero-tag">Sinyal Yolakları</span>
+    <span class="hero-tag">Hipofiz</span>
+    <span class="hero-tag">Hipotalamus</span>
+    <span class="hero-tag">POMC</span>
+    <span class="hero-tag">ADH & Oksitosin</span>
+    <span class="hero-tag">GH · PRL · TSH · FSH · LH</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="toc">
+  <span class="toc-label">İçindekiler →</span>
+  <a href="#terimler">Terim Sözlüğü</a>
+  <a href="#sinyal">Sinyal Yolakları</a>
+  <a href="#hipofiz">Hipofiz Anatomisi</a>
+  <a href="#hipotalamus">Hipotalamus</a>
+  <a href="#on-hipo">Ön Hipofiz</a>
+  <a href="#arka-hipo">Arka Hipofiz</a>
+</div>
+
+<!-- ==================== BÖLÜM 1: TERİM SÖZLÜĞÜ ==================== -->
+<div class="part-divider" id="terimler">
+  <h2>📖 Terim Sözlüğü</h2>
+  <p>Cornell Tekniği — Ders notunu okumadan önce bu terimleri kavra.</p>
+</div>
+
+<div class="wrapper">
+
+  <!-- Sinyal Yolağı Terimleri -->
+  <div class="section">
+    <div class="term-group">
+      <div class="term-group-title">⚡ Sinyal Yolağı Terimleri</div>
+
+      <div class="term-card">
+        <div class="term-name">cAMP<small>Siklik Adenozin Monofosfat</small></div>
+        <div class="term-body">
+          <div class="term-def">Hücre içi "ikincil haberci" molekülü. Adenilat siklaz enzimi aracılığıyla ATP'den üretilir ve Protein Kinaz A'yı (PKA) aktive ederek hücresel yanıt başlatır.</div>
+          <div class="memory-trick">ATP → (adenilat siklaz) → cAMP → PKA aktif! Hormon mesajını ileten <em>posta şirketi</em> gibi düşün. Hormon = mektup, cAMP = kurye.</div>
+          <div class="clinical-note">Bu yolağı kullanan hormonları ezberle: <strong>CRH, GHRH, TSH, ACTH, FSH, LH, V2-ADH</strong> (hepsi uyarır). <strong>Somatostatin ve Dopamin (PIH)</strong> bu yolağı DÜŞÜRÜR.</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">cGMP<small>Siklik Guanozin Monofosfat</small></div>
+        <div class="term-body">
+          <div class="term-def">İkinci haberci; cAMP'nin kardeşi gibidir ama GTP'den yapılır. cGMP bağımlı protein kinazları aktive eder.</div>
+          <div class="memory-trick">Yalnızca <strong>ANF (Atriyal Natriüretik Faktör)</strong> bu yolağı kullanır. "Kalp hormonu → cGMP" diye ez.</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">G Proteini<small>Gs ve Gi</small></div>
+        <div class="term-body">
+          <div class="term-def">Zar reseptörüne bağlı olan, hücre içi iletim için aracı işlevi gören GTP-bağlayan proteinlerdir. <strong>Gs</strong> (stimülan) adenilat siklazı AÇAR → cAMP↑. <strong>Gi</strong> (inhibitör) adenilat siklazı KAPATIR → cAMP↓.</div>
+          <div class="memory-trick">S = Stimülan = cAMP artar. I = İnhibitör = cAMP azalır. G<u>s</u> → <u>s</u>iklik AMP artışı. G<u>i</u> → <u>i</u>nhibisyon.</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">IP₃ & DAG<small>İnozitol Trifosfat & Diaçilgliserol</small></div>
+        <div class="term-body">
+          <div class="term-def">Fosfolipaz C enzimi, zar fosfolipidi PIP₂'yi yıkarak IP₃ ve DAG oluşturur. <strong>IP₃</strong> → ER'den Ca²⁺ salınımı. <strong>DAG</strong> → Protein Kinaz C (PKC) aktivasyonu.</div>
+          <div class="memory-trick">PIP₂ yıkılır → "İki çocuk doğar": IP₃ (kalsiyum açar) + DAG (PKC'yi iter). Bu yolu kullananlar: <strong>TRH, GnRH, V1-ADH</strong> — "TGV treni" gibi ez!</div>
+          <div class="clinical-note">V1 (damarlar) = IP₃ → vazokonstrüksiyon. V2 (böbrek) = cAMP → su geri emilimi. Aynı hormon (ADH), farklı reseptörde farklı yol!</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Tirozin Kinaz Yolu</div>
+        <div class="term-body">
+          <div class="term-def">Reseptörün kendisi enzim aktivitesine sahiptir (intrensek kinaz). Hormon alfa alt birimine bağlanır → beta alt birimindeki tirozin kinaz aktive olur → otofosforilasyon gerçekleşir.</div>
+          <div class="memory-trick"><strong>İnsülin, büyüme faktörleri (IGF) ve GH</strong> bu yolu kullanır. "İnsülin ve Büyüme = Tirozin" diye ez. Bunlar büyüme sinyali veren hormonlardır.</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">İkincil Haberci<small>Second Messenger</small></div>
+        <div class="term-body">
+          <div class="term-def">Hücre zarından geçemeyen bir hormonun mesajını hücre içine aktaran küçük moleküllerdir. cAMP, cGMP, IP₃, DAG, Ca²⁺ ikincil habercilere örnektir.</div>
+          <div class="memory-trick">Hormon = birinci haberci (kapıya kadar gelir). cAMP = ikinci haberci (mesajı içeri taşır). Kapıcı analojisi!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hipofiz Anatomisi Terimleri -->
+    <div class="term-group">
+      <div class="term-group-title">🧠 Hipofiz & Anatomi Terimleri</div>
+
+      <div class="term-card">
+        <div class="term-name">Adenohipofiz<small>Ön Hipofiz</small></div>
+        <div class="term-body">
+          <div class="term-def">Hipofizin ön bölümü; hipotalamik hormonlar portal kan akımı ile buraya ulaşır ve 6 ana hormon salgılanır.</div>
+          <div class="memory-trick">"Adeno" = gland (bez). Adenohipofiz = BEZ hipofiz. Kendi sentezler ve salgılar. Ön = üreten.</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Nörohipofiz<small>Arka Hipofiz</small></div>
+        <div class="term-body">
+          <div class="term-def">Hipofizin arka bölümü; hormon üretmez! Hipotalamusta sentezlenen ADH ve Oksitosin'i sadece depolar ve salgılar.</div>
+          <div class="memory-trick">"Nöro" = sinir. Nörohipofiz = SİNİR hipofiz. Depocudur, üretici değil. "Arka = depo" olarak ez.</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Asidofil / Bazofil / Kromofob</div>
+        <div class="term-body">
+          <div class="term-def">Adenohipofiz hücrelerinin boyanma özelliğine göre sınıflandırılması. <strong>Asidofil</strong> (%40): GH, PRL üretir. <strong>Bazofil</strong> (%10): LH, FSH, TSH, ACTH, LPH üretir. <strong>Kromofob</strong> (%50): Granülsüz, aktif olmayan.</div>
+          <div class="memory-trick">Asidofil = A harfi = GH ve PRL (iki "büyük" hormon). Bazofil = B = Bütün glikoproteinler + ACTH. Kromofob = Çok fazla ama sessiz (%50 ama üretmiyor).</div>
+          <div class="clinical-note">Tümörde hücre tipine bakarak hangi hormonun fazla olduğunu tahmin edebilirsin!</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Portal Kan Akımı<small>Hipofizer Portal Sistem</small></div>
+        <div class="term-body">
+          <div class="term-def">Hipotalamik hormonların doğrudan kandan geçmeden önce bir portal sistem aracılığıyla adenohipofize ulaşmasını sağlayan özel damar ağı.</div>
+          <div class="memory-trick">Portal = kapı. Hipotalamus komutları "özel bir kapıdan" adenohipofize gider, kandan geçmez. Karaciğerin portal sistemine benzer.</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Negatif Geri Bildirim<small>Negative Feedback</small></div>
+        <div class="term-body">
+          <div class="term-def">Üretilen hormonun kendi salınımını baskılaması. Termostat gibi çalışır: Hedef bez hormonu yeterince üretince, hipotalamus ve hipofiz baskılanır.</div>
+          <div class="memory-trick">Termostat analojisi: Oda ısınca ısıtıcı kapanır. Kan kortizolü yükselince → CRH ↓ → ACTH ↓ → kortizol ↓. HPT, HPA, HPG aksları hep böyle çalışır.</div>
+          <div class="clinical-note">Negatif feedback bozulursa hastalık çıkar: Cushing'de kortizol yüksek ama ACTH baskılanmıyor (tümör otonom çalışıyor).</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Nörofizin</div>
+        <div class="term-body">
+          <div class="term-def">ADH ve Oksitosini hipotalamdan arka hipofize taşıyan taşıyıcı proteindir. Öncül molekül (prohormon) ile birlikte sentezlenir.</div>
+          <div class="memory-trick">Nörofizin = hormonun "taksi şoförü". ADH ve oksitosini hipotalamdan arka hipofize taşır, sonra ayrılır.</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Epifiz Plağı<small>Growth Plate / Büyüme Plağı</small></div>
+        <div class="term-body">
+          <div class="term-def">Kemik uçlarındaki kıkırdak bölge; kapanana kadar uzunlama büyüme gerçekleşir. Erişkinlikte kapanır.</div>
+          <div class="memory-trick">Epifiz plağı açıkken GH fazlası → GİGANTİZM (boy uzar). Plaklar kapandıktan sonra → AKROMEGALİ (yalnızca akral kemikler büyür: el, ayak, çene).</div>
+          <div class="clinical-note">Bu ayrım sınavda çok sorulan klasik sorudur!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hipotalamus Hormon Terimleri -->
+    <div class="term-group">
+      <div class="term-group-title">🔬 Hipotalamus Hormonları</div>
+
+      <div class="term-card">
+        <div class="term-name">TRH<small>Tirotropin Salgılatıcı Hormon</small></div>
+        <div class="term-body">
+          <div class="term-def">Tripeptit (3 amino asit); N-terminalinde piroglutamik asit içerir. IP₃/Ca/DAG yolunu kullanarak TSH salgılatır.</div>
+          <div class="memory-trick">TRH → TSH → Tiroid. "T silsilesi": TRH-TSH-T₃/T₄. Tripeptit olması özelliği sınavda önemli!</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">CRH<small>Kortikotropin Salgılatıcı Hormon</small></div>
+        <div class="term-body">
+          <div class="term-def">41 amino asitlidir. cAMP yoluyla ACTH, beta-endorfin ve alfa-lipotropin salgılatır (bunlar POMC ürünleridir).</div>
+          <div class="memory-trick">CRH → ACTH → Kortizol. Stres yolağı: "CRH stres sinyalini ACTH'a iletir." 41 amino asit = 4+1=5 harf = ACTH (diye uydurma ile ez)!</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">GHRH & Somatostatin<small>GH'ı Düzenleyenler</small></div>
+        <div class="term-body">
+          <div class="term-def"><strong>GHRH</strong> (44 aa): cAMP ile GH salgılatır — uyarır. <strong>Somatostatin (GHRIH)</strong>: GH salınımını inhibe eder; hipotalamusta 14 aa, diğer dokularda 28 aa formları vardır; cAMP'yi düşürür.</div>
+          <div class="memory-trick">GH'ın gaz pedalı = GHRH, freni = Somatostatin. "Somatostatin = STOP-statin" gibi düşün — dur anlamına gelir. Klinik: Somatostatin analoğu <strong>octreotide</strong> akromegali tedavisinde kullanılır!</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Dopamin (PIH)<small>Prolaktin İnhibitör Hormon</small></div>
+        <div class="term-body">
+          <div class="term-def">Prolaktini sürekli baskılayan ana hormondur. D2 reseptörüne bağlanarak Gi proteini üzerinden adenilat siklazı inhibe eder → cAMP düşer.</div>
+          <div class="memory-trick">"Dopamin prolaktini BEKÇİ gibi basar." Dopamin kesintiye uğrarsa (örn. antipsikotikler D2 bloke ederse) → Prolaktin yükselir → Galaktore!</div>
+          <div class="clinical-note">Antipsikotikler D2 reseptörünü bloke eder → PRL artar → kadında galaktore, erkekte jinekomasti. Klinik sınavda klasik soru!</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">GnRH<small>Gonadotropin Salgılatıcı Hormon</small></div>
+        <div class="term-body">
+          <div class="term-def">92 aa'lik prohormondan sentezlenen, 10 aa'lik aktif polipeptit. N-terminalinde piroglutamik asit. IP₃/Ca/DAG yoluyla FSH ve LH salgılatır.</div>
+          <div class="memory-trick">GnRH → FSH + LH → Gonadlar. "GnRH iki kardeşi (FSH ve LH) birlikte tetikler." Pulsatil salgılanma önemli; sürekli verilirse FSH/LH baskılanır (tıbbi kastrasyon)!</div>
+          <div class="clinical-note">Prostat kanserinde GnRH analoğu sürekli verilir → LH↓ → testosteron↓ → tıbbi kastrasyon.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ön Hipofiz Hormon Terimleri -->
+    <div class="term-group">
+      <div class="term-group-title">🟡 Ön Hipofiz Hormonları</div>
+
+      <div class="term-card">
+        <div class="term-name">IGF-1<small>Somatomedin C / İnsülin Benzeri Büyüme Faktörü</small></div>
+        <div class="term-body">
+          <div class="term-def">GH'ın karaciğerden salgılattığı asıl anabolik etki mediatörü. Kanda en çok IGFBP-3 proteinine bağlı taşınır.</div>
+          <div class="memory-trick">GH doğrudan büyütmez — IGF-1 üzerinden büyütür. "GH müdür, IGF-1 uygulayan mühendis." Laron cüceliğinde GH var ama IGF-1 yok (reseptör bozuk)!</div>
+          <div class="clinical-note">Laron cüceliği: GH ↑, IGF-1 ↓. Normal cücelik: GH ↓, IGF-1 ↓. Bu ayrım tanıda kritik!</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">POMC<small>Proopiomelanokortin</small></div>
+        <div class="term-body">
+          <div class="term-def">285 aa'lik büyük öncül molekül. Enzimlerle parçalanarak ACTH, MSH, Lipotropin, Endorfinler ve CLIP oluşturur. Lizin ve arginin kalıntıları kırpılma noktalarını belirler.</div>
+          <div class="memory-trick">POMC = bir fabrika, ürettiği ürünler farklı. "POMC'den 5 farklı ürün çıkar" diye ez: ACTH, MSH (α/β/γ), LPH, Endorfin, CLIP.</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Siyalik Asit<small>Glikoprotein Hormonlarda</small></div>
+        <div class="term-body">
+          <div class="term-def">TSH, FSH, LH, hCG gibi glikoprotein hormonların karbonhidrat kısmında bulunan şeker türevi. Hormonun yarı ömrünü belirler.</div>
+          <div class="memory-trick">Siyalik asit = hormonun "koruyu kalkanı." Daha fazla siyalik asit → Daha uzun yarı ömür. hCG en uzun yarı ömüre sahiptir (hamilelik testi bundan yapılır).</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Korpus Luteum</div>
+        <div class="term-body">
+          <div class="term-def">Ovulasyon sonrası foliküllün dönüştüğü sarı renkli endokrin yapı. Progesteron ve östrojen salgılar. LH bunu oluşturur, hCG ise gebelikte yaşatır.</div>
+          <div class="memory-trick">"Corpus luteum = sarı cisim (Latince: luteus = sarı)." LH olmadan → korpus luteum oluşmaz. hCG olmadan → ilk 6 haftada yıkılır ve gebelik düşer.</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">ABP<small>Androjen Bağlayıcı Protein</small></div>
+        <div class="term-body">
+          <div class="term-def">FSH'ın uyarımıyla testisin Sertoli hücrelerinde sentezlenir. Testosteron ve DHT'yi tübül lümeninde tutarak spermatogenez için yüksek konsantrasyon sağlar.</div>
+          <div class="memory-trick">ABP = testosteron için "tuzak." FSH → Sertoli → ABP → testosteronu tutar → sperm olgunlaşır.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hastalıklar Terimleri -->
+    <div class="term-group">
+      <div class="term-group-title">🩺 Klinik Terimler & Hastalıklar</div>
+
+      <div class="term-card">
+        <div class="term-name">Diabetes Insipidus<small>Şekersiz Diyabet</small></div>
+        <div class="term-body">
+          <div class="term-def">ADH yetersizliği veya ADH'a böbreğin yanıt vermemesi sonucu gelişir. Şiddetli poliüri (günde 15 L'ye kadar) ve polidipsi ile karakterizedir. İdrar şeker içermez (şekersiz).</div>
+          <div class="memory-trick">DI = "Dilüe idrar insanı." İki tipi: <strong>Nörojenik/Hipotalamik</strong> (ADH üretilmiyor) ve <strong>Nefrojenik</strong> (ADH var ama böbrek dinlemiyor — V2 reseptör bozuk). Tedavide: Nörojenik → ADH ver. Nefrojenik → ADH işe yaramaz!</div>
+          <div class="clinical-note">DM'den ayırt: DM'de idrar şekerli (glukozüri), DI'da şekersiz. İsim yanıltıcı ama mantıklı!</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Akromegali & Gigantizm</div>
+        <div class="term-body">
+          <div class="term-def"><strong>Gigantizm:</strong> Epifiz plakları kapanmadan GH fazlalığı → aşırı boy uzaması. <strong>Akromegali:</strong> Plaklar kapandıktan sonra GH fazlalığı → el, ayak, çene, alın büyümesi (akral = uç).</div>
+          <div class="memory-trick">Akromegali → "Akral büyüme" → uç kemikler. Sınavda "el-ayak boyutu artan, çene büyüyen hasta" = Akromegali. Çocukta = gigantizm, yetişkinde = akromegali.</div>
+          <div class="clinical-note">Akromegalide insülin direnci gelişir (GH diyabetojenik etki). GH adenomunu düşün!</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Cushing Sendromu</div>
+        <div class="term-body">
+          <div class="term-def">ACTH fazlalığı veya kortizol fazlalığına bağlı klinik tablo. Trunkal obezite, buffalo hörgücü (ense yağı), ay yüzü, striae, hipertansiyon, glikoz intoleransı.</div>
+          <div class="memory-trick">"Cushing = Her şey göbeğe birikir." Vücut ortası şişer, kollar-bacaklar incedir. Buffalo hörgücü unutan olmaz — ense yağ birikmesi.</div>
+          <div class="clinical-note">Cushing hastalığı (hipofizer ACTH tümörü) ≠ Cushing sendromu (geniş tanım). Sınav tuzağı!</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Laron Tipi Cücelik</div>
+        <div class="term-body">
+          <div class="term-def">Karaciğerdeki GH reseptörünün bozukluğu nedeniyle IGF-1 üretilememesi sonucu gelişen cücelik. GH yüksek, IGF-1 düşüktür.</div>
+          <div class="memory-trick">"GH elçiyi gönderiyor ama kapı açılmıyor." GH var, sinyal gitmiyor. Tedavide GH değil, IGF-1 ver!</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Guatr</div>
+        <div class="term-body">
+          <div class="term-def">Tiroid bezinin büyümesi. TSH'ın sürekli uyarısı tiroid hücrelerini çoğaltır, prizmatikleştirir ve bez hacmi artar.</div>
+          <div class="memory-trick">TSH sürekli vurursa tiroid şişer = Guatr. İyot eksikliğinde T₃/T₄ düşer → negatif feedback bozulur → TSH yükselir → Guatr. Endemik guatırın nedeni budur!</div>
+        </div>
+      </div>
+
+      <div class="term-card">
+        <div class="term-name">Galaktore & Amenore</div>
+        <div class="term-body">
+          <div class="term-def">Prolaktin yükselmesi sonucu kadında patolojik süt gelmesi (galaktore) ve adet kesilmesi (amenore); erkekte meme büyümesi (jinekomasti) ve empotans.</div>
+          <div class="memory-trick">Prolaktinoma veya antipsikotik ilaç → PRL ↑ → Kadında "süt-adet yok", Erkekte "meme büyür". PRL yüksekliği = üreme eksenini de baskılar (GnRH inhibe).</div>
+          <div class="clinical-note">Prolaktinomada ilk tedavi dopamin agonisti (kabergolin/bromokriptin), cerrahi değil!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== BÖLÜM 2: DERS NOTU ==================== -->
+<div class="part-divider" id="notlar">
+  <h2>📚 Öğrenci Ders Notu</h2>
+  <p>Hiç bilgi kaybı olmadan — tüm mekanizmalar, yapılar ve klinik detaylar</p>
+</div>
+
+<div class="wrapper">
+
+  <!-- KISIM 1: Sınıflandırma -->
+  <div class="section" id="sinyal">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <div>
+        <div class="section-title">Hormonların Sınıflandırılması & Sinyal Yolakları</div>
+        <div class="section-subtitle">Kimyasal yapı · Reseptör tipleri · İkincil haberciler</div>
+      </div>
+    </div>
+
+    <div class="note-block">
+      <h3><span class="icon">🧪</span> Kimyasal Yapıya Göre Sınıflandırma</h3>
+      <p>Hormonlar kimyasal yapılarına göre 3 ana gruba ayrılır:</p>
+
+      <div class="two-col">
+        <div class="mini-card">
+          <div class="mini-card-title">Amino Asit Türevleri</div>
+          <ul>
+            <li><strong>Tirozin kaynaklı:</strong> Katekolaminler (epinefrin, norepinefrin), Tiroid hormonları (T₃, T₄)</li>
+            <li><strong>Triptofan kaynaklı:</strong> Melatonin</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title">Peptit Hormonlar</div>
+          <ul>
+            <li>Kısa polipeptitler (ADH, oksitosin, insülin)</li>
+            <li>Glikoproteinler (TSH, FSH, LH, hCG)</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title">Lipit Türevleri</div>
+          <ul>
+            <li>Eikozanoidler (prostaglandinler)</li>
+            <li>Steroidler (kortizol, aldosteron, seks hormonları)</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title">Hedef Hücre Seçiciliği</div>
+          <p style="font-size:14px">Bir hücre, ancak o hormona özgü reseptör taşıyorsa yanıt verebilir. Reseptör = anahtar, hormon = kilit.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="note-block">
+      <h3><span class="icon">🔑</span> Reseptör Tipleri ve Etki Mekanizmaları</h3>
+
+      <h4>A) Hücre İçi Reseptörler (Sitoplazma/Çekirdek)</h4>
+      <p>Steroid ve tiroid hormonları lipofilik yapıda olduğundan hücre zarından geçebilir ve hücre içindeki reseptörlere bağlanır.</p>
+      <div class="pathway">
+        <span class="pathway-step key">Steroid/Tiroid Hormonu</span>
+        <span class="pathway-arrow">→</span>
+        <span class="pathway-step">Zar geçişi</span>
+        <span class="pathway-arrow">→</span>
+        <span class="pathway-step key">Çekirdek Reseptörü</span>
+        <span class="pathway-arrow">→</span>
+        <span class="pathway-step">DNA bağlanması (AP3 bölgesi)</span>
+        <span class="pathway-arrow">→</span>
+        <span class="pathway-step sti">mRNA sentezi</span>
+        <span class="pathway-arrow">→</span>
+        <span class="pathway-step sti">Yeni Protein Üretimi</span>
+      </div>
+      <div class="highlight-box">
+        <strong>Not:</strong> DNA'nın kromatininde histon olmayan AP3 bölgesine bağlanır. Bu yüzden steroid hormonların etkisi <em>gecikmiş ama uzun sürelidir</em> — yeni protein sentezi gerekir.
+      </div>
+
+      <h4>B) Zar Reseptörleri — 4 Farklı Yolak</h4>
+      <p>Polipeptit hormonlar hücre zarından geçemez; zar üzerindeki reseptörlere bağlanarak G proteini ya da enzim aracılığıyla etki gösterir.</p>
+
+      <!-- cAMP Yolu -->
+      <div class="highlight-box">
+        <strong>① Adenilat Siklaz / cAMP Yolu (en yaygın!)</strong><br>
+        Gs proteini → Adenilat siklaz aktive → ATP → <span class="tag tag-camp">cAMP</span> → PKA aktive → Hücresel yanıt<br><br>
+        <strong>Bu yolu KULLANAN (uyaran) hormonlar:</strong>
+        <div style="margin-top:8px">
+          <span class="hormone-pill s">CRH</span><span class="hormone-pill s">GHRH</span><span class="hormone-pill s">TSH</span><span class="hormone-pill s">ACTH</span><span class="hormone-pill s">FSH</span><span class="hormone-pill s">LH</span><span class="hormone-pill s">V2-ADH</span>
+        </div>
+        <div style="margin-top:8px"><strong>Bu yolu DÜŞÜREN (inhibe eden) hormonlar:</strong>
+          <div style="margin-top:8px">
+            <span class="hormone-pill i">Somatostatin (Gi)</span><span class="hormone-pill i">Dopamin/PIH (Gi, D2 reseptörü)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- IP3-DAG Yolu -->
+      <div class="highlight-box" style="border-left-color: var(--accent5); background: rgba(206,147,216,0.05);">
+        <strong>② Fosfolipaz C / IP₃-DAG Yolu</strong><br>
+        Gq proteini → Fosfolipaz C → PIP₂ yıkılır →
+        <span class="tag tag-ip3">IP₃</span> (ER'den Ca²⁺ çıkışı) +
+        <span class="tag tag-ip3">DAG</span> (PKC aktivasyonu)<br><br>
+        <strong>Kullanan hormonlar:</strong>
+        <span class="hormone-pill" style="border-color: rgba(206,147,216,0.3); color: var(--accent5);">TRH</span>
+        <span class="hormone-pill" style="border-color: rgba(206,147,216,0.3); color: var(--accent5);">GnRH</span>
+        <span class="hormone-pill" style="border-color: rgba(206,147,216,0.3); color: var(--accent5);">V1-ADH</span>
+        <span style="font-size:13px; color: var(--text2);">&nbsp;&nbsp;→ "TGV" formülü ile ez!</span>
+      </div>
+
+      <!-- cGMP Yolu -->
+      <div class="highlight-box" style="border-left-color: var(--accent3); background: rgba(255,183,77,0.05);">
+        <strong>③ cGMP Yolu</strong><br>
+        <span class="hormone-pill" style="border-color: rgba(255,183,77,0.3); color: var(--accent3);">ANF (Atriyal Natriüretik Faktör)</span>
+        → Guanilat siklaz → GTP → <span class="tag tag-cgmp">cGMP</span> → cGMP bağımlı protein kinazlar aktive
+      </div>
+
+      <!-- Tirozin Kinaz Yolu -->
+      <div class="highlight-box" style="border-left-color: var(--accent2); background: rgba(129,199,132,0.05);">
+        <strong>④ Tirozin Kinaz Yolu</strong><br>
+        <span class="hormone-pill s">İnsülin</span><span class="hormone-pill s">Büyüme Faktörleri (IGF)</span><span class="hormone-pill s">GH</span>
+        → Hormon alfa alt birimine bağlanır → Beta alt birimindeki tirozin kinaz aktive olur → Otofosforilasyon → Hücresel yanıt<br>
+        <span style="font-size:13px; color: var(--text2); margin-top:6px; display:block">Reseptörün kendisi enzim aktivitesine sahiptir (intrinsic kinase activity).</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- KISIM 2: Hipofiz Anatomisi -->
+  <div class="section" id="hipofiz">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <div>
+        <div class="section-title">Hipofiz Anatomisi & Hormon Salınım Düzeni</div>
+        <div class="section-subtitle">Lokalizasyon · Hücre tipleri · Aks sistemleri · Feedback</div>
+      </div>
+    </div>
+
+    <div class="note-block">
+      <h3><span class="icon">📍</span> Anatomik Lokalizasyon</h3>
+      <p>Hipofiz, <strong>optik kiazmanın arkasında</strong>, <strong>hipotalamusun altında</strong> yer alır ve hipofiz sapı ile hipotalamusa bağlıdır.</p>
+
+      <div class="two-col">
+        <div class="mini-card">
+          <div class="mini-card-title">Adenohipofiz (Ön Hipofiz)</div>
+          <ul>
+            <li>Hipotalamik hormonlar <strong>portal kan akımı</strong> ile ulaşır</li>
+            <li>Düzenleyici peptidleri sentezler ve salgılar</li>
+            <li>3 hücre tipi vardır</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title">Nörohipofiz (Arka Hipofiz)</div>
+          <ul>
+            <li>Hormon <strong>sentezlemez</strong></li>
+            <li>Hipotalamik hormonları (ADH, Oksitosin) <strong>depolar ve salgılar</strong></li>
+            <li>Paraventriküler + supraoptik çekirdeklerden gelir</li>
+          </ul>
+        </div>
+      </div>
+
+      <h4>Adenohipofiz Hücre Tipleri (Boyanma Özelliğine Göre)</h4>
+      <table>
+        <tr>
+          <th>Hücre Tipi</th>
+          <th>Oran</th>
+          <th>Salgıladığı Hormonlar</th>
+        </tr>
+        <tr>
+          <td><span class="tag tag-acid">Asidofil</span></td>
+          <td>%40</td>
+          <td>GH (Büyüme Hormonu), PRL (Prolaktin)</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-baz">Bazofil</span></td>
+          <td>%10</td>
+          <td>LH, FSH, TSH, ACTH, LPH (Lipotropin)</td>
+        </tr>
+        <tr>
+          <td><span class="tag">Kromofob</span></td>
+          <td>%50</td>
+          <td>Granülsüz / Aktif olmayan (yedek hücreler)</td>
+        </tr>
+      </table>
+
+      <h4>Endokrin Kontrol Sistemleri</h4>
+      <p>Hipotalamus-Hipofiz-Hedef bez eksenleri <strong>negatif geri bildirim (feedback)</strong> ile düzenlenir:</p>
+      <ul>
+        <li><strong>HPT Ekseni:</strong> Hipotalamik-Hipofizer-Tiroidal</li>
+        <li><strong>HPA Ekseni:</strong> Hipotalamik-Hipofizer-Adrenal</li>
+        <li><strong>HPG Ekseni:</strong> Hipotalamik-Hipofizer-Gonadal</li>
+      </ul>
+      <div class="highlight-box">
+        <strong>Salınım uyarı tipleri:</strong> Humoral (sıvısal — örn. Ca²⁺ düzeyi), Nöral (sinirsel), Hormonal (bir başka hormon aracılığıyla).
+      </div>
+    </div>
+  </div>
+
+  <!-- KISIM 3: Hipotalamus -->
+  <div class="section" id="hipotalamus">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <div>
+        <div class="section-title">Hipotalamus Hormonları</div>
+        <div class="section-subtitle">TRH · CRH · GHRH · Somatostatin · Dopamin · GnRH</div>
+      </div>
+    </div>
+
+    <div class="note-block">
+      <h3><span class="icon">🔬</span> Hipotalamik Releasing ve İnhibiting Hormonlar</h3>
+
+      <table>
+        <tr>
+          <th>Hormon</th>
+          <th>Yapı</th>
+          <th>Sinyal Yolağı</th>
+          <th>Etkisi</th>
+          <th>Hedef</th>
+        </tr>
+        <tr>
+          <td><strong>TRH</strong><br><small>Tirotropin Salgılatıcı</small></td>
+          <td>Tripeptit<br>N-terminali: piroglutamik asit</td>
+          <td><span class="tag tag-ip3">IP₃/Ca/DAG</span></td>
+          <td>↑ TSH</td>
+          <td>Adenohipofiz</td>
+        </tr>
+        <tr>
+          <td><strong>CRH</strong><br><small>Kortikotropin Salgılatıcı</small></td>
+          <td>41 amino asit</td>
+          <td><span class="tag tag-camp">cAMP</span></td>
+          <td>↑ ACTH, β-endorfin, α-lipotropin (POMC ürünleri)</td>
+          <td>Adenohipofiz</td>
+        </tr>
+        <tr>
+          <td><strong>GHRH</strong><br><small>GH Salgılatıcı</small></td>
+          <td>44 amino asit</td>
+          <td><span class="tag tag-camp">cAMP</span></td>
+          <td>↑ GH</td>
+          <td>Adenohipofiz</td>
+        </tr>
+        <tr>
+          <td><strong>Somatostatin (GHRIH)</strong><br><small>GH İnhibitör</small></td>
+          <td>Hipotalamusts: 14 aa<br>Diğer dokular: 28 aa</td>
+          <td><span class="tag tag-inh">↓ cAMP (Gi)</span></td>
+          <td>↓ GH (ve ↓ TSH, insülin, glukagon)</td>
+          <td>Adenohipofiz & diğer</td>
+        </tr>
+        <tr>
+          <td><strong>Dopamin (PIH)</strong><br><small>PRL İnhibitör</small></td>
+          <td>Katekolamin (amino asit türevi)</td>
+          <td><span class="tag tag-inh">↓ cAMP (Gi/D2)</span></td>
+          <td>↓ PRL (sürekli baskılar)</td>
+          <td>Adenohipofiz laktotroplar</td>
+        </tr>
+        <tr>
+          <td><strong>GnRH</strong><br><small>Gonadotropin Salgılatıcı</small></td>
+          <td>10 aa aktif form<br>(92 aa prohormondan)<br>N-terminali: piroglutamik asit</td>
+          <td><span class="tag tag-ip3">IP₃/Ca/DAG</span></td>
+          <td>↑ FSH, ↑ LH</td>
+          <td>Adenohipofiz gonadotroplar</td>
+        </tr>
+      </table>
+
+      <div class="highlight-box warning">
+        <strong>PRH (Prolaktin Salgılatıcı Hormon):</strong> Varlığı bilinir ancak tam kimliği henüz netleşmemiştir. Prolaktini uyaran ancak PIH (dopamin) kadar baskın değildir. Fizyolojik önemi sınırlıdır.
+      </div>
+    </div>
+  </div>
+
+  <!-- KISIM 4: Ön Hipofiz -->
+  <div class="section" id="on-hipo">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <div>
+        <div class="section-title">Ön Hipofiz Hormonları</div>
+        <div class="section-subtitle">GH · PRL · TSH · FSH · LH · hCG · POMC ailesi</div>
+      </div>
+    </div>
+
+    <!-- GH -->
+    <div class="note-block">
+      <h3><span class="icon">📈</span> 1. GH — Büyüme Hormonu (Somatotropin)</h3>
+
+      <div class="two-col">
+        <div class="mini-card">
+          <div class="mini-card-title">Yapısal Özellikler</div>
+          <ul>
+            <li>Asidofil somatotroplardan salgılanır</li>
+            <li><strong>191 amino asit</strong>, <strong>22 kDa</strong></li>
+            <li>2 disülfit bağı içerir</li>
+            <li>Tirozin kinaz yolunu kullanır</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title">Salınım Düzenleyicileri</div>
+          <ul>
+            <li class="emoji-list">⬆️ <strong>Uyaran:</strong> Hipoglisemi, stres, egzersiz, arjinin, GHRH, uyku</li>
+            <li class="emoji-list">⬇️ <strong>Baskılayan:</strong> Hiperglisemi (glukoz infüzyonu), glukokortikoidler, somatostatin, IGF-1</li>
+          </ul>
+        </div>
+      </div>
+
+      <h4>GH'ın Etkileri</h4>
+      <ul>
+        <li><strong>Protein sentezi:</strong> Uyarır → anabolik etki</li>
+        <li><strong>Lipoliz:</strong> Artırır (yağ yakımı)</li>
+        <li><strong>Mineral dengesi:</strong> Ca, Mg, P, Na, K, Cl retansiyonu sağlar</li>
+        <li><strong>Karbonhidrat metabolizması:</strong> Periferik glukoz kullanımını azaltır → insüline <strong>antagonist (diyabetojenik)</strong> etki → Uzun süre GH fazlalığında DM gelişebilir!</li>
+        <li><strong>İGF-1 (Somatomedin C) üretimi:</strong> Asıl anabolik etki karaciğerden salgılattığı IGF-1 üzerinden gerçekleşir.</li>
+      </ul>
+
+      <div class="highlight-box">
+        <strong>IGF-1 (Somatomedin C):</strong> Kanda en çok <strong>IGFBP-3</strong> proteinine bağlı dolaşır. GH'ın "icra kolu" denilebilir — GH komut verir, IGF-1 uygular.
+      </div>
+
+      <h4>GH Hastalıkları</h4>
+      <table>
+        <tr>
+          <th>Durum</th>
+          <th>GH</th>
+          <th>IGF-1</th>
+          <th>Klinik Tablo</th>
+        </tr>
+        <tr>
+          <td>GH eksikliği (çocuk)</td>
+          <td>↓</td>
+          <td>↓</td>
+          <td>Cücelik</td>
+        </tr>
+        <tr>
+          <td>Laron tipi cücelik</td>
+          <td>↑↑</td>
+          <td>↓↓</td>
+          <td>Hepatik GH reseptör eksikliği; GH yüksek ama etkisiz</td>
+        </tr>
+        <tr>
+          <td>GH fazlalığı (çocuk, plak açık)</td>
+          <td>↑</td>
+          <td>↑</td>
+          <td>Gigantizm (Devlik)</td>
+        </tr>
+        <tr>
+          <td>GH fazlalığı (yetişkin, plak kapalı)</td>
+          <td>↑</td>
+          <td>↑</td>
+          <td>Akromegali (akral kemikler büyür: el, ayak, çene, alın)</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- PRL -->
+    <div class="note-block">
+      <h3><span class="icon">🤱</span> 2. PRL — Prolaktin</h3>
+
+      <div class="two-col">
+        <div class="mini-card">
+          <div class="mini-card-title">Yapısal Özellikler</div>
+          <ul>
+            <li>Asidofil <strong>laktotrop</strong> hücrelerden salgılanır</li>
+            <li><strong>199 amino asit</strong></li>
+            <li><strong>3 disülfit bağı</strong> (GH'a yapısal olarak benzer)</li>
+            <li>Salınım <strong>pulsatildir</strong>; geceleri daha fazla</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title">Temel İşlevi</div>
+          <ul>
+            <li>Laktasyonu (süt oluşumunu) <strong>başlatır ve sürdürür</strong></li>
+            <li>Meme dokusunda laktalbümin gibi proteinlerin sentezini uyarır</li>
+            <li>Dopamin tarafından sürekli baskı altındadır</li>
+          </ul>
+        </div>
+      </div>
+
+      <h4>Prolaktin Fazlalığı (Hiperprolaktinemi)</h4>
+      <ul>
+        <li><strong>Kadında:</strong> Amenore + Galaktore (patolojik süt gelmesi)</li>
+        <li><strong>Erkekte:</strong> Jinekomasti (meme büyümesi) + Empotans</li>
+        <li>Nedenler: Prolaktinoma (prolaktin salgılayan hipofiz tümörü), dopamin antagonistleri (antipsikotikler)</li>
+      </ul>
+
+      <div class="highlight-box success">
+        <strong>hPL (Human Plasental Laktojen / Plasental Laktojen):</strong> Sinsitiotrofoblastlardan salınır. GH ve PRL etkilerini taklit eder. Gebelikte maternal metabolizmayı düzenler.
+      </div>
+    </div>
+
+    <!-- Glikoprotein Hormonlar -->
+    <div class="note-block">
+      <h3><span class="icon">🔗</span> 3. Glikoprotein Hormonlar — TSH, FSH, LH, hCG</h3>
+
+      <div class="highlight-box">
+        <strong>Ortak Yapısal Özellikler:</strong>
+        <ul style="margin-top:8px">
+          <li>Tümü <strong>iki alt birimlidir</strong> (α ve β)</li>
+          <li><strong>Alfa (α) alt birimi:</strong> TSH, FSH, LH ve hCG'de <em>aynıdır</em> (ortak)</li>
+          <li><strong>Beta (β) alt birimi:</strong> Her hormona özgüdür → biyolojik aktiviteyi belirler</li>
+          <li>Yapılarındaki karbonhidrat kısmındaki <strong>siyalik asit</strong> içeriği, hormonun yarı ömrünü belirler</li>
+          <li>Tümü <span class="tag tag-camp">cAMP</span> yolunu kullanır</li>
+        </ul>
+      </div>
+
+      <table>
+        <tr>
+          <th>Hormon</th>
+          <th>Ağırlık</th>
+          <th>Erkekte Etkisi</th>
+          <th>Kadında Etkisi</th>
+        </tr>
+        <tr>
+          <td><strong>FSH</strong><br><small>Folikül Stimüle Edici</small></td>
+          <td>30 kDa</td>
+          <td>Sertoli hücrelerinde <strong>ABP (Androjen Bağlayıcı Protein)</strong> sentezi ↑, Spermatogenezi uyarır</td>
+          <td>Over foliküllerinin büyümesini ve östrojen salınımını uyarır</td>
+        </tr>
+        <tr>
+          <td><strong>LH</strong><br><small>Lüteinizan Hormon</small></td>
+          <td>32 kDa</td>
+          <td>Testis <strong>Leydig hücrelerinden testosteron</strong> sentezini uyarır</td>
+          <td>Ovulasyonu tetikler; folikülü <strong>korpus luteum'a</strong> dönüştürür</td>
+        </tr>
+        <tr>
+          <td><strong>hCG</strong><br><small>Human Koryonik Gonadotropin</small></td>
+          <td>—</td>
+          <td colspan="2">Plasentada üretilir. Hamileliğin <strong>4–6. haftasında</strong> korpus luteumun devamlılığını sağlar. Gebelik testlerinde ölçülür.</td>
+        </tr>
+        <tr>
+          <td><strong>TSH</strong><br><small>Tiroid Stimulan Hormon</small></td>
+          <td>26.6 kDa</td>
+          <td colspan="2">Tirotropik hücrelerden salgılanır. Tiroid bezinden T₃ ve T₄ sentez ve salınımını düzenler (iyodun alınması, organifikasyon dahil). Sürekli uyarı → hücre çoğalması → beze büyümesi → <strong>Guatr</strong>.</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- POMC Ailesi -->
+    <div class="note-block">
+      <h3><span class="icon">🧩</span> 4. POMC (Proopiomelanokortin) Peptid Ailesi</h3>
+
+      <p><strong>285 amino asitlik</strong> büyük bir öncül moleküldür. Lizin ve arginin amino asitleri, enzimatik kırpılma noktalarını belirler. Farklı işlenerek birden fazla hormon oluşturur.</p>
+
+      <div class="highlight-box">
+        <strong>POMC'dan türeyen hormonlar:</strong> ACTH · α-MSH · β-MSH · γ-MSH · β-LPH · Endorfinler · Enkefalinler · CLIP
+      </div>
+
+      <h4>① ACTH (Adrenokortikotropik Hormon)</h4>
+      <ul>
+        <li><strong>39 amino asitli</strong>; biyolojik aktivite için ilk <strong>24 amino asit</strong> gerekli</li>
+        <li><span class="tag tag-camp">cAMP</span> yolunu kullanır</li>
+        <li>Adrenal kortekste:
+          <ul>
+            <li><strong>Zona fasikülata:</strong> Kortizol sentezini uyarır</li>
+            <li><strong>Zona retikülaris:</strong> Androjen sentezini uyarır</li>
+          </ul>
+        </li>
+        <li>Tropik etki: Bezi büyütür (steroidogenez)</li>
+      </ul>
+      <div class="highlight-box warning">
+        <strong>Cushing Sendromu:</strong> ACTH tümörü (Cushing hastalığı) veya kortizol fazlalığı → Trunkal obezite, buffalo hörgücü, hipertansiyon, glikoz intoleransı, ay yüzü, striae.
+      </div>
+
+      <h4>② MSH (Melanosit Stimüle Edici Hormon)</h4>
+      <ul>
+        <li>Alfa (α), beta (β), gamma (γ) formları vardır</li>
+        <li>Melanin dispersiyonunu ve melanogenezi uyarır → deri rengi koyulaşması</li>
+        <li><strong>α-MSH'ın dizilimi, ACTH'ın ilk 13 amino asiti ile aynıdır</strong> — Bu nedenle ACTH fazlalığında MSH benzeri etki → hiperpigmentasyon!</li>
+      </ul>
+
+      <h4>③ Lipotropin (β-LPH)</h4>
+      <ul>
+        <li><strong>91 amino asitlidir</strong></li>
+        <li>Adipoz dokuda lipoliz (yağ yıkımı) yapar</li>
+        <li>Endorfinlerin öncülüdür</li>
+      </ul>
+
+      <h4>④ Endorfinler ve Enkefalinler</h4>
+      <ul>
+        <li>Opioid reseptörlerine bağlanan endojen opiat peptidlerdir</li>
+        <li>Ağrı ve stres algısında rol oynar</li>
+        <li>Nörotransmitter işlevi görür</li>
+      </ul>
+
+      <h4>⑤ CLIP (Kortikotropin Benzeri Ara Lop Peptidi)</h4>
+      <ul>
+        <li>ACTH'ın <strong>18–39. amino asitlerini</strong> içerir</li>
+        <li>Pankreasta insülin salgısını uyarabilir</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- KISIM 5: Arka Hipofiz -->
+  <div class="section" id="arka-hipo">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <div>
+        <div class="section-title">Arka Hipofiz Hormonları</div>
+        <div class="section-subtitle">ADH (Vazopressin) · Oksitosin · Nörofizin</div>
+      </div>
+    </div>
+
+    <div class="note-block">
+      <h3><span class="icon">💧</span> Genel Özellikleri</h3>
+      <ul>
+        <li>Hipotalamustaki <strong>paraventriküler</strong> ve <strong>supraoptik çekirdekler</strong>de öncül molekül olarak sentezlenir</li>
+        <li><strong>Nörofizin</strong> adı verilen taşıyıcı proteinlere bağlanarak sinir uzantıları aracılığıyla arka hipofize taşınır ve depolanır</li>
+        <li>İkisi de <strong>9 amino asitlidir</strong></li>
+        <li>İlk 6 amino asit disülfit köprüsüyle bağlıdır</li>
+        <li>Aralarındaki fark yalnızca <strong>3. ve 8. amino asitlerdir</strong></li>
+      </ul>
+
+      <div class="two-col">
+        <div class="mini-card">
+          <div class="mini-card-title">ADH (Vazopressin)</div>
+          <p>3. pozisyon: Fenilalanin<br>8. pozisyon: Arginin</p>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title">Oksitosin</div>
+          <p>3. pozisyon: İzolösin<br>8. pozisyon: Lösin</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="note-block">
+      <h3><span class="icon">🫧</span> ADH (Antidiüretik Hormon / Vazopressin)</h3>
+
+      <h4>Salınımı Düzenleyen Faktörler</h4>
+      <div class="two-col">
+        <div class="mini-card">
+          <div class="mini-card-title">↑ ADH Uyaranlar</div>
+          <ul class="emoji-list">
+            <li>⬆️ Plazma osmolalitesi artışı</li>
+            <li>⬇️ Kan hacmi / basınç düşmesi</li>
+            <li>🚨 Stres, ağrı, bulantı</li>
+            <li>💊 Bazı ilaçlar (morfin vb.)</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title">↓ ADH Baskılayanlar</div>
+          <ul class="emoji-list">
+            <li>🍺 Etanol (alkol)</li>
+            <li>⬆️ Plazma volümü artışı</li>
+            <li>❄️ Soğuk</li>
+          </ul>
+        </div>
+      </div>
+
+      <h4>Reseptörler ve Etkileri</h4>
+      <table>
+        <tr>
+          <th>Reseptör</th>
+          <th>Lokalizasyon</th>
+          <th>Sinyal Yolağı</th>
+          <th>Etkisi</th>
+        </tr>
+        <tr>
+          <td><strong>V1</strong></td>
+          <td>Ekstrarenal (damarlar, karaciğer, trombositler)</td>
+          <td><span class="tag tag-ip3">IP₃/DAG</span> → Ca²⁺ ↑</td>
+          <td><strong>Vazokonstriksiyon</strong> → Kan basıncı ↑ (bu yüzden "vazopressin"!)</td>
+        </tr>
+        <tr>
+          <td><strong>V2</strong></td>
+          <td>Böbrek tübülleri (distal tüp + toplayıcı kanallar)</td>
+          <td><span class="tag tag-camp">cAMP</span></td>
+          <td><strong>Su geri emilimi</strong> → İdrar konsantrasyonu ↑, idrar miktarı ↓</td>
+        </tr>
+      </table>
+
+      <h4>Diabetes İnsipidus (DI)</h4>
+      <div class="two-col">
+        <div class="mini-card">
+          <div class="mini-card-title">Nörojenik/Hipotalamik DI</div>
+          <ul>
+            <li>ADH sentezi veya salınımı yetersiz</li>
+            <li>Tedavi: <strong>ADH ver</strong> (desmopressin)</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-title">Nefrojenik/Herediter DI</div>
+          <ul>
+            <li>Böbrekte V2 reseptör bozukluğu</li>
+            <li>ADH mevcut ama böbrek yanıtlamıyor</li>
+            <li>Tedavi: ADH işe yaramaz!</li>
+          </ul>
+        </div>
+      </div>
+      <div class="highlight-box warning">
+        <strong>Klinik:</strong> Şiddetli poliüri (günde 15 litreye kadar!) + Polidipsi. İdrar şeker içermez — DM'den böyle ayrılır. "Şekersiz diyabet" adı buradan gelir.
+      </div>
+    </div>
+
+    <div class="note-block">
+      <h3><span class="icon">🤰</span> Oksitosin</h3>
+
+      <h4>Ana İşlevleri</h4>
+      <ul>
+        <li><strong>Doğum sırasında:</strong> Uterus düz kaslarının kasılmasını kolaylaştırır (oxytocin = "hızlı doğum" anlamında)</li>
+        <li><strong>Emzirme döneminde:</strong> Meme bezi miyoepitelyal hücrelerini kastırarak sütün fışkırmasını (milk ejection reflex) sağlar</li>
+      </ul>
+
+      <h4>Oksitosin Salınımını Düzenleyenler</h4>
+      <table>
+        <tr>
+          <th>Uyaranlar (↑)</th>
+          <th>Baskılayanlar (↓)</th>
+        </tr>
+        <tr>
+          <td>
+            <ul>
+              <li><strong>Östrojen</strong> (reseptör sayısını ↑)</li>
+              <li><strong>Nörofizin-1</strong> (salınımı ↑)</li>
+              <li><strong>Emme refleksi</strong> (nöral impuls)</li>
+              <li><strong>Serviks gerilmesi</strong> (Ferguson refleksi)</li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><strong>Progesteron</strong> (reseptör miktarını ve salınımı inhibe eder)</li>
+            </ul>
+          </td>
+        </tr>
+      </table>
+
+      <div class="highlight-box success">
+        <strong>Klinik kullanım:</strong> Sentetik oksitosin (Syntocinon/Pitocin) doğumu başlatmak veya hızlandırmak için IV uygulanır. Postpartum kanamalarda da kullanılır.
+      </div>
+    </div>
+
+    <!-- ÖZET TABLO -->
+    <div class="note-block">
+      <h3><span class="icon">📋</span> Tüm Hipofiz Hormonları — Hızlı Özet Tablosu</h3>
+      <table>
+        <tr>
+          <th>Hormon</th>
+          <th>Kaynak</th>
+          <th>Yapı</th>
+          <th>Sinyal Yolağı</th>
+          <th>Temel Etki / Hastalık</th>
+        </tr>
+        <tr>
+          <td><strong>GH</strong></td>
+          <td>Ön hipofiz (asidofil)</td>
+          <td>191 aa, 22 kDa, 2 S-S</td>
+          <td>Tirozin kinaz (IGF-1 üzerinden)</td>
+          <td>Büyüme, anabolizm; ↑ → Gigantizm/Akromegali; ↓ → Cücelik</td>
+        </tr>
+        <tr>
+          <td><strong>PRL</strong></td>
+          <td>Ön hipofiz (asidofil)</td>
+          <td>199 aa, 3 S-S</td>
+          <td>JAK-STAT (tirozin kinaz benzeri)</td>
+          <td>Laktasyon; ↑ → Galaktore, amenore, jinekomasti</td>
+        </tr>
+        <tr>
+          <td><strong>TSH</strong></td>
+          <td>Ön hipofiz (bazofil)</td>
+          <td>Glikoprotein, α+β, 26.6 kDa</td>
+          <td>cAMP</td>
+          <td>Tiroid hormon sentezi; ↑ sürekli → Guatr</td>
+        </tr>
+        <tr>
+          <td><strong>FSH</strong></td>
+          <td>Ön hipofiz (bazofil)</td>
+          <td>Glikoprotein, α+β, 30 kDa</td>
+          <td>cAMP</td>
+          <td>Spermatogenez / Folikül gelişimi; ABP sentezi</td>
+        </tr>
+        <tr>
+          <td><strong>LH</strong></td>
+          <td>Ön hipofiz (bazofil)</td>
+          <td>Glikoprotein, α+β, 32 kDa</td>
+          <td>cAMP</td>
+          <td>Testosteron sentezi / Ovulasyon / Korpus luteum</td>
+        </tr>
+        <tr>
+          <td><strong>ACTH</strong></td>
+          <td>Ön hipofiz (bazofil)</td>
+          <td>39 aa (aktif ilk 24)</td>
+          <td>cAMP</td>
+          <td>Kortizol ve androjen sentezi; ↑ → Cushing</td>
+        </tr>
+        <tr>
+          <td><strong>ADH</strong></td>
+          <td>Arka hipofiz (hipotalamus sentezler)</td>
+          <td>9 aa, disülfit köprülü</td>
+          <td>V1: IP₃/DAG; V2: cAMP</td>
+          <td>Su dengesi, vazokonstriksiyon; ↓ → DI</td>
+        </tr>
+        <tr>
+          <td><strong>Oksitosin</strong></td>
+          <td>Arka hipofiz (hipotalamus sentezler)</td>
+          <td>9 aa, disülfit köprülü</td>
+          <td>IP₃/DAG (Gq)</td>
+          <td>Uterus kasılması, süt ejeksiyonu</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Bu not, derste geçen tüm bilgileri kapsamaktadır. Eksik veya hatalı gördüğünüz yerler için düzeltme ekleyebilirsiniz.<br>
+  Eksik olduğunu düşündüğünüz konular (örn. tiroid fizyolojisi, adrenal korteks hormonları) farklı ders notlarıyla tamamlanabilir.
+</footer>
+
+</body>
+</html>
