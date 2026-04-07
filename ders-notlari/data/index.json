@@ -20,12 +20,48 @@
     "renk": "#50c878",
     "notlar": [
       {
-        "baslik": "Hormonların Sınıflandırılması ve Etki Mekanizmaları",
+       	"baslik": "Hormonların Sınıflandırılması ve Etki Mekanizmaları",
         "aciklama": "Sinyal yolakları, hipofiz anatomisi, hipotalamus hormonları, POMC ailesi, ADH ve Oksitosin",
         "dosya": "biyokimya/hormonlar.html",
         "tarih": "2026-03-25",
         "etiketler": ["Endokrinoloji", "Sinyal Yolakları", "Hipofiz"]
+      },
+      {
+       	"baslik": "Tiroid Hormonları & Kalsiyum Metabolizması",
+        "aciklama": "Tiroglobulin, iyot metabolizması, T3/T4, TPO, PTH, Kalsitriol, RANKL, Kalsiyum hastalıkları",
+        "dosya": "biyokimya/tiroid_kalsiyum.html",
+        "tarih": "2026-04-02",
+        "etiketler": ["Tiroid", "Kalsiyum", "PTH", "D Vitamini"]
+      },
+      {
+       	"baslik": "Adrenal Korteks Hormonları",
+        "aciklama": "Steroid hormon biyosentezi, glukokortikoidler (kortizol), mineralokortikoidler (aldosteron), adrenal androjenler (DHEA)",
+        "dosya": "biyokimya/adrenal_korteks.html",
+        "tarih": "2026-04-03",
+        "etiketler": ["Adrenal Korteks", "Kortizol", "Aldosteron", "Endokrinoloji"]
+      },
+      {
+       	"baslik": "Adrenal Medulla Hormonları",
+        "aciklama": "Katekolamin biyosentezi (Tirozin yolağı), epinefrin ve norepinefrin etkileri, yıkım mekanizmaları (MAO ve COMT)",
+        "dosya": "biyokimya/adrenal_medulla.html",
+        "tarih": "2026-04-03",
+        "etiketler": ["Adrenal Medulla", "Katekolaminler", "Endokrinoloji"]
+      },
+      {
+       	"baslik": "Cinsiyet Bezi Hormonları",
+        "aciklama": "Androjen (T, DHT) ve östrojen (E1, E2, E3) sentez mekanizmaları, 5α-redüktaz ve aromataz yolakları, menstrüel siklus evreleri, gebelik endokrinolojisi (hCG, hPL) ve klinik sendroml>
+        "dosya": "biyokimya/cinsiyet_hormonlari.html",
+        "tarih": "2026-04-06",
+        "etiketler": ["Cinsiyet Hormonları", "Üreme Biyokimyası", "HPG Aksı", "Endokrinoloji", "Klinik"]
+      },
+      {
+        "baslik": "Pankreas Hormonları ve Metabolik Homeostaz",
+        "aciklama": "Langerhans adacıkları, insülin biyosentezi ve C peptid, glukagon ve cAMP kaskadı, somatostatin, pankreatik polipeptid (PP), Diabetes Mellitus (Tip 1/Tip 2) ve Diyabetik Ketoasidoz >
+        "dosya": "biyokimya/pankreas_hormonlari.html",
+        "tarih": "2026-04-07",
+        "etiketler": ["Pankreas", "İnsülin", "Glukagon", "Diabetes Mellitus", "Endokrinoloji", "DKA"]
       }
+
     ]
   },
   {
